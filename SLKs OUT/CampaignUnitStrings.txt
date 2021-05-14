@@ -1,0 +1,242 @@
+[Eevi]
+Name=Demon Hunter
+Hotkey=D
+Ubertip="Cunning Hero, adept at maneuvering through battles. Can learn Immolation, Evasion, Mana Burn, and Metamorphosis. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix= (Evil)
+Propernames=Illidan
+Revivetip=Revive |cffffcc00D|remon Hunter
+Awakentip=Revive |cffffcc00D|remon Hunter
+DependencyOr=Eevm
+[Eevm]
+Name=Demon Hunter
+Hotkey=D
+Ubertip="Cunning Hero, adept at maneuvering through battles. Can learn Immolation, Evasion, Mana Burn, and Metamorphosis. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix= (Evil)
+Propernames=Illidan
+Revivetip=Revive |cffffcc00D|remon Hunter
+Awakentip=Revive |cffffcc00D|remon Hunter
+[Efur]
+Name=Keeper of the Grove
+Hotkey=K
+Ubertip="Mystical Hero, adept at using nature spells. Can learn Entangling Roots, Force of Nature, Thorns Aura, and Tranquility. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Furion
+Revivetip=Revive |cffffcc00K|reeper of the Grove
+Awakentip=Revive |cffffcc00K|reeper of the Grove
+[Ekgg]
+Name=Keeper of the Grove
+Hotkey=G
+Ubertip="Mystical Hero, adept at using nature spells. Can learn Entangling Roots, Force of Nature, Thorns Aura, and Tranquility. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Ghost
+Revivetip=Revive |cffffcc00G|rhost
+Awakentip=Revive |cffffcc00G|rhost
+[Emfr]
+Name=Keeper of the Grove
+Hotkey=K
+Ubertip="Mystical Hero, adept at using nature spells. Can learn Entangling Roots, Force of Nature, Thorns Aura, and Tranquility. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Malfurion
+Revivetip=Revive |cffffcc00K|reeper of the Grove
+Awakentip=Revive |cffffcc00K|reeper of the Grove
+[Etyr]
+Name=Priestess of the Moon
+Hotkey=P
+Ubertip="Warrior Hero, adept at enhancing ranged attacks and slaying enemies from afar. Can learn Scout, Searing Arrows, Trueshot Aura, and Starfall. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Tyrande
+Revivetip=Revive |cffffcc00P|rriestess of the Moon
+Awakentip=Revive |cffffcc00P|rriestess of the Moon
+[Ewrd]
+Name=Warden
+Hotkey=W
+Ubertip="Cunning Hero, adept at entering and escaping combat. Can learn Blink, Fan of Knives, Shadow Strike and Vengeance. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Maiev
+Revivetip=Revive |cffffcc00W|rarden
+Awakentip=Revive |cffffcc00W|rarden
+[Hapm]
+Name=Paladin
+Hotkey=L
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Admiral Proudmoore
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[Harf]
+Name=Paladin
+Hotkey=L
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix= (wielding Frostmourne)
+Propernames=Arthas
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[Hgam]
+Name=Ghostly Archmage
+Hotkey=A
+Ubertip="Mystical Hero Spirit, adept at ranged assaults. Can learn Blizzard, Summon Water Elemental, Brilliance Aura and Mass Teleport. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Antonidas
+Revivetip=Revive Ghostly |cffffcc00A|rrchmage
+Awakentip=Revive Ghostly |cffffcc00A|rrchmage
+[Hjai]
+Name=Archmage
+Hotkey=A
+Ubertip="Mystical Hero, adept at ranged assaults. Can learn Blizzard, Summon Water Elemental, Brilliance Aura and Mass Teleport. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Jaina
+Revivetip=Revive |cffffcc00A|rrchmage
+Awakentip=Revive |cffffcc00A|rrchmage
+[Hkal]
+Name=Blood Mage
+Hotkey=B
+Ubertip="Mystical Hero, adept at controlling magic and ranged assaults. Can learn Flame Strike, Banish, Siphon Mana and Phoenix. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Kael
+Revivetip=Revive |cffffcc00B|rlood Mage
+Awakentip=Revive |cffffcc00B|rlood Mage
+[Hlgr]
+Name=Dark Knight
+Hotkey=L
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Lord Garithos
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[Hmbr]
+Name=Mountain King
+Hotkey=M
+Ubertip="Warrior Hero, adept at offensive combat and disrupting enemy troops. Can learn Storm Bolt, Thunder Clap, Bash and Avatar. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Muradin Bronzebeard
+Revivetip=Revive |cffffcc00M|rountain King
+Awakentip=Revive |cffffcc00M|rountain King
+[Huth]
+Name=Paladin
+Hotkey=L
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Uther
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[Hvwd]
+Name=Ranger
+Hotkey=P
+Propernames=Sylvanas Windrunner
+Revivetip=Revive |cffffcc00R|ranger
+Awakentip=Revive |cffffcc00R|ranger
+[Nbbc]
+Name=Blademaster
+Hotkey=B
+Ubertip="Cunning Hero, adept at quickly killing individual units and creating confusion among enemies. Can learn Mirror Image, Wind Walk, Critical Strike and Bladestorm. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Blademaster of Blackrock Clan
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+[Ocb2]
+Name=Tauren Chieftain
+Hotkey=T
+Ubertip="Warrior Hero, exceptional at absorbing damage and melee combat. Can learn Shockwave, War Stomp, Endurance Aura and Reincarnation. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix=(Expansion)
+Propernames=Cairne Bloodhoof
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[Ogrh]
+Name=Blademaster
+Hotkey=B
+Ubertip="Cunning Hero, adept at quickly killing individual units and creating confusion among enemies. Can learn Mirror Image, Wind Walk, Critical Strike and Bladestorm. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Grom Hellscream
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+[Opgh]
+Name=Blademaster
+Hotkey=B
+Ubertip="Cunning Hero, adept at quickly killing individual units and creating confusion among enemies. Can learn Mirror Image, Wind Walk, Critical Strike and Bladestorm. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix= (Possessed)
+Propernames=Grom Hellscream
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+[Orex]
+Name=Beastmaster
+Hotkey=B
+Tip=Summon |cffffcc00B|reastmaster
+Ubertip="Warrior Hero, adept at summoning beasts and rallying his allies. Can learn Summon Bear, Summon Quilbeast, Battle Roar, and Stampede. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Rexxar
+Revivetip=Revive |cffffcc00B|reastmaster
+Awakentip=Revive |cffffcc00B|reastmaster
+[Orkn]
+Name=Shadow Hunter
+Hotkey=S
+Tip=Summon |cffffcc00S|rhadow Hunter
+Ubertip="Cunning Hero, adept at healing magics and voodoo curses. Can learn Healing Wave, Hex, Serpent Ward and Big Bad Voodoo. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Rokhan
+Revivetip=Revive |cffffcc00S|rhadow Hunter
+Awakentip=Revive |cffffcc00S|rhadow Hunter
+[Othr]
+Name=Far Seer
+Hotkey=F
+Ubertip="Mystical Hero, effective at ranged attacks and scouting. Can learn Chain Lightning, Far Sight, Feral Spirit and Earthquake. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Thrall
+Revivetip=Revive |cffffcc00F|rar Seer
+Awakentip=Revive |cffffcc00F|rar Seer
+[Uear]
+Name=Death Knight
+Hotkey=D
+Ubertip="Warrior Hero, evil counterpart to the Human Paladin. Can learn Death Coil, Death Pact, Unholy Aura, and Animate Dead. |n|n|cffffcc00Attacks land units.|r"
+EditorSuffix= (Evil)
+Propernames=Arthas
+Revivetip=Revive |cffffcc00D|reath Knight
+Awakentip=Revive |cffffcc00D|reath Knight
+[Uktl]
+Name=Lich
+Hotkey=L
+Ubertip="Mystical Hero, particularly adept at cold magic. Can learn Frost Armor, Frost Nova, Dark Ritual and Death And Decay. |n|n|cffffcc00Attacks land and air units.|r"
+EditorSuffix= (Lich)
+Propernames=Kel'Thuzad
+Revivetip=Revive |cffffcc00L|rich
+Awakentip=Revive |cffffcc00L|rich
+[Umal]
+Name=Dreadlord
+Hotkey=E
+Ubertip="Cunning Hero, adept at controlling combat. Can learn Carrion Swarm, Sleep, Vampiric Aura, and Inferno. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Mal'Ganis
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[Utic]
+Name=Dreadlord
+Hotkey=E
+Ubertip="Cunning Hero, adept at controlling combat. Can learn Carrion Swarm, Sleep, Vampiric Aura, and Inferno. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Tichondrius
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[n00E]
+Name=OZ
+[n00F]
+Name=OZ
+[n00G]
+Name=OZ
+[n00H]
+Name=OZ
+[n00I]
+Name=OZ
+[n00J]
+Name=OZ
+[n00K]
+Name=OZ
+[n00L]
+Name=OZ
+[n00V]
+Name=Frost Trap
+[n010]
+Name=OZ
+[n011]
+Name=Saber Nero
+[n012]
+Name=Mimic
+[ncop]
+Name=Circle of Power
+Description=A small pedestal that glows with energy.
+Tip=Build Circle of Power
+[ncp3]
+Name=Circle of Power
+Description=A large pedestal that glows with energy.
+Tip=Build Circle of Power
+EditorSuffix=(large)
+[nfgl]
+Name=OZ
+[nmdm]
+Name=Medivh
+EditorSuffix= (Raven Form)
+[nmed]
+Name=Medivh
+[nzom]
+Name=Zombie
+Tip=Summon Zombie
+Ubertip="Light melee unit. |n|n|cffffcc00Attacks land units.|r"

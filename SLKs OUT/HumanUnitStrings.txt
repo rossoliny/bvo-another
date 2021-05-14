@@ -1,0 +1,735 @@
+[E003]
+Name=Captain of 10th Division
+Hotkey=P
+Tip=Summon |cffffcc00P|rriestess of the Moon
+Ubertip="Warrior Hero, adept at enhancing ranged attacks and slaying enemies from afar. Can learn Scout, Searing Arrows, Trueshot Aura, and Starfall. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Hitsugaya Toshiro
+Revivetip=Revive |cffffcc00P|rriestess of the Moon
+Awakentip=Revive |cffffcc00P|rriestess of the Moon
+[E004]
+Name=Time Reverser
+Hotkey=O
+Tip=Inoue |cffffcc00O|rrihime
+Ubertip="Orihime Inoue is a long-time classmate of Ichigo, linked to him by mutual friend Arisawa Tatsuki. She is effectively an orphan, as when she was 3, her older brother Sora left their abusive parents' home with Orihime and raised her on his own, later on, when Orihime was in middle school he died in a car accident.|nThough initially devoid of spiritual powers, she develops spiritual awareness early in the plot and later obtains one of the strongest powers in the universe, a god-like ability to reject time.|n|n|c000042ffStrength|r - 23 + 2|n|c000042ffAgility|r - 25 + 2.5|n|c00ff0303Intelligence|r - 42 + 4.5|n|n|cffffcc00Learns:|r|nKoten Zanshun|nSanten Kesshun|nSoten Kishun|nLight Flower|nTime Reverse|n|n|cffffcc00Default Ability:|r|nMagic Bounce|n|nAttack range of 650.|nMovement speed of 290."
+Propernames=Inoue Orihime
+Revivetip=Revive |cffffcc00G|rhost
+Awakentip=Revive |cffffcc00G|rhost
+[E005]
+Name=Last Quincy
+Hotkey=U
+Tip=Ishida |cffffcc00U|rryuu
+Ubertip="Uryuu is a Quincy, descendant of a line of priest-like hollow-hunting archers who were historical enemies of the Shinigamis. He bears a deep grudge against all Shinigamis including Ichigo, and is an early antagonist in the series. He comes to view Ichigo differently over time, however, eventually becoming a valuable ally and friendly rival.|n|n|c000042ffStrength|r - 25 + 2.25|n|c00ff0303Agility|r - 40 + 4.75|n|c000042ffIntelligence|r - 25 + 2|n|n|cffffcc00Learns:|r|nTriple Shot|nStrafe|nSeele Schneider|nSprenger|nGinrei Kojyaku|n|n|cffffcc00Default Ability:|r|nHirenkyaku|n|nAttack range of 800.|nMovement speed of 300."
+Propernames=Ishida Uryu
+Revivetip=Revive |cffffcc00K|reeper of the Grove
+Awakentip=Revive |cffffcc00K|reeper of the Grove
+[EC08]
+Name=Last Quincy
+Hotkey=U
+Tip=Ishida |cffffcc00U|rryu
+Ubertip="Uryu is a Quincy, descendant of a line of priest-like hollow-hunting archers who were historical enemies of the Shinigamis. He bears a deep grudge against all Shinigamis including Ichigo, and is an early antagonist in the series. He comes to view Ichigo differently over time, however, eventually becoming a valuable ally and friendly rival.|n|n|c000042ffStrength|r - 25 + 2.25|n|c00ff0303Agility|r - 35 + 4.5|n|c000042ffIntelligence|r - 30 + 2.25|n|n|cffffcc00Learns:|r|nGinrei Kojyaku|nLicht Regen|nSeele Schneider|nSprenger|nQuincy Final Form|n|n|cffffcc00Default Ability:|r|nHirenkyaku|n|nAttack range of 800.|nMovement speed of 300."
+Propernames=Ishida Uryu
+Revivetip=Revive |cffffcc00K|reeper of the Grove
+Awakentip=Revive |cffffcc00K|reeper of the Grove
+[EC12]
+Name=Captain of 10th Division
+Hotkey=H
+Tip=|cffffcc00H|ritsugaya Toshiro
+Ubertip="Hitsugaya's early life was spent in Junrinan, District 1 of Rokungai. Than he lived with his grandmother and Hinamori Momo. As a child, Hitsugaya has an icy demeanor that estranged himself from others.|nWith his natural talent, he entered Shinigami Academy in spite of his age and became known as prodigity, quickly ascending to Captain of 10th Division.|nHis Zanpakuto named Hyorinmaru which is the strongest of all ice element Zanpakuto in Soul Society.|n|n|c000042ffStrength|r - 30 + 2.75|n|c00ff0303Agility|r - 40 + 3.75|n|c000042ffIntelligence|r - 20 + 2.5|n|n|cffffcc00Learns:|r|nHyorinmaru|nIce Nova/Sennen Hyoro|nBankai: Daiguren Hyorinmaru|nRyusenka|nHyoten Hyakkaso|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 100 (melee).|nMovement speed of 300."
+Propernames=Hitsugaya Toshiro
+Revivetip=Revive |cffffcc00P|rriestess of the Moon
+Awakentip=Revive |cffffcc00P|rriestess of the Moon
+[H003]
+Name=Substitute Shinigami
+Hotkey=I
+Tip=Kurosaki |cffffcc00I|rchigo
+Ubertip="Ichigo is the primary protagonist of Bleach, orange-haired high school freshman Ichigo is forced to become a substitute Shinigami after unintentionally absorbing most of Rukia's powers. His cynical nature at first makes him ill-disposed towards the duty, but with the passage of time he comes to accept and welcome the strength his Zanpakuto powers give him, as it allows him to protect those close to him.|n|n|c00ff0303Strength|r - 35 + 4|n|c000042ffAgility|r - 35 + 3|n|c000042ffIntelligence|r - 20 + 2|n|n|cffffcc00Learns:|r|nGetsuga Tenshou|nReiatsu Blade|nBankai: Tensa Zangetsu + Hollow Mask|nBlack Moon Slash|nTrue Hollow Form|n|n|cffffcc00Default Ability:|r|nShunpo|n|nAttack range of 100 (melee).|nMovement speed of 290."
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H004]
+Name=Hollowfist Fighter
+Hotkey=S
+Tip=|cffffcc00S|rado Yasutora
+Ubertip="Known as Chad, is one of Ichigo's friends at school. He does not have awareness of ghosts at first, but this changes when he witnesses a group of children being attacked by a hollow. He discovers a unique ability that strengthens and armors his right arm, enabling him to fight hollows. He later develops the ability to shoot energy from his armored arm and also discovers that his left arm holds powerful offensive abilities.|n|n|c00ff0303Strength|r - 35 + 4|n|c000042ffAgility|r - 33 + 2.75|n|c000042ffIntelligence|r - 22 + 2.25|n|n|cffffcc00Learns:|r|nEl Directo|nShield Arm|nEarth Slam|nBrazo Izquierdo del Diablo|nLa Muerte|n|n|cffffcc00Default Ability:|r|nBash|n|nAttack range of 100 (melee).|nMovement speed of 290."
+Propernames=Sado Yasutora
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H00E]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H00I]
+Name=Hollow Incarnation
+Hotkey=V
+Tip=Z|cffffcc00a|rngetsu
+Ubertip="Zangetsu is the manifested spirit of Ichigo Kurosaki's Zanpakuto as well as his inner Hollow. He has been variously called Hollow Ichigo, more properly called The Hollow within Ichigo's conscience. Inherited from his mother, Masaki Kurosaki, Zangetsu represents the dark side of Ichigo's soul. He has stated himself to represent Ichigo's purest instincts.|n|n|c00ff0303Strength|r - 40 + 3.5|n|c000042ffAgility|r - 30 + 3.5|n|c000042ffIntelligence|r - 20 + 2|n|n|cffffcc00Learns:|r|nGetsuga Tenshou|nZangetsu Strike|nBankai: Tensa Zangetsu|nHigh Slam|nBlack Moon Slash|n|n|cffffcc00Default Ability:|r|nSonido|n|nAttack range of 100 (melee).|nMovement speed of 290."
+Propernames=Zangetsu
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H00J]
+Name=Hollow Incarnation
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Zangetsu
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H00U]
+Name=Hollowfist Fighter
+Hotkey=S
+Tip=|cffffcc00S|rado Yasutora
+Ubertip="............."|n|n|c00ff0303Strength|r - 40 + 4.25|n|c000042ffAgility|r - 30 + 3.75|n|c000042ffIntelligence|r - 20 + 2|n|n|cffffcc00Learns:|r|nEl Directo|nShield Arm|nEarth Slam|nBrazo Izquierdo del Diablo|nLa Muerte|n|n|cffffcc00Special Ability:|r|nBash|n|nAttack range of 100 (melee).|nMovement speed of 290.
+Propernames=Sado Yasutora
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01B]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01C]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01D]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01E]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01F]
+Name=Substitute Shinigami
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Kurosaki Ichigo
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[H01Q]
+Name=Vice-Captain of 6th Division
+Hotkey=J
+Tip=Abarai Ren|cffffcc00j|ri
+Ubertip="Renji starts out as an antagonist, but after his surprising defeat by Ichigo, saw the error of his ways and joined the fight alongside Ichigo's group.|nRenji is highly skilled in swordsmanship techniques, having trained under Madarame Ikkaku. He has increased his strength and skill to allow him to become a captain-level fighter, so as to achieve his dream. What makes Renji so effective is the unique method in which his Zanpakuto works, in the fact that his Zanpakuto is more of an amalgam of a whip and a sword.|n|n|c00ff0303Strength|r - 35 + 3.5|n|c000042ffAgility|r - 35 + 3.5|n|c000042ffIntelligence|r - 20 + 2|n|n|cffffcc00Learns:|r|nZabimaru|nHado #31: Shakkaho|nHiga Zekko|nBankai: Hihio Zabimaru|nHikotsu Taiho|n|n|cffffcc00Default Ability:|r|nShunpo|n|nAttack range of 120 (melee).|nMovement speed of 300."
+Propernames=Abarai Renji
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[Hamg]
+Name=Archmage
+Hotkey=A
+Tip=Summon |cffffcc00A|rrchmage
+Ubertip="Mystical Hero, adept at ranged assaults. Can learn Blizzard, Summon Water Elemental, Brilliance Aura and Mass Teleport. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Tenn Flamecaster,Nilas Arcanister,Andromath,Shal Lightbinder,Aran Spellweaver,Manath Magesinger,Landazar,Doril Magefont,Peril Spellbinder,Conjurus Rex,Fordred Aran,Dalar Dawnweaver,Kelen the Seeker
+Revivetip=Revive |cffffcc00A|rrchmage
+Awakentip=Revive |cffffcc00A|rrchmage
+[Hblm]
+Name=Blood Mage
+Hotkey=B
+Tip=Summon |cffffcc00B|rlood Mage
+Ubertip="Mystical Hero, adept at controlling magic and ranged assaults. Can learn Flame Strike, Banish, Siphon Mana and Phoenix. |n|n|cffffcc00Attacks land and air units.|r"
+Propernames=Eldin Sunstrider,Tanin Hawkwing,Lorn Bloodseeker,Aldos Firestar,Gilaras Drakeson,Hale Magefire,Kath'ranis Remar,Tyoril Sunchaser,Sylvos Windrunner,Tenris Mirkblood,Marakanis Starfury,Geldor Earthfire,Halendor Burnkin,Kelen the Destroyer
+Revivetip=Revive |cffffcc00B|rlood Mage
+Awakentip=Revive |cffffcc00B|rlood Mage
+[Hmkg]
+Name=Mountain King
+Hotkey=M
+Tip=Summon |cffffcc00M|rountain King
+Ubertip="Warrior Hero, adept at offensive combat and disrupting enemy troops. Can learn Storm Bolt, Thunder Clap, Bash and Avatar. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Bor Stonebreaker,Munin Ironcliff,Thorgas Broadaxe,Kelv Sternhammer,Grim Thunderbrew,Buri Frostbeard,Huginn Ironcliff,Thordin Rockbeard,Bandis Forgefire,Gar Doomforge,Beazel Bludstone,Modi Stonesmith,Aggronor the Mighty
+Revivetip=Revive |cffffcc00M|rountain King
+Awakentip=Revive |cffffcc00M|rountain King
+[Hpal]
+Name=Paladin
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Granis Darkhammer,Jorn the Redeemer,Sage Truthbearer,Malak the Avenger,Gavinrad the Dire,Morlune the Mighty,Agamand the True,Ballador the Bright,Manadar the Healer,Zann the Defender,Arius the Seeker,Aurrius the Pure,Karnwield the Seeker,Buzan the Fearless
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+[N00N]
+Name=6th Espada
+Hotkey=G
+Tip=|cffffcc00G|rrimmjow Jaguarjack
+Ubertip="......i am the king!"|n|n|c00ff0303Strength|r - 30 + 3.25|n|c000042ffAgility|r - 40 + 3.25|n|c000042ffIntelligence|r - 20 + 2.5|n|n|cffffcc00Learns:|r|nCero|nWild Strikes|nResurreccion - Pantera|nSonic Roar|nDesgarron|n|n|cffffcc00Default Ability:|r|nSonido|n|nAttack range of 100 (melee).|nMovement speed of 290.
+Propernames=Grimmjow Jaguarjack
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+[N00P]
+Name=6th Espada
+Hotkey=G
+Tip=|cffffcc00G|rrimmjow Jaguarjack
+Ubertip="......i am the king!"|n|n|c00ff0303Strength|r - 30 + 3.25|n|c000042ffAgility|r - 40 + 3.25|n|c000042ffIntelligence|r - 20 + 2.5|n|n|cffffcc00Learns:|r|nCero|nWild Strikes|nResurreccion - Pantera|nSonic Roar|nDesgarron|n|n|cffffcc00Default Ability:|r|nSonido|n|nAttack range of 100 (melee).|nMovement speed of 290.
+Propernames=Grimmjow Jaguarjack
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+[O000]
+Name=Goddess of Flash
+Hotkey=T
+Tip=Summon |cffffcc00T|rauren Chieftain
+Ubertip="Warrior Hero, exceptional at absorbing damage and melee combat. Can learn Shockwave, War Stomp, Endurance Aura and Reincarnation. |n|n|cffffcc00Attacks land units.|r"
+Propernames=Shihoin Yoruichi
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[O001]
+Name=Daughter of the Kuchiki Clan
+Hotkey=R
+Tip=Kuchiki |cffffcc00R|rukia
+Ubertip="Rukia is a Shinigami who is assigned hollow extermination duties in Ichigo's hometown. Though her physical appearance is that of a teenage girl, in reality she is ten times older than Ichigo. At the opening of the story, Rukia is forced to transfer her powers to Ichigo and assume a temporary lifestyle as a regular human. She registers at the local high school and takes up residence in Ichigo's closet, while teaching him how to be a substitute Shinigami in her place.|n|n|c000042ffStrength|r - 27 + 2.5|n|c00ff0303Agility|r - 40 + 4.25|n|c000042ffIntelligence|r - 23 + 2.25|n|n|cffffcc00Learns:|r|nSome no Mai: Tsukishiro|nHado #33: Sokatsui|nTsugi no Mai: Hakuren|nSan no Mai: Shirafune|nWhite Dance|n|n|cffffcc00Default Ability:|r|nShunpo|n|nAttack range of 100 (melee).|nMovement speed of 300."
+Propernames=Kuchiki Rukia
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[O002]
+Name=Captain of 2nd Division
+Hotkey=F
+Tip=Soi |cffffcc00F|ron
+Ubertip="She is the Captain of the 2nd Division. She is a hard worker who believes strongly in following orders. She is also outwardly antagonistic to her underlings, as she believes this keeps them on their toes.|nDuring her childhood, she served as a bodyguard of Shihoin Yoruichi, with whom she developed a close relationship.|n|n|c000042ffStrength|r - 25 + 2|n|c00ff0303Agility|r - 45 + 4.75|n|c000042ffIntelligence|r - 20 + 2.25|n|n|cffffcc00Learns:|r|nShikai: Suzumebachi|nWind Blast|nAssassinate|nShunko|nHomonka: Nigeki Kessatsu|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 100 (melee).|nMovement speed of 340."
+Propernames=Soi Fon
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[O003]
+Name=Captain of 2nd Division
+Hotkey=F
+Tip=Soi |cffffcc00F|rong
+Ubertip="............."|n|n|c000042ffStrength|r - 25 + 2|n|c00ff0303Agility|r - 45 + 4.75|n|c000042ffIntelligence|r - 20 + 2.25|n|n|cffffcc00Learns:|r|nSuzumebachi|nWind Blast|nAssassinate|nShunkou|nHomonka - Nigeki Kessatsu|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 100 (melee).|nMovement speed of 340.
+Propernames=Soi Fon
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[OC10]
+Name=Goddess of Flash
+Hotkey=Y
+Tip=Shihoin |cffffcc00Y|roruichi
+Ubertip="Having been the former Captain of the 2nd Division, she is very knowledgeable of the Soul Society. A century ago, she abandoned her post and escape to the human world.|nYoruichi is very skilled in the use of shunpo so that she is known as the Goddess of Flash. She is also skilled with flash release, a technique that combines hand-to-hand combat and kido abilities.|n|n|c000042ffStrength|r - 20 + 2|n|c00ff0303Agility|r - 50 + 5|n|c000042ffIntelligence|r - 20 + 2|n|n|cffffcc00Learns:|r|nFlash Bolt|nFlash Counter|nFlash Strike|nShunko|nFlash Combo|n|n|cffffcc00Default Ability:|r|nShunpo (highest level)|n|nAttack range of 100 (melee).|nMovement speed of 340."
+Propernames=Shihoin Yoruichi
+Revivetip=Revive |cffffcc00T|rauren Chieftain
+Awakentip=Revive |cffffcc00T|rauren Chieftain
+[U004]
+Name=Captain of 11th Division
+Hotkey=Z
+Tip=|cffffcc00Z|raraki Kenpachi
+Ubertip=Zaraki is the most recent captain of the 11th division. Like all of his predecessors he has earned the title of 'Kenpachi' meaning that he is the strongest swordman among all of the Shinigamis.|nKenpachi is the only Captain of Gotei 13 who doesn't know the name of his sword nor can use his Bankai. In addition he never uses Kidou and rarely uses Shunpo.|n|n|c00ff0303Strength|r - 45 + 4.25|n|c000042ffAgility|r - 30 + 2.75|n|c000042ffIntelligence|r - 15 + 2|n|n|cffffcc00Learns:|r|nHardened Skin|nThrilling Reiatsu|nCrazy Jump|nRelease Eye Patch|nKendo Slash|n|n|cffffcc00Default Ability:|r|nZanpakutou Empower|n|nAttack range of 120 (melee).|nMovement speed of 290.
+Propernames=Zaraki Kenpachi
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U005]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="I want to fight and die under 'his' command"|n|n|c00ff0303Strength|r - 40 + 3.75|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai - Ryuumon Hoozukimaru|nDragon Charge|nFinal Rage|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 310.
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U006]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="I want to fight and die under 'his' command"|n|n|c00ff0303Strength|r - 40 + 3.75|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai - Ryuumon Hoozukimaru|nDragon Charge|nFinal Rage|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 310.
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U007]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="I want to fight and die under 'his' command"|n|n|c00ff0303Strength|r - 40 + 3.75|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai - Ryuumon Hoozukimaru|nDragon Charge|nFinal Rage|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 310.
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U008]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="I want to fight and die under 'his' command"|n|n|c00ff0303Strength|r - 40 + 3.75|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai - Ryuumon Hoozukimaru|nDragon Charge|nFinal Rage|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 310.
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U00A]
+Name=Ex-Captain of 9th Division
+Hotkey=T
+Tip=|cffffcc00T|rosen Kaname
+Ubertip="He was formerly the blind Captain of the 9th Division of the Gotei 13, he has since left Soul Society after it is revealed that he was a co-conspirator working for recently revealed traitor Sosuke Aizen. He has since become a Commander in Aizen's Army of Arrancar. Tosen follows a personal philosophy which shapes his outlook on life, stating he follows the path that leads to the least bloodshed.|n|n|c000042ffStrength|r - 30 + 3.25|n|c00ff0303Agility|r - 30 + 3.75|n|c000042ffIntelligence|r - 30 + 2|n|n|cffffcc00Learns:|r|nSuzumushi|nSpiritual Sense|nHado #54: Haien|nBenihiko|nBankai: Enma Korogi|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 110 (melee).|nMovement speed of 320."
+Propernames=Tosen Kaname
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U00S]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="Ikkaku is the 3rd Seat of 11th Division. He is a bald, battle-loving man. He fought and was defeated by Zaraki Kenpachi sometime in the past, though was strong enough to survive the battle. Once Zaraki became captain of the 11th Division, Ikkaku and his friend Yumichika joined the 11th Division.|nHe is basically the second strongest man in 11th Division. Though strong enough to take a position as a captain, ikkaku insists his one mission in life to die under Zaraki's command.|n|n|c00ff0303Strength|r - 40 + 4|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai: Ryumon Hozukimaru|nDragon Charge|nFinal Madness|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 320."
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U00T]
+Name=3rd Seat of 11th Division
+Hotkey=M
+Tip=|cffffcc00M|radarame Ikkaku
+Ubertip="I want to fight and die under 'his' command"|n|n|c00ff0303Strength|r - 40 + 3.75|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nGreat Cleave|nCounter|nBankai - Ryuumon Hoozukimaru|nDragon Charge|nFinal Rage|n|n|cffffcc00Default Ability:|r|nWeapon Master|n|nAttack range of 128 (melee).|nMovement speed of 310.
+Propernames=Madarame Ikkaku
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U00U]
+Name=Former 3rd Espada
+Hotkey=N
+Tip=|cffffcc00N|reliel Tu Oderschvank
+Ubertip="Proclaim....Gamuza!!"|n|n|c00ff0303Strength|r - 30 + 3|n|c000042ffAgility|r - 35 + 3.75|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nCero Doble|nDashing Strike|nResurreccion - Gamuza|nRapid Strike|nLanzador Verde|n|n|cffffcc00Default Ability:|r|nCombat Master|n|nAttack range of 100 (melee).|nMovement speed of 320.
+Propernames=Neliel Tu Oderschvank
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[U00V]
+Name=Former 3rd Espada
+Hotkey=N
+Tip=|cffffcc00N|reliel Tu Oderschvank
+Ubertip="Proclaim....Gamuza!!"|n|n|c00ff0303Strength|r - 30 + 3|n|c000042ffAgility|r - 35 + 3.75|n|c000042ffIntelligence|r - 25 + 2.25|n|n|cffffcc00Learns:|r|nCero Doble|nDashing Strike|nResurreccion - Gamuza|nRapid Strike|nLanzador Verde|n|n|cffffcc00Default Ability:|r|nCombat Master|n|nAttack range of 100 (melee).|nMovement speed of 320.
+Propernames=Neliel Tu Oderschvank
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[UC11]
+Name=Captain of 1st Division
+Hotkey=G
+Tip=Shigekuni Yamamoto-|cffffcc00G|renryusai
+Ubertip="Genryusai is the Captain of the 1st Division and the leader of Gotei 13. He is an oldman with a very muscular body. He believes that laws must be upheld for the benefit of the community and despises those who break them.|nHis Zanpakuto is the most powerful fire-based Zanpakuto in Soul Society, and the sheer power of the flame can disintegrate almost anything the sword is waved at.|n|n|c00ff0303Strength|r - 40 + 4|n|c000042ffAgility|r - 25 + 3|n|c000042ffIntelligence|r - 25 + 2|n|n|cffffcc00Learns:|r|nShikai: Ryujinjakka|nFlame Sweep|nFire Slash|nJokaku Enjo|nFirst Form: Nadegiri|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 100 (melee).|nMovement speed of 310."
+Propernames=Yamamoto Genryusai
+Revivetip=Revive Dr|cffffcc00e|radlord
+Awakentip=Revive Dr|cffffcc00e|radlord
+[UC13]
+Name=Captain of 6th Division
+Hotkey=B
+Tip=Kuchiki |cffffcc00B|ryakuya
+Ubertip="Byakuya is the 28th head of the noble Kuchiki clan, one of the four great noble families in Soul Society. Becomes captain after his grandfather, Kuchiki Ginrei, vacates his captaincy.|nHe acts in an aristocratic manner, extremely calm, even in battle. He also strongly believes in law and orders.|nByakuya is skilled in all forms of Shinigami combat. In keeping with his rank, Byakuya's abilities allow him to defeat opponents without much effort.|n|n|c000042ffStrength|r - 30 + 3.25|n|c00ff0303Agility|r - 30 + 3.5|n|c000042ffIntelligence|r - 30 + 2.25|n|n|cffffcc00Learns:|r|nSenbonzakura|nBakudo #61: Rikujo Koro|nBankai: Senbonzakura Kageyoshi|nSenkei|nShukei Hakuteiken|n|n|cffffcc00Default Ability:|r|nShunpo (high level)|n|nAttack range of 100 (melee).|nMovement speed of 300."
+Propernames=Kuchiki Byakuya
+Revivetip=Revive |cffffcc00D|reath Knight
+Awakentip=Revive |cffffcc00D|reath Knight
+[h000]
+Name=Volley Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h001]
+Name=Hotarubi
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h002]
+Name=Entei ball
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h005]
+Name=Ice Pillar
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h006]
+Name=Senkei Blade
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h007]
+Name=Entei Explosion 2
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h008]
+Name=Robin Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h009]
+Name=Sprenger Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00A]
+Name=Luffy Punch
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00B]
+Name=Entei Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00C]
+Name=Fire Boshi
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00D]
+Name=Zoro Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00F]
+Name=Kenpachi Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00G]
+Name=Mihawk Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00H]
+Name=Aizen Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00K]
+Name=Zangetsu Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00L]
+Name=Zangetsu Bankai Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00M]
+Name=Ice Sparks
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00N]
+Name=Joukaku Fire Wall
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00O]
+Name=Yellow Sphere 
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00P]
+Name=Senbonzakura Sword
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00Q]
+Name=METEOR BIRTH DUMMY
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00R]
+Name=METEOR DUMMY
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00S]
+Name=Wind Effect
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00T]
+Name=Wind Effect 2
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00V]
+Name=Nagashi Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00W]
+Name=Goukakyuu Ball
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h00X]
+Name=Kirin Thunder
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h013]
+Name=Little Ice
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h014]
+Name=Thick Ice
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h015]
+Name=Ice Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h016]
+Name=Hyourinmaru
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h017]
+Name=Sound Wave
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h018]
+Name=Brook Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h019]
+Name=Senkei Explosion
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01A]
+Name=Soukatsui Missile
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01G]
+Name=Ice Nova
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01H]
+Name=Kenpachi Kendo Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01I]
+Name=Licht Missile
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01J]
+Name=Flash Arrow Missile
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01K]
+Name=Cloud Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01L]
+Name=Raigou Ball
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01M]
+Name=Cyclone
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01N]
+Name=Thunder Ball
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01O]
+Name=Thunder cloud
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01P]
+Name=Fire Wave
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01R]
+Name=Zabimaru Blade
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01S]
+Name=Zabimaru Missile A
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01T]
+Name=Zabimaru Missile B
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01U]
+Name=Zabimaru Segment
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01V]
+Name=Zabimaru Head
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01W]
+Name=Hollow Ichigo Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01X]
+Name=Yellow Laser
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01Y]
+Name=Cute Paw
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h01Z]
+Name=Sand Tornado
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h020]
+Name=Benihiko Blade
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h021]
+Name=Enma Kourogi
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h022]
+Name=Phoenix Wave
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[h023]
+Name=Sand Shockwave
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[halt]
+Name=Altar of Kings
+Hotkey=A
+Tip=Build |cffffcc00A|rltar of Kings
+Ubertip="Summons Heroes. Revives slain Heroes."
+[harm]
+Name=Recipe Shop 3
+Hotkey=W
+Tip=Build |cffffcc00W|rorkshop
+Ubertip="Produces Siege Engines, Flying Machines, and Mortar Teams. |nAlso contains the Flare, Fragmentation Shards, Barrage, Flying Machine Bombs, and Flak Cannons upgrades."
+[hars]
+Name=Item Shop 3
+Hotkey=R
+Tip=Build A|cffffcc00r|rcane Sanctum
+Ubertip="Trains Priests, Sorceresses, and Spell Breakers. |nAlso contains spell upgrades for Priests and Sorceresses, Control Magic, and Magic Sentry."
+[hbar]
+Name=Barracks
+Hotkey=B
+Tip=Build |cffffcc00B|rarracks
+Ubertip="Primary troop production building. Trains Footmen, Riflemen and Knights. |nAlso contains the Defend, Long Rifles, and Animal War Training upgrades."
+[hbla]
+Name=Recipe Shop 4
+Hotkey=S
+Tip=Build Black|cffffcc00s|rmith
+Ubertip="Contains upgrades for improved armor, weaponry and gunpowder."
+[hcas]
+Name=Castle
+Hotkey=U
+Tip=|cffffcc00U|rpgrade to Castle
+Ubertip="Upgrade to Castle to enable the production of additional types of structures and units."
+[hctw]
+Name=Black Market
+Hotkey=C
+Tip=Upgrade to |cffffcc00C|rannon Tower
+Ubertip="Heavy defensive structure. Particularly effective against clusters of troops. Can learn the Magic Sentry ability. |n|n|cffffcc00Attacks land units and trees.|r"
+[hdhw]
+Name=Dragonhawk Rider
+Hotkey=D
+Tip=Train |cffffcc00D|rragonhawk Rider
+Ubertip="Swift flying unit, mounted by an Elven warrior. Has the Aerial Shackles ability, which allows it to immobilize and disarm enemy air units temporarily. Can learn Animal War Training, and the Cloud ability. |n|n|cffffcc00Attacks land and air units.|r"
+[hfoo]
+Name=Footman
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+[hgra]
+Name=Gryphon Aviary
+Hotkey=G
+Tip=Build |cffffcc00G|rryphon Aviary
+Ubertip="Trains Gryphon Riders, and Dragonhawk Riders. |nAlso contains the Storm Hammers and Cloud upgrades."
+[hgry]
+Name=Gryphon Rider
+Hotkey=G
+Tip=Train |cffffcc00G|rryphon Rider
+Ubertip="Powerful flying creature, mounted by a Dwarven hammer-thrower. Can learn Animal War Training, and the Storm Hammers ability. |n|n|cffffcc00Attacks land and air units.|r"
+[hgtw]
+Name=Medal Exchange
+Hotkey=G
+Tip=Upgrade to |cffffcc00G|ruard Tower
+Ubertip="Primary defensive structure. Can learn the Magic Sentry ability. |n|n|cffffcc00Attacks land and air units.|r"
+[hhou]
+Name=Recipe Shop 1
+Hotkey=F
+Tip=Build |cffffcc00F|rarm
+Ubertip="Provides food, which increases the maximum number of units that can be trained."
+[hkee]
+Name=Keep
+Hotkey=U
+Tip=|cffffcc00U|rpgrade to Keep
+Ubertip="Upgrade to Keep to enable the production of additional types of structures and units."
+[hkni]
+Name=Knight
+Hotkey=K
+Tip=Train |cffffcc00K|rnight
+Ubertip="Powerful mounted warrior. Can learn Animal War Training. |n|n|cffffcc00Attacks land units.|r"
+[hlum]
+Name=Item Shop 4
+Hotkey=L
+Tip=Build |cffffcc00L|rumber Mill
+Ubertip="Serves as a drop-off point for harvested lumber. |nAlso contains the upgrades for Lumber Harvesting and Masonry."
+[hmil]
+Name=Militia
+[hpea]
+Name=Peasant
+Hotkey=P
+Tip=Train |cffffcc00P|reasant
+Ubertip="Basic worker unit. Can harvest gold and lumber, build structures and Repair. Can become Militia. |n|n|cffffcc00Attacks land units and trees.|r"
+[hphx]
+Name=Phoenix
+[hpxe]
+Name=Phoenix Egg
+[hrif]
+Name=Rifleman
+Hotkey=R
+Tip=Train |cffffcc00R|rifleman
+Ubertip="Highly skilled sharpshooter, effective against air units. Can gain the Long Rifles upgrade. |n|n|cffffcc00Attacks land and air units.|r"
+[htow]
+Name=Town Hall
+Hotkey=H
+Tip=Build Town |cffffcc00H|rall
+Ubertip="Primary structure, used to train Peasants and receive gathered resources. Can be upgraded to Keep and then Castle to enable the production of additional types of structures and units."
+[hvlt]
+Name=Item shop 1
+Hotkey=V
+Tip=Build Arcane |cffffcc00V|rault
+Ubertip="Creates a shop with purchasable items. The items available depend upon what level of upgrade your Town Hall has (Town Hall, Keep, or Castle) and which buildings you have."
+[hwat]
+Name=Water Elemental
+EditorSuffix= (Level 1)
+[hwt2]
+Name=Water Elemental
+EditorSuffix= (Level 2)
+[hwt3]
+Name=Water Elemental
+EditorSuffix= (Level 3)
+[hwtw]
+Name=Recipe Shop 2
+Hotkey=T
+Tip=Build Scout |cffffcc00T|rower
+Ubertip="Basic observation tower. Has no attack, but can be upgraded into a Guard Tower, an Arcane Tower, or a Cannon Tower. Can learn the Magic Sentry ability."
