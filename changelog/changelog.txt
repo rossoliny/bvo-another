@@ -1,0 +1,7 @@
+HERO CHANGES
+
+Renji
+E now does not disarm for two seconds after hitting target. Now Renji is able to attack right after spell hits the target.
+
+Ichigo
+T HP requirements changed from <= 40% to <=60%.

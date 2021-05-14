@@ -1,0 +1,2301 @@
+[I000]
+Name=Heart of the Bount
+Hotkey=
+Tip=Purchase Heart of the Bount
+Ubertip="Preserved heart of an extinct creature. Bolsters the bearer's fortitude. Adds 35 strength, 300 hit points, and regenerates 20 hit points per second."
+Description="Preserved heart of an extinct creature. Bolsters the bearer's fortitude. Adds 35 strength, 300 hit points, and regenerates 20 hit points per second."
+Art=ReplaceableTextures\CommandButtons\BTNHeartOfAszune.blp
+[I010]
+Name=Nami's Staff
+Tip=Purchase Nami's Staff [|cffffcc00Q|r]
+Ubertip=Staff looking weapon that used by navigator of Strawhat Pirates.|nGives +10 damage and +10% attack speed.
+Description=Boosts attack damage by 10 and AS by 10%.
+Art=ReplaceableTextures\CommandButtons\BTNAlleriaFlute.blp
+Hotkey=Q
+[I020]
+Name=Arrancar's Horn (recipe)
+Hotkey=S
+Tip=Arrancar'|cffffcc00s|r Horn
+Ubertip="|cffffcc00Gives:|r|n33% lifesteal (orb, passive)|n+75 damage|n+25 Strength|n+5 armor|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nElbaf's Reaver|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n33% lifesteal (orb, passive)|n+75 damage|n+25 Strength|n+5 armor|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nElbaf's Reaver|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I030]
+Name=Shihoin's Shuriken (shop)
+Hotkey=
+Tip=Shihoin's Shuriken
+Ubertip=|cffffcc00Gives:|r|n+6 Agility|n+3 Intelligence|n+3 Strength|n|cffffcc00Requires:|r|nCirclet of Nobility|nSlippers of Agility
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNUpgradeMoonGlaive.blp
+[I040]
+Name=|cffffcc00Hell Crusher|r -17500
+Hotkey=C
+Tip=|cffffcc00Hell Crusher|r [|cffffcc00C|r] - 17500
+Ubertip=|cffffcc00Gives:|r|n+120 damage|n+25 Strength|n9% chance to Bash for 2 seconds (passive)|n|cffffcc00Requires:|r|nExcalibur|nElbaf's Reaver
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNcraniumbasher.tga
+[I050]
+Name=Alleria's Sacred Sight
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Alleria's sacred weapon. Increases base ranged damage by 30%, attack damage by +50, and agility by +30.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I060]
+Name=Shihouin's Claws
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A pair of claws that used by Shihouin Clan. Adds +16 agility, +10% attack speed and +10% movement speed."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I070]
+Name=Mystic Staff (shop)
+Hotkey=M
+Tip=Purchase |cffffcc00M|rystic Staff
+Ubertip=Enigmatic staff made of only the most expensive crystals in DotA. Gives +50 Intelligence.
+Description=Enigmatic staff made of only the most expensive crystals in DotA. Gives +50 Intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNStaffOfNegation.blp
+[I001]
+Name=|c00fffc01Ghost Ring|r
+Tip=Purchase Ghost Ring
+Ubertip=A mysterious ring that holds a demon power gives +25 to All Stats and passive invisibility.|n|n|cffff0000Drops upon death|r
+Description=A mysterious ring that holds a demon power gives +25 to All Stats and passive invisibility.|n|n|cffff0000Drops upon death|r
+Art=ReplaceableTextures\CommandButtons\BTNRingLionHead.blp
+[I011]
+Name=Hollow Skin
+Hotkey=S
+Tip=Purchase Hollow |cffffcc00S|rkin
+Ubertip=A hollow skin. Gives +40% chance to block 30 damage.
+Description=Blocks damage.
+Art=ReplaceableTextures\CommandButtons\BTNReinforcedHides.blp
+[I021]
+Name=Frozen Hollow Mask (recipe)
+Hotkey=E
+Tip=Froz|cffffcc00e|rn Hollow Mask
+Ubertip="|cffffcc00Gives:|r|n+25 Agility|n+25 Intelligence|n+25 Strength|n+500 HP|n+500 mana|nCold Attack (orb, passive)|n|cffffcc00Requires:|r|nSoul Orb|nSoul Booster (level 2 shop)|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Description="|cffffcc00Gives:|r|n+25 Agility|n+25 Intelligence|n+25 Strength|n+500 HP|n+500 mana|nCold Attack (orb, passive)|n|cffffcc00Requires:|r|nSoul Orb|nSoul Booster (level 2 shop)|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I031]
+Name=Bracer (shop)
+Hotkey=
+Tip=Bracer
+Ubertip=|cffffcc00Gives:|r|n+3 Agility|n+3 Intelligence|n+6 Strength|n|cffffcc00Requires:|r|nCirclet of Nobility|nGauntlet of Strength
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNRunedBracers.blp
+[I041]
+Name=|cffffcc00Zanbato|r - 20000
+Hotkey=Z
+Tip=|cffffcc00Zanbato|r [|cffffcc00Z|r] - 20000
+Ubertip=|cffffcc00Gives:|r|n+700 damage|n+18 mana bonus when attacking|n+20 HP/sec regen|n35% Cleaving Attack (|cffff0000melee|r)|n|cffffcc00Requires:|r|nSentomaru's Axe (level 3 shop)|nDivine Rapier (Dropped Item)|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNzanbatou.tga
+[I051]
+Name=Shiva's Guard (recipe)
+Hotkey=
+Tip=""
+Ubertip=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Description=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I061]
+Name=Shihouin's Shuriken
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A shuriken often used by Shihouin Clan. Gives +3 to all attributes, and an additional +3 to agility."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I071]
+Name=Komamura's Helm (shop)
+Hotkey=H
+Tip=Purchase Komamura's |cffffcc00H|relm
+Ubertip=Helm of Captain Komamura!! Gives +4 armor and +3 HP regeneration.
+Description=Helm of Captain Komamura!! Gives +4 armor and +3 HP regeneration.
+Art=ReplaceableTextures\CommandButtons\BTNHelmutPurple.blp
+[rhe1]
+Name=Double Damage
+Hotkey=H
+Tip=Purchase Double Damage
+Ubertip=Double yer damage
+Description=Double yer damage
+Art=ReplaceableTextures\CommandButtons\BTNRune.blp
+[rre1]
+Name=Armor bonus
+Tip=Purchase Armor bonus
+Ubertip=+20 armor
+Description=+20 armor
+Art=ReplaceableTextures\CommandButtons\BTNRune.blp
+[rag1]
+Name=Slippers of Agility
+Hotkey=A
+Tip=Purchase Slippers of |cffffcc00A|rgility
+Ubertip=Light boots made from spider skin. Increases the Agility of the Hero by 3 when worn.
+Description=Boosts Agility by 3.
+Art=ReplaceableTextures\CommandButtons\BTNSlippersOfAgility.blp
+[rin1]
+Name=Mantle of Intelligence
+Hotkey=I
+Tip=Purchase Mantle of |cffffcc00I|rntelligence
+Ubertip=A cool mantle. Increases the Intelligence of the Hero by 3 when worn.
+Description=Boosts Intelligence by 3.
+Art=ReplaceableTextures\CommandButtons\BTNMantle.blp
+[TWN1]
+Name=Town Hall or Great Hall or Tree of Life or Necropolis
+DependencyOr=htow,ogre,etol,unpl
+XPFactor=0
+[rst1]
+Name=Gauntlets of Strength
+Hotkey=S
+Tip=Purchase Gauntlets of |cffffcc00S|rtrength
+Ubertip=Gauntlets of a warrior. Increases the Strength of the Hero by 3 when worn.
+Description=Boosts Strength by 3.
+Art=ReplaceableTextures\CommandButtons\BTNGauntletsOfOgrePower.blp
+[I002]
+Name=Bracer
+Hotkey=
+Tip=Purchase Bracer
+Ubertip="A decorated wrist band. Gives +3 to all attributes, and an additional +3 to strength."
+Description="A decorated wrist band. Gives +3 to all attributes, and an additional +3 to strength."
+Art=ReplaceableTextures\CommandButtons\BTNRunedBracers.blp
+[I012]
+Name=|cffffcc00Corrupted Desolator|r (recipe)
+Hotkey=D
+Tip=|cffffcc00Corrupted Desolator|r [|cffffcc00D|r]
+Ubertip="|cffffcc00Gives:|r|n+500 damage|nExtreme Desolate (orb, passive)|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r|n|cffff0000Drops upon death|r"
+Description="|cffffcc00Gives:|r|n+500 damage|nExtreme Desolate (orb, passive)|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r|n|cffff0000Drops upon death|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I022]
+Name=The Butterfly (recipe)
+Hotkey=T
+Tip=|cffffcc00T|rhe Butterfly
+Ubertip=|cffffcc00Gives:|r|n+30 Agility|n+30 Damage|n+20% Attack Speed|n+20% Evasion|n|cffffcc00Requires:|r|nBow of the Quincy|nNami's Staff
+Description=|cffffcc00Gives:|r|n+30 Agility|n+30 Damage|n+20% Attack Speed|n+20% Evasion|n|cffffcc00Requires:|r|nBow of the Quincy|nNami's Staff
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I032]
+Name=Spirit Talisman (shop)
+Hotkey=
+Tip=Spirit Talisman
+Ubertip=|cffffcc00Gives:|r|n+3 Agility|n+6 Intelligence|n+3 Strength|n|cffffcc00Requires:|r|nCirclet of Nobility|nMantle of Intelligence
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNPendantOfEnergy.blp
+[I042]
+Name=Helm of the Life Stealer (shop)
+Hotkey=
+Tip=Helm of the Life Stealer
+Ubertip="|cffffcc00Gives:|r|n+10 damage|n+4 armor|n13% Lifesteal (orb, passive)|n|cffffcc00Requires:|r|nKomamura's Helm|nMask of Death|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNUnholyAura.blp
+[I052]
+Name=Bladebane Armor (recipe)
+Hotkey=
+Tip=""
+Ubertip=|cffffcc00Gives:|r|n+5 Armor|n+20 damage|nBerserker's Call (Active)|n|cffffcc00Requires:|r|nChainmail|nBroadsword
+Description=|cffffcc00Gives:|r|n+5 Armor|n+20 damage|nBerserker's Call (Active)|n|cffffcc00Requires:|r|nChainmail|nBroadsword
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I062]
+Name=Silver Helm
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The helm that once protected the legendary Paladin from famous tale. Gives +15 armor, +50 damage, 20% magic resistance, and 28% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I072]
+Name=Jidanbo's Maul (shop)
+Hotkey=C
+Tip=Purchase Jidanbo's Maul [|cffffcc00C|r]
+Ubertip="Hammer used by Seireitei's gate keeper, Jidanbo. Gives +21 damage."
+Description="Hammer used by Seireitei's gate keeper, Jidanbo. Gives +21 damage."
+Art=ReplaceableTextures\CommandButtons\BTNHammer.blp
+[rde2]
+Name=Ring of Protection
+Hotkey=R
+Tip=Purchase |cffffcc00R|ring of Protection
+Ubertip=Ring that magically boots your armor. Increases the armor of the Hero by 3 when worn.
+Description=Boosts armor by 3.
+Art=ReplaceableTextures\CommandButtons\BTNRingPurple.blp
+[rhe2]
+Name=Heal
+Hotkey=H
+Tip=Purchase Heal
+Ubertip=Heals 1500 hit points.
+Description=Heals 1500 hit points.
+Art=ReplaceableTextures\CommandButtons\BTNRune.blp
+[oli2]
+Name=Orb of Lightning
+Hotkey=L
+Tip=Purchase Orb of |cffffcc00L|rightning
+Ubertip="Adds <AIll,DataA1> bonus damage to the attack of a Hero when carried. The Hero's attacks also become ranged when attacking air, and have a chance to dispel magic and slow the movement speed of the enemy for <AIlp,Dur1> seconds. |n|cffffcc00Deals <AIpg,DataC1> bonus damage to summoned units."
+Description=Attacks cause lightning damage.
+Buttonpos=0,2
+Requires=ofrt
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfLightning.blp
+[tin2]
+Name=Tome of Intelligence +4
+Tip=Purchase Tome of Intelligence [|cffffcc00I|r]
+Ubertip=Permanently increases the Intelligence of the Hero by 4 when used.
+Description=Permanently increases Intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNTome.blp
+Hotkey=I
+[TWN2]
+Name=Keep or Stronghold or Tree of Ages or Halls of the Dead
+DependencyOr=hkee,ostr,etoa,unp1
+XPFactor=0
+[tst2]
+Name=Tome of Strength +2
+Tip=Purchase Tome of Strength [|cffffcc00S|r]
+Ubertip=Permanently increases the Strength of the Hero by 2 when used. 
+Description=Permanently increases Strength.
+Art=ReplaceableTextures\CommandButtons\BTNTome.blp
+Hotkey=S
+[tdx2]
+Name=Tome of Agility +2
+Tip=Purchase Tome of Agility [|cffffcc00A|r]
+Ubertip=Permanently increases the Agility of the Hero by 2 when used. 
+Description=Permanently increases Agility.
+Art=ReplaceableTextures\CommandButtons\BTNTome.blp
+Hotkey=A
+[I003]
+Name=Shihoin's Shuriken
+Hotkey=
+Tip=Purchase Shihoin's Shuriken
+Ubertip="A shuriken often used by Shihoin Clan. Gives +3 to all attributes, and an additional +3 to agility."
+Description="A shuriken often used by Shihoin Clan. Gives +3 to all attributes, and an additional +3 to agility."
+Art=ReplaceableTextures\CommandButtons\BTNUpgradeMoonGlaive.blp
+[I013]
+Name=Komamura's Helm
+Hotkey=H
+Tip=Purchase Komamura's |cffffcc00H|relm
+Ubertip=Helm of Captain Komamura!! Gives +4 armor and +3 HP regeneration.
+Description=Boosts armor by 4 and HP regen by 3.
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNHelmutPurple.blp
+[I023]
+Name=Diffusal Lance
+Hotkey=
+Tip=Purchase Diffusal Lance
+Ubertip="Lance capable of draining the target's spirit. Gives +20 to agility, +10 to intelligence, and Mana Break ability (burn 35 mana per hit).|nIllusions can't do Mana Break.|n|n|cffff0000Orb effects do not stack|r"
+Description="Lance capable of draining the target's spirit. Gives +20 to agility, +10 to intelligence, and Mana Break ability (burn 35 mana per hit).|nIllusions can't do Mana Break.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNStrengthOfTheMoon.blp
+[I033]
+Name=Hollow Shield (shop)
+Hotkey=
+Tip=Hollow Shield
+Ubertip=|cffffcc00Gives:|r|n+5 HP regen/second|n+300 Hit Points|n65% to block 60 damage|n|cffffcc00Requires:|r|nRing of Health|nVitality Booster|nHollow Skin
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNGrimWard.blp
+[I043]
+Name=Mace of Zeus - 4000
+Hotkey=Z
+Tip=Mace of |cffffcc00Z|reus - 4000
+Ubertip="|cffffcc00Gives:|r|n+140 Damage|n+15 All Stats|n25% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nOrb of Lightning (level 3 shop)|nNejibana|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNmjollnir.blp
+[I053]
+Name=|cffffcc00Zanbatou|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Zanbatou once wielded by The Master Samurai from the Eastern Country. Grants the power to destroy everything. Gives +18 mana bonus when attacking, 20 hit points regenerated per second, +700 damage, and 50% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I063]
+Name=Sorcerer's Sceptre (Basic)
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="|cffffcc00Gives:|r|n+50 Intelligence|n+500 HP|n+500 Mana|nImproves ultimates of Inoue Orihime, Enel, Nami, Nico Robin and Kuma.|n|cffffcc00Requires:|r|nMystic Staff|nSoul Booster (level 2 shop)"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I073]
+Name=Hollow Skin (shop)
+Hotkey=S
+Tip=Purchase Hollow |cffffcc00S|rkin
+Ubertip=A hollow skin. Gives +40% chance to block 30 damage.
+Description=A hollow skin. Gives +40% chance to block 30 damage.
+Art=ReplaceableTextures\CommandButtons\BTNReinforcedHides.blp
+[TWN3]
+Name=Castle or Fortress or Tree of Eternity or Black Citadel
+DependencyOr=hcas,ofrt,etoe,unp2
+XPFactor=0
+[I004]
+Name=Frozen Hollow Mask
+Hotkey=
+Tip=Purchase Frozen Hollow Mask
+Ubertip="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Description="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNIceShard.blp
+[I014]
+Name=Katen Kyokotsu
+Hotkey=
+Tip=Purchase Katen Kyokotsu
+Ubertip="Katen Kyokotsu, a wind based zanpakuto capable of calling a massive storm. Gives +20 agility, +20 strength, +50 damage, +15% movement speed, +15% attack speed, and a 15% chance to maim the target.|n|n|cffff0000Orb effects do not stack|r"
+Description="Katen Kyokotsu, a wind based zanpakuto capable of calling a massive storm. Gives +20 agility, +20 strength, +50 damage, +15% movement speed, +15% attack speed, and a 15% chance to maim the target.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNsangeandyasha.tga
+[I024]
+Name=Suzumebachi (recipe)
+Hotkey=C
+Tip=Suzumeba|cffffcc00c|rhi
+Ubertip=|cffffcc00Gives:|r|n+25 Damage|n15% Critical Strike (1.5x)|n|cffffcc00Requires:|r|nBroadsword|nHollow's Claw
+Description=|cffffcc00Gives:|r|n+25 Damage|n15% Critical Strike (1.5x)|n|cffffcc00Requires:|r|nBroadsword|nHollow's Claw
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I034]
+Name=Alleria's Sacred Sight (recipe)
+Hotkey=D
+Tip=Alleria's Sacre|cffffcc00d|r Sight
+Ubertip=|cffffcc00Gives:|r|n+50 Damage|n+30 Agility|n+30% Attack Damage (|cffff0000ranged|r)|n|cffffcc00Requires:|r|nBow of the Quincy|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Description=|cffffcc00Gives:|r|n+50 Damage|n+30 Agility|n+30% Attack Damage (|cffff0000ranged|r)|n|cffffcc00Requires:|r|nBow of the Quincy|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I044]
+Name=Killer Axe - 14000
+Hotkey=X
+Tip=Killer A|cffffcc00x|re - 14000
+Ubertip=|cffffcc00Gives:|r|n+150 Damage|n+55% Attack Speed|n+35% chance for 250 bonus damage and 0.01 seconds ministun (passive)|n|cffffcc00Requires:|r|nExcalibur|nHaki Stone
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNmkb.blp
+[I054]
+Name=Sorcerer's Sceptre
+Tip=Purchase Sorcerer's Sceptre
+Ubertip="The scepter of a sorcerer with Demigod-like powers. Adds 50 Intelligence, 500 HP, 500 Mana and improves ultimates for: Inoue Orihime, Enel, Nami, Nico Robin and Kuma."
+Description="The scepter of a sorcerer with Demigod-like powers. Adds 50 Intelligence, 500 HP, 500 Mana and improves ultimates for: Inoue Orihime, Enel, Nami, Nico Robin and Kuma."
+Art=ReplaceableTextures\CommandButtons\BTNPriestAdept.blp
+[I064]
+Name=Soukyoku
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A very strong zanpakutou equivalent to one million zanpakutou combined. Gives +100 damage and a 20% Critical Strike for 2.2x damage.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I074]
+Name=Haki Stone (shop)
+Hotkey=Y
+Tip=Purchase Haki Stone [|cffffcc00Y|r]
+Ubertip="A mystical, carved stone that boosts the fervor of the holder. Gives +35% attack speed."
+Description="A mystical, carved stone that boosts the fervor of the holder. Gives +35% attack speed."
+Art=ReplaceableTextures\CommandButtons\BTNPeriapt1.blp
+[I005]
+Name=Spirit Talisman
+Hotkey=
+Tip=Purchase Spirit Talisman
+Ubertip=A small gemstone that countains minor spiritual power. Gives +3 to all attributes and an additional +3 to intelligence.
+Description=A small gemstone that countains minor spiritual power. Gives +3 to all attributes and an additional +3 to intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNPendantOfEnergy.blp
+[I015]
+Name=Ero Statue
+Hotkey=P
+Tip=Purchase Ero Statue [|cffffcc00P|r]
+Ubertip=What the hell is this!? Adults only item!! Gives +9 armor.
+Description=Boosts armor by 9.
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNClayFigurine.blp
+[I025]
+Name=Soul-devourer Stones (recipe)
+Hotkey=G
+Tip=Soul-devourer Stones [|cffffcc00G|r]
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|nSoul Wrath (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nVizard's Zanpakuto
+Description=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|nSoul Wrath (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nVizard's Zanpakuto
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I035]
+Name=Urahara's Offering (recipe)
+Hotkey=V
+Tip=Urahara's Offering [|cffffcc00V|r]
+Ubertip=|cffffcc00Gives:|r|n+16% Lifesteal Aura (|cffff0000melee|r)|n+1.5 Mana Regen Aura|n+4 Armor Aura|n|cffffcc00Requires:|r|nRing of the Arrancar (level 1 shop)|nMask of Death
+Description=|cffffcc00Gives:|r|n+16% Lifesteal Aura (|cffff0000melee|r)|n+1.5 Mana Regen Aura|n+4 Armor Aura|n|cffffcc00Requires:|r|nRing of the Arrancar (level 1 shop)|nMask of Death
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I045]
+Name=Mask of Vizard - 1050
+Hotkey=A
+Tip=M|cffffcc00a|rsk of Vizard - 1050
+Ubertip="|cffffcc00Gives:|r|n20% lifesteal (orb, passive)|nBerserk (active)|n|cffffcc00Requires:|r|nMask of Death|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNHollowMask.blp
+[I065]
+Name=Soul Booster
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The crystalized Soul of an ancient dragon. Gives 500 hit points, 500 mana, increases mana bonus by 2 when attacking and 2 hp regeneration.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I075]
+Name=Giant Axe (shop)
+Hotkey=X
+Tip=Purchase Giant A|cffffcc00x|re
+Ubertip=Axe that used by Giants for duel. Increases the Strength of the Hero by 10 when worn.
+Description=Axe that used by Giants for duel. Increases the Strength of the Hero by 10 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNSpiritWalkerAdeptTraining.blp
+[I006]
+Name=Soul Orb
+Hotkey=O
+Tip=Purchase Soul |cffffcc00O|rrb
+Ubertip="A mystical orb containing the essence of life. Increases the Strength, Agility and Intelligence of the Hero by 10 when worn."
+Description="A mystical orb containing the essence of life. Increases the Strength, Agility and Intelligence of the Hero by 10 when worn."
+Art=ReplaceableTextures\CommandButtons\BTNOrbofSlowness.blp
+[I016]
+Name=Vizard's Zanpakuto
+Tip=Purchase Vizar|cffffcc00d|r's Zanpakuto
+Ubertip=A common vizard sword. Gives +36 Damage.
+Description=Boosts attack damage by 36.
+Art=ReplaceableTextures\CommandButtons\BTNFrostmourne.blp
+Hotkey=D
+[I026]
+Name=Darkness Sphere (recipe)
+Hotkey=R
+Tip=Da|cffffcc00r|rkness Sphere
+Ubertip=|cffffcc00Gives:|r|nBlocks most targeted spells once every 20 seconds|n+6 HP regen/second|n+9 mana bonus when attacking|n+15 Agility|n+15 Intelligence|n+15 Strength|n|cffffcc00Requires:|r|nPerseverance (level 1 shop)|nSoul Orb|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=|cffffcc00Gives:|r|nBlocks most targeted spells once every 20 seconds|n+6 HP regen/second|n+9 mana bonus when attacking|n+15 Agility|n+15 Intelligence|n+15 Strength|n|cffffcc00Requires:|r|nPerseverance (level 1 shop)|nSoul Orb|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I036]
+Name=Orb of Fire (recipe)
+Hotkey=F
+Tip=Orb of |cffffcc00F|rire
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+15 All Stats|nChaos Meteor (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nSoul Orb
+Description=|cffffcc00Gives:|r|n+20 Intelligence|n+15 All Stats|nChaos Meteor (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nSoul Orb
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I046]
+Name=Frozen Hollow Mask - 5000
+Hotkey=E
+Tip=Froz|cffffcc00e|rn Hollow Mask - 5000
+Ubertip="|cffffcc00Gives:|r|n+25 Agility|n+25 Intelligence|n+25 Strength|n+500 HP|n+500 mana|nCold Attack (orb, passive)|n|cffffcc00Requires:|r|nSoul Orb|nSoul Booster (level 2 shop)|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNIceShard.blp
+[I066]
+Name=Soul-devourer Stones
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A stones that has been imbued time and time again. Gives +20 Intelligence, +40 damage, and Soul Wrath ability (Bounces up to 11 times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|n|n|cffc3dbffCooldown:|r 60 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I076]
+Name=Excalibur (shop)
+Hotkey=X
+Tip=Purchase E|cffffcc00x|rcalibur
+Ubertip=A legendary sword from ancient tale. Gives +110 damage.
+Description=A legendary sword from ancient tale. Gives +110 damage.
+Art=ReplaceableTextures\CommandButtons\BTNexcalibur.blp
+[I007]
+Name=Darkness Sphere
+Hotkey=
+Tip=Purchase Darkness Sphere
+Ubertip="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfDarkness.blp
+[I017]
+Name=Haki Stone
+Tip=Purchase Haki Stone [|cffffcc00Y|r]
+Ubertip="A mystical, carved stone that boosts the fervor of the holder. Gives +35% attack speed."
+Description=Increases attack speed.
+Art=ReplaceableTextures\CommandButtons\BTNPeriapt1.blp
+Hotkey=Y
+[I027]
+Name=Drake's Axe (recipe)
+Hotkey=S
+Tip=Drake'|cffffcc00s|r Axe
+Ubertip="|cffffcc00Gives:|r|n+16 Strength|n+10 damage|n10% chance to Maim (orb, passive)|n|cffffcc00Requires:|r|nGiant Axe|nBelt of Giant Strength|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+16 Strength|n+10 damage|n10% chance to Maim (orb, passive)|n|cffffcc00Requires:|r|nGiant Axe|nBelt of Giant Strength|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I037]
+Name=Horn of Mana
+Hotkey=
+Tip=Purchase Horn of Mana
+Ubertip="A long forgotten horn. Gives +30 to agility, +20 to intelligence, +600 Mana, Replenish Mana (Fully restore Mana), Mana Break (burn 100 mana per hit), and Mana Void (6% chance on an attack to deal 0.85 pure dmg/target's mana loss).|nIllusions can't do Mana Break.|n|n|cffc3dbffCooldown:|r 45 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Description="A long forgotten horn. Gives +30 to agility, +20 to intelligence, +600 Mana, Replenish Mana (Fully restore Mana), Mana Break (burn 100 mana per hit), and Mana Void (6% chance on an attack to deal 0.85 pure dmg/target's mana loss).|nIllusions can't do Mana Break.|n|n|cffc3dbffCooldown:|r 45 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNHornOfFog.blp
+[I047]
+Name=Drake's Axe - 800
+Hotkey=S
+Tip=Drake'|cffffcc00s|r Axe - 800
+Ubertip="|cffffcc00Gives:|r|n+16 Strength|n+10 damage|n10% chance to Maim (orb, passive)|n|cffffcc00Requires:|r|nGiant Axe|nBelt of Giant Strength|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNOrcMeleeUpThree.blp
+[I067]
+Name=Spirit Talisman
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A small gemstone that countains minor spiritual power. Gives +3 to all attributes and an additional +3 to intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I077]
+Name=Ero Statue (shop)
+Hotkey=P
+Tip=Purchase Ero Statue [|cffffcc00P|r]
+Ubertip=What the hell is this!? Adults only item!! Gives +9 armor.
+Description=What the hell is this!? Adults only item!! Gives +9 armor.
+Art=ReplaceableTextures\CommandButtons\BTNClayFigurine.blp
+[I008]
+Name=Frozen Hollow Mask (melee)
+Hotkey=
+Tip=Purchase Frozen Hollow Mask
+Ubertip="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Description="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNIceShard.blp
+[I018]
+Name=Reiatsu Booster
+Tip=Purchase Reiatsu Booster [|cffffcc00E|r]
+Ubertip=A material that gives you much energy. Increases the mana capacity of the Hero by 250 when worn.
+Description=Provides additional mana.
+Art=ReplaceableTextures\CommandButtons\BTNEnchantedGemstone.blp
+Hotkey=E
+[I028]
+Name=Shihoin's Claws (recipe)
+Hotkey=Y
+Tip=Shihoin's Claws [|cffffcc00Y|r]
+Ubertip=|cffffcc00Gives:|r|n+16 Agility|n10% increased movement speed|n10% increased attack speed|n|cffffcc00Requires:|r|nClaw of Alacrity|nBoots of the Quincy
+Description=|cffffcc00Gives:|r|n+16 Agility|n10% increased movement speed|n10% increased attack speed|n|cffffcc00Requires:|r|nClaw of Alacrity|nBoots of the Quincy
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I038]
+Name=Horn of Mana (recipe)
+Hotkey=H
+Tip=|cffffcc00H|rorn of Mana
+Ubertip="|cffffcc00Gives:|r|n+30 Agility|n+20 Intelligence|n+600 Mana|nReplenish Mana (active)|n100 points Mana Break (orb, passive)|n6% chance Mana Void (passive)|n|cffffcc00Requires:|r|nDiffusal Lance (level 2 shop)|nReiatsu Orb (level 1 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+30 Agility|n+20 Intelligence|n+600 Mana|nReplenish Mana (active)|n100 points Mana Break (orb, passive)|n6% chance Mana Void (passive)|n|cffffcc00Requires:|r|nDiffusal Lance (level 2 shop)|nReiatsu Orb (level 1 shop)|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I048]
+Name=Darkness Sphere - 1500
+Hotkey=R
+Tip=Da|cffffcc00r|rkness Sphere - 1500
+Ubertip=|cffffcc00Gives:|r|nBlocks most targeted spells once every 20 seconds|n+6 HP regen/second|n+9 mana bonus when attacking|n+15 Agility|n+15 Intelligence|n+15 Strength|n|cffffcc00Requires:|r|nPerseverance (level 1 shop)|nSoul Orb|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfDarkness.blp
+[I058]
+Name=Darkness Sphere
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I068]
+Name=Suzumebachi
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A shikai form zanpakutou from one of Shinigami's Captain. Adds 35 damage and has a 10% Critical Strike for 1.75x damage.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I078]
+Name=Elbaf's Reaver (shop)
+Hotkey=R
+Tip=Purchase Elbaf's |cffffcc00R|reaver
+Ubertip=A massive axe from Elbaf capable of tearing whole mountains down. Gives +25 Strength.
+Description=A massive axe from Elbaf capable of tearing whole mountains down. Gives +25 Strength.
+Art=ReplaceableTextures\CommandButtons\BTNSpiritWalkerMasterTraining.blp
+[I009]
+Name=|c00ff0303Blood Sword|r
+Tip=Purchase |c00ff0303Blood Sword|r
+Ubertip="A cursed blood sword corrupts the soul of the wielder, but giving a great power in return. Grants +1500 damage and Bloodseeker ability (-9% hp per attack, +30% target's hp per kill)|n|n|cffff0000Drops upon death|r"
+Description=Boosts attack damage by 1500.
+Art=ReplaceableTextures\CommandButtons\BTNbloodrapier.tga
+[I019]
+Name=Point Booster
+Hotkey=P
+Tip=Purchase |cffffcc00P|roint Booster
+Ubertip=This material increases the reservoir of points that a hero has available to it when carried. Gives +200 Hit Points and +150 Mana.
+Description=Increases the hit points and mana of the Hero.
+Art=ReplaceableTextures\CommandButtons\BTNUsedSoulGem.blp
+[I029]
+Name=Mask of Vizard (recipe)
+Hotkey=A
+Tip=M|cffffcc00a|rsk of Vizard
+Ubertip="|cffffcc00Gives:|r|n20% lifesteal (orb, passive)|nBerserk (active)|n|cffffcc00Requires:|r|nMask of Death|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n20% lifesteal (orb, passive)|nBerserk (active)|n|cffffcc00Requires:|r|nMask of Death|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I039]
+Name=Mystic Staff
+Hotkey=M
+Tip=Purchase |cffffcc00M|rystic Staff
+Ubertip=Enigmatic staff made of only the most expensive crystals in DotA. Gives +50 Intelligence.
+Description=Provides a bonus to Agility.
+Art=ReplaceableTextures\CommandButtons\BTNStaffOfNegation.blp
+[I049]
+Name=Arrancar's Horn - 5450
+Hotkey=S
+Tip=Arrancar'|cffffcc00s|r Horn - 5450
+Ubertip="|cffffcc00Gives:|r|n33% lifesteal (orb, passive)|n+75 damage|n+25 Strength|n+5 armor|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nElbaf's Reaver|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNHornOfDoom.blp
+[I069]
+Name=The Butterfly
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Butterfly is a blade that was magically created for use in the Defense of the Ancients, grants its bearer +30 Agility, 30 damage, +30% increased attack speed, and 30% Evasion."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I079]
+Name=Claw of Alacrity (shop)
+Hotkey=Y
+Tip=Purchase Claw of Alacrit|cffffcc00y|r
+Ubertip=A clay imbued with Haki. Increases the Agility of the Hero by 10 when worn.
+Description=A clay imbued with Haki. Increases the Agility of the Hero by 10 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNShamanAdept.blp
+[rat9]
+Name=Hollow's Claw
+Hotkey=A
+Tip=Purchase Hollow's Cl|cffffcc00a|rw
+Ubertip=A claw of hollow. Increases the attack damage of the Hero by 9 when worn.
+Description=Boosts attack damage by 9.
+Art=ReplaceableTextures\CommandButtons\BTNClawsOfAttack.blp
+[I00A]
+Name=|c00fffc01Divine Rapier|r
+Tip=Purchase |c00fffc01Divine Rapier|r
+Ubertip=The Divine Rapier was known as an ancient weapon from the Defense of the Ancients. Grants +500 damage.|n|n|cffff0000This item can't be dropped but it will dropped when carrier dies|r
+Description=Boosts attack damage by 500.
+Art=ReplaceableTextures\CommandButtons\BTNdivinerapier.tga
+[I01A]
+Name=Vitality Booster
+Hotkey=B
+Tip=Purchase Vitality |cffffcc00B|rooster
+Ubertip=A material that makes you fell more thougher. Increases the hit points of the Hero by 300 when worn.
+Description=Increases the hit points of the Hero.
+Art=ReplaceableTextures\CommandButtons\BTNSoulGem.blp
+[I02A]
+Name=Soul Booster
+Hotkey=
+Tip=Purchase Soul Booster
+Ubertip="The crystalized Soul of an ancient dragon. Gives 500 hit points, 500 mana, increases mana bonus by 2 when attacking and 2 hp regeneration.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="The crystalized Soul of an ancient dragon. Gives 500 hit points, 500 mana, increases mana bonus by 2 when attacking and 2 hp regeneration.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNPhilosophersStone.blp
+[I03A]
+Name=Sorcerer's Sceptre (shop)
+Hotkey=
+Tip=Sorcerer's Sceptre
+Ubertip="|cffffcc00Gives:|r|n+50 Intelligence|n+500 HP|n+500 Mana|nImproves ultimates of Inoue Orihime, Enel, Nami, Nico Robin and Kuma.|n|cffffcc00Requires:|r|nMystic Staff|nSoul Booster (level 2 shop)"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNPriestAdept.blp
+[I04A]
+Name=Ancient Staff of Mythology - 13400
+Hotkey=M
+Tip=Ancient Staff of |cffffcc00M|rythology - 13400
+Ubertip=|cffffcc00Gives:|r|n+80 Intelligence|n+20 Agility|n+20 Strength|n+500 HP|n+500 mana|nGlobal Hex (active)|n|cffffcc00Requires:|r|nMystic Staff|nSoul Orb|nPoint Booster
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNWandOfManaSteal.blp
+[I06A]
+Name=The Red Butterfly
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Red Butterfly is a blade that once used by the most feared assassin, the blood from his victims makes the weapon stronger and become more stronger than its mate, the green one. It grants its bearer +50 Agility, 100 damage, +85% increased attack speed, and 40% Evasion."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07A]
+Name=Arrancar's Horn
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Powerful horn of the Arrancar. Gives 33% life steal, +25 Strength, +10 armor, and +75 damage.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[phea]
+Name=Potion of Healing
+Hotkey=P
+Tip=Purchase |cffffcc00P|rotion of Healing
+Ubertip="Heals <AIh1,DataA1> hit points when used."
+Description=Restores lost hit points.
+Requires=TWN2
+Buttonpos=0,1
+Art=ReplaceableTextures\CommandButtons\BTNPotionGreenSmall.blp
+[shea]
+Name=Scroll of Healing
+Hotkey=H
+Tip=Purchase Scroll of |cffffcc00H|realing
+Ubertip="Heals <AIha,DataA1> hit points to all friendly non-mechanical units around the Hero when used."
+Description=Restores hit points to nearby units.
+Requires=unp2
+Buttonpos=1,2
+Art=ReplaceableTextures\CommandButtons\BTNScrollOfTownPortal.blp
+[I00B]
+Name=Arrancar's Horn
+Tip=Purchase Arrancar's Horn
+Ubertip="Powerful horn of the Arrancar. Gives 33% life steal, +25 Strength, +10 armor, and +75 damage.|n|n|cffff0000Orb effects do not stack|r"
+Description="Powerful horn of the Arrancar. Gives 33% life steal, +25 Strength, +10 armor, and +75 damage.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNHornOfDoom.blp
+[I01B]
+Name=Suzumebachi
+Tip=Purchase Suzumebachi
+Ubertip=A shikai form zanpakuto from one of Shinigami's Captain. Adds 25 damage and has a 15% Critical Strike for 1.5x damage.
+Description=A shikai form zanpakuto from one of Shinigami's Captain. Adds 25 damage and has a 15% Critical Strike for 1.5x damage.
+Art=ReplaceableTextures\CommandButtons\BTNThoriumMelee.blp
+[I02B]
+Name=Reiatsu Orb (recipe)
+Hotkey=A
+Tip=Reiatsu Orb [|cffffcc00A|r]
+Ubertip=|cffffcc00Gives:|r|n+5 Armor|n+500 Mana|nFully Replenish Mana (active)|n|cffffcc00Requires:|r|nReiatsu Booster|nRing of Protection
+Description=|cffffcc00Gives:|r|n+5 Armor|n+500 Mana|nFully Replenish Mana (active)|n|cffffcc00Requires:|r|nReiatsu Booster|nRing of Protection
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScroll.blp
+[I03B]
+Name=Sorcerer's Sceptre
+Tip=Purchase Sorcerer's Sceptre
+Ubertip="The scepter of a sorcerer with Demigod-like powers. Adds 50 Intelligence, 500 HP, 500 Mana and improves ultimates for: Inoue Orihime, Enel, Nami, Nico Robin and Kuma."
+Description="The scepter of a sorcerer with Demigod-like powers. Adds 50 Intelligence, 500 HP, 500 Mana and improves ultimates for: Inoue Orihime, Enel, Nami, Nico Robin and Kuma."
+Art=ReplaceableTextures\CommandButtons\BTNPriestAdept.blp
+[I04B]
+Name=Alleria's Sacred Sight - 2100
+Hotkey=D
+Tip=Alleria's Sacre|cffffcc00d|r Sight - 2100
+Ubertip=|cffffcc00Gives:|r|n+50 Damage|n+30 Agility|n+30% Attack Damage (|cffff0000ranged|r)|n|cffffcc00Requires:|r|nBow of the Quincy|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNAdvancedStrengthOfTheMoon.blp
+[I06B]
+Name=Totem of Might
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Sven's sacred symbol. Increases base melee damage by 30%, and attack damage by +100.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07B]
+Name=Ironwood Branch (shop)
+Hotkey=N
+Tip=Purchase Iro|cffffcc00n|rwood Branch
+Ubertip=Just for fun. Gives +1 to all stats.
+Description=Just for fun. Gives +1 to all stats.
+Art=ReplaceableTextures\CommandButtons\BTNNatureTouchGrow.blp
+[cnob]
+Name=Circlet of Nobility
+Hotkey=C
+Tip=Purchase |cffffcc00C|rirclet of Nobility
+Ubertip="An elegant circlet designed for Alabasta princesses. Increases the Strength, Agility and Intelligence of the Hero by 2 when worn."
+Description="Provides a +2 bonus to Strength, Agility and Intelligence."
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNCirclet.blp
+[I00C]
+Name=Shihoin's Boots
+Hotkey=
+Tip=Purchase Shihoin's Boots
+Ubertip="A boots that often used by the Shihoin Clan. Increases movement speed by 65, attack speed by 20% and provides a +5 bonus to Agility, Strength, and Intelligence when worn.|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Power Treads|r"
+Description=Increases movement and attack rate.
+Art=ReplaceableTextures\CommandButtons\BTNWirtsLeg.blp
+[I01C]
+Name=Sokyoku
+Tip=Purchase Sokyoku
+Ubertip=A very strong zanpakuto equivalent to one million zanpakuto combined. Gives +100 damage and a 20% Critical Strike for 2x damage.
+Description=A very strong zanpakuto equivalent to one million zanpakuto combined. Gives +100 damage and a 20% Critical Strike for 2x damage.
+Art=ReplaceableTextures\CommandButtons\BTNArcaniteMelee.blp
+[I02C]
+Name=Silver Helm (recipe)
+Hotkey=S
+Tip=|cffffcc00S|rilver Helm
+Ubertip="|cffffcc00Gives:|r|n28% lifesteal (orb, passive)|n+50 damage|n+15 armor|n+20% magic resistance|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nHood of Kairoseki (level 2 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n28% lifesteal (orb, passive)|n+50 damage|n+15 armor|n+20% magic resistance|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nHood of Kairoseki (level 2 shop)|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03C]
+Name=Hood of Kairoseki (shop)
+Hotkey=
+Tip=Hood of Kairoseki
+Ubertip=|cffffcc00Gives:|r|n+8 HP regen/second|n+4 armor|n15% magic resistance|n|cffffcc00Requires:|r|nKomamura's Helm|nShinigami's Cloak|nRing of Health|n|n|cffff0000Orb effects do not stack|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNHoodOfCunning.blp
+[I04C]
+Name=|cffffcc00Zanbato|r
+Tip=Purchase |cffffcc00Zanbato|r
+Ubertip="The Zanbato once wielded by The Master Samurai from the Eastern Country. Grants the power to destroy everything. Gives +18 mana bonus when attacking, 20 hit points regenerated per second, +700 damage, and 35% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="The Zanbato once wielded by The Master Samurai from the Eastern Country. Grants the power to destroy everything. Gives +18 mana bonus when attacking, 20 hit points regenerated per second, +700 damage, and 35% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNzanbatou.tga
+[I06C]
+Name=Urahara's Offering
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An eerie mask that is haunted with the malice of a fallen Arrancar. Grants a +16% Lifesteal Aura (melee), +4 Armor Aura, and +1.5 Mana Regen Aura."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07C]
+Name=Gem of True Seeing
+Hotkey=T
+Tip=Purchase Gem of |cffffcc00T|rrue Seeing
+Ubertip="A crystal that grants the hero true sight, which reveals nearby invisible units.|n|n|cffff0000Drops upon death|r"
+Description="A crystal that grants the hero true sight, which reveals nearby invisible units.|n|n|cffff0000Drops upon death|r"
+Art=ReplaceableTextures\CommandButtons\BTNGem.blp
+[brac]
+Name=Shinigami's Cloak
+Hotkey=W
+Tip=Purchase Shinigami's Cloak [|cffffcc00W|r]
+Ubertip=A cloak made of a magic material that works to dispel any magic cast on it. Increases magic resistance by 10%.
+Description=Reduces Magic damage to Hero.
+Art=ReplaceableTextures\CommandButtons\BTNCloak.blp
+[rnec]
+Name=Rod of Necromancy
+Hotkey=R
+Tip=Purchase |cffffcc00R|rod of Necromancy
+Ubertip="Creates two Skeleton Warriors from a corpse. |nContains <rnec,uses> charges."
+Description=Creates two Skeleton Warriors from a corpse.
+Art=ReplaceableTextures\CommandButtons\BTNRodOfNecromancy.blp
+[desc]
+Name=Kuma's Unique Book
+Hotkey=K
+Tip=Purchase |cffffcc00K|ruma's Unique Book
+Ubertip=Allows the Hero to teleport a short distance.|n|n|cffc3dbffCooldown:|r 10 seconds.
+Description=Teleports the Hero a short distance.
+Art=ReplaceableTextures\CommandButtons\BTNSpellBookBLS.blp
+[I00D]
+Name=|c00ff0303Blood Sword|r (recipe)
+Hotkey=B
+Tip=|c00ff0303Blood Sword|r [|cffffcc00B|r]
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)
+Description=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I01D]
+Name=|cffffcc00Hell Crusher|r (recipe)
+Hotkey=C
+Tip=|cffffcc00Hell Crusher|r [|cffffcc00C|r]
+Ubertip=|cffffcc00Gives:|r|n+120 damage|n+25 Strength|n9% chance to Bash for 2 seconds (passive)|n|cffffcc00Requires:|r|nExcalibur|nElbaf's Reaver
+Description=|cffffcc00Gives:|r|n+120 damage|n+25 Strength|n9% chance to Bash for 2 seconds (passive)|n|cffffcc00Requires:|r|nExcalibur|nElbaf's Reaver
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I02D]
+Name=Maximillian (recipe)
+Hotkey=A
+Tip=M|cffffcc00a|rximillian
+Ubertip=|cffffcc00Gives:|r|n+50 Strength|n+30 HP/second regen|n+500 HP|n+15 Armor|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nEro Statue
+Description=|cffffcc00Gives:|r|n+50 Strength|n+30 HP/second regen|n+500 HP|n+15 Armor|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nEro Statue
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03D]
+Name=Sorcerer's Sceptre (Basic)
+Tip=Purchase Sorcerer's Sceptre (Basic)
+Ubertip="|cffffcc00Gives:|r|n+50 Intelligence|n+500 HP|n+500 Mana|nImproves ultimates of Inoue Orihime, Enel, Nami, Nico Robin and Kuma.|n|cffffcc00Requires:|r|nMystic Staff|nSoul Booster (level 2 shop)"
+Description="|cffffcc00Gives:|r|n+50 Intelligence|n+500 HP|n+500 Mana|nImproves ultimates of Inoue Orihime, Enel, Nami, Nico Robin and Kuma.|n|cffffcc00Requires:|r|nMystic Staff|nSoul Booster (level 2 shop)"
+Art=ReplaceableTextures\CommandButtons\BTNPriestAdept.blp
+[I04D]
+Name=Diffusal Lance - 1550
+Hotkey=D
+Tip=|cffffcc00D|riffusal Lance - 1550
+Ubertip="|cffffcc00Gives:|r|n+20 Agility|n+10 Intelligence|n35 points Mana Break (orb, passive)|n|cffffcc00Requires:|r|nClaw of Alacrity|nRobe of the Magi|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNStrengthOfTheMoon.blp
+[I06D]
+Name=Windrunner
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A very light material, it holds the power of legendary wind walker. Gives +35 Agility and Wind Walk ability (invisible for lasts 7 seconds).|n|n|cffc3dbffCooldown:|r 20 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07D]
+Name=Orb of Frost
+Hotkey=R
+Tip=Purchase Orb of F|cffffcc00r|rost
+Ubertip=Adds frost attack to the bearer. Also give 40% chance to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Description=Adds frost attack to the bearer. Also give 40% chance to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfFrost.blp
+[gold]
+Name=Gold Coins
+Tip=Purchase Gold Coins
+Ubertip=Gives 250 gold to the player when used.
+Description=Gives gold to player.
+Art=ReplaceableTextures\CommandButtons\BTNChestOfGold.blp
+[bspd]
+Name=Boots of Speed
+Hotkey=S
+Tip=Purchase Boots of |cffffcc00S|rpeed
+Ubertip=Generic sneakers. Increases the movement speed of the Hero by 50 when worn.|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Power Treads|r
+Description=Increases movement rate.
+Art=ReplaceableTextures\CommandButtons\BTNBootsOfSpeed.blp
+[rspd]
+Name=Move Speed Bonus
+Hotkey=D
+Tip=Purchase Move Speed Bonus
+Ubertip=Increases the movement speed.
+Description=Increases the movement speed.
+Art=ReplaceableTextures\CommandButtons\BTNRune.blp
+[fgrd]
+Name=Red Drake Egg
+Tip=Purchase Drake |cffffcc00E|rgg
+Hotkey=E
+Ubertip="Summons a Red Drake to fight for you. |nLasts <AIfd,Dur1> seconds."
+Description=Summons a Red Drake.
+Art=ReplaceableTextures\CommandButtons\BTNRedDragon.blp
+[I00E]
+Name=Ancient Staff of Mythology (recipe)
+Hotkey=M
+Tip=Ancient Staff of |cffffcc00M|rythology
+Ubertip=|cffffcc00Gives:|r|n+80 Intelligence|n+20 Agility|n+20 Strength|n+500 HP|n+500 mana|nGlobal Hex (active)|n|cffffcc00Requires:|r|nMystic Staff|nSoul Orb|nPoint Booster
+Description=|cffffcc00Gives:|r|n+80 Intelligence|n+20 Agility|n+20 Strength|n+500 HP|n+500 mana|nGlobal Hex (active)|n|cffffcc00Requires:|r|nMystic Staff|nSoul Orb|nPoint Booster
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I01E]
+Name=Helm of the Life Stealer
+Tip=Purchase Helm of the Life Stealer
+Ubertip="The powerful headpiece of a dead lifestealer. Gives +4 armor, +10 damage, and 13% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Description="The powerful headpiece of a dead lifestealer. Gives +4 armor, +10 damage, and 13% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNUnholyAura.blp
+[I02E]
+Name=The Red Butterfly (recipe)
+Hotkey=T
+Tip=|cffffcc00T|rhe Red Butterfly
+Ubertip=|cffffcc00Gives:|r|n+50 Agility|n+100 Damage|n+55% Attack Speed|n+35% Evasion|n|cffffcc00Requires:|r|nThe Butterfly (level 4 shop)|nHaki Stone
+Description=|cffffcc00Gives:|r|n+50 Agility|n+100 Damage|n+55% Attack Speed|n+35% Evasion|n|cffffcc00Requires:|r|nThe Butterfly (level 4 shop)|nHaki Stone
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03E]
+Name=Killer Axe (recipe)
+Hotkey=X
+Tip=Killer A|cffffcc00x|re
+Ubertip=|cffffcc00Gives:|r|n+150 Damage|n+55% Attack Speed|n+35% chance for 250 bonus damage and 0.01 seconds ministun (passive)|n|cffffcc00Requires:|r|nExcalibur|nHaki Stone
+Description=|cffffcc00Gives:|r|n+150 Damage|n+55% Attack Speed|n+35% chance for 250 bonus damage and 0.01 seconds ministun (passive)|n|cffffcc00Requires:|r|nExcalibur|nHaki Stone
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I04E]
+Name=|cffffcc00Zanbato|r (recipe)
+Hotkey=Z
+Tip=|cffffcc00Zanbato|r [|cffffcc00Z|r]
+Ubertip=|cffffcc00Gives:|r|n+700 damage|n+18 mana bonus when attacking|n+20 HP/sec regen|n35% Cleaving Attack (|cffff0000melee|r)|n|cffffcc00Requires:|r|nSentomaru's Axe (level 3 shop)|nDivine Rapier (Dropped Item)|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=|cffffcc00Gives:|r|n+700 damage|n+18 mana bonus when attacking|n+20 HP/sec regen|n35% Cleaving Attack (|cffff0000melee|r)|n|cffffcc00Requires:|r|nSentomaru's Axe (level 3 shop)|nDivine Rapier (Dropped Item)|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I06E]
+Name=|c000042ffFrostmourne|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=The Ice-based Sword.|n|n|cffff0000Orb effects do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07E]
+Name=Mask of Death (shop)
+Hotkey=M
+Tip=Purchase |cffffcc00M|rask of Death
+Ubertip="The phattest lewt, definitely. Gives +10% Life Steal.|n|n|cffff0000Orb effects do not stack|r"
+Description="The phattest lewt, definitely. Gives +10% Life Steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNMaskOfDeath.blp
+[spre]
+Name=Staff of Preservation
+Hotkey=E
+Tip=Purchase Staff of Pr|cffffcc00e|rservation
+Ubertip="Teleports a target friendly unit to its highest level town hall."
+Description=Teleports a target unit home.
+Buttonpos=3,1
+Requires=etoa
+Art=ReplaceableTextures\CommandButtons\BTNStaffOfPreservation.blp
+[I00F]
+Name=Complete Hypnosis
+Hotkey=I
+Tip=Purchase Wand of |cffffcc00I|rllusion
+Ubertip="Create an illusory double of the targeted unit when used. The illusory double deals no damage to enemy units, takes <AIil,DataB1> times the damage from enemy attacks, and will disappear after <AIil,Dur1> seconds or when its hit points reach zero. |nContains <will,uses> charges."
+Description=Creates a phantom double.
+Art=ReplaceableTextures\CommandButtons\BTNWand.blp
+[I01F]
+Name=Killer Axe
+Hotkey=
+Tip=Purchase Killer Axe
+Ubertip="A powerful axe used by a famous killer. Grants +150 damage, 35% increased attack speed, and a 35% chance to deal 200 bonus damage on every attack stopping channeling or casting spells."
+Description="A powerful axe used by a famous killer. Grants +150 damage, 35% increased attack speed, and a 35% chance to deal 200 bonus damage on every attack stopping channeling or casting spells."
+Art=ReplaceableTextures\CommandButtons\BTNmkb.blp
+[I02F]
+Name=|c00fffc01Ultima Sword|r (recipe)
+Hotkey=U
+Tip=|c00fffc01Ultima Sword|r [|cffffcc00U|r]
+Ubertip=|cffffcc00Gives:|r|n+350 Damage|n+16% Evasion|n20% Critical Strike (3x)|n20% chance to deal 400 damage (passive)|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nSokyoku (level 4 shop)|nRadiance (level 4 shop)|nExcalibur
+Description=|cffffcc00Gives:|r|n+350 Damage|n+16% Evasion|n20% Critical Strike (3x)|n20% chance to deal 400 damage (passive)|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nSokyoku (level 4 shop)|nRadiance (level 4 shop)|nExcalibur
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I03F]
+Name=Excalibur
+Tip=Purchase E|cffffcc00x|rcalibur
+Ubertip=A legendary sword from ancient tale. Gives +110 damage.
+Description=Boosts attack damage by 110.
+Art=ReplaceableTextures\CommandButtons\BTNexcalibur.blp
+Hotkey=X
+[I04F]
+Name=Horn of Mana - 5500
+Hotkey=H
+Tip=|cffffcc00H|rorn of Mana - 5500
+Ubertip="|cffffcc00Gives:|r|n+30 Agility|n+20 Intelligence|n+600 Mana|nReplenish Mana (active)|n100 points Mana Break (orb, passive)|n6% chance Mana Void (passive)|n|cffffcc00Requires:|r|nDiffusal Lance (level 2 shop)|nReiatsu Orb (level 1 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNHornOfFog.blp
+[I05F]
+Name=Diffusal Lance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Lance capable of draining the target's spirit. Gives +20 to agility, +10 to intelligence, and Mana Break ability (burn 35 mana per hit).|nIllusions can't do Mana Break.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07F]
+Name=Slippers of Agility (shop)
+Hotkey=A
+Tip=Purchase Slippers of |cffffcc00A|rgility
+Ubertip=Light boots made from spider skin. Increases the Agility of the Hero by 3 when worn.
+Description=Light boots made from spider skin. Increases the Agility of the Hero by 3 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNSlippersOfAgility.blp
+[I00G]
+Name=Ancient Staff of Mythology
+Tip=Purchase Ancient Staff of Mythology
+Ubertip="Ancient staff found in the ruin of Skypiea (maybe). Gives +20 to all stats, +60 intelligence, +500 hp, +500 mp, and Global HEX ability (turn all enemy heroes into random shit for lasts 4 seconds).|nWew!|n|n|cffc3dbffCooldown:|r 70 seconds."
+Description="Ancient staff found in the ruin of Skypiea (maybe). Gives +20 to all stats, +60 intelligence, +500 hp, +500 mp, and Global HEX ability (turn all enemy heroes into random shit for lasts 4 seconds).|nWew!|n|n|cffc3dbffCooldown:|r 70 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNWandOfManaSteal.blp
+[I01G]
+Name=Drake's Axe
+Hotkey=
+Tip=Purchase Drake's Axe
+Ubertip="An axe that used by Drake, Captain of Drake Pirates. Gives +16 to strength, +10 damage, and has a 10% chance on hit to maim the target, reducing speed.|n|n|cffff0000Orb effects do not stack|r"
+Description="An axe that used by Drake, Captain of Drake Pirates. Gives +16 to strength, +10 damage, and has a 10% chance on hit to maim the target, reducing speed.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNOrcMeleeUpThree.blp
+[I02G]
+Name=Orb of Lightning (recipe)
+Hotkey=L
+Tip=Orb of |cffffcc00L|rightning
+Ubertip="|cffffcc00Gives:|r|n+40 Damage|n+10 All Stats|n20% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nJidanbo's Maul|nSoul Orb|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+40 Damage|n+10 All Stats|n20% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nJidanbo's Maul|nSoul Orb|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I03G]
+Name=Gold Coins
+Tip=Purchase Gold Coins
+Ubertip=Gives 200 gold to the player when used.
+Description=Gives gold to player.
+Art=ReplaceableTextures\CommandButtons\BTNChestOfGold.blp
+[I04G]
+Name=Orb of Fire - 3000
+Hotkey=F
+Tip=Orb of |cffffcc00F|rire - 3000
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+15 All Stats|nChaos Meteor (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nSoul Orb
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNorboffire2.blp
+[I05G]
+Name=Drake's Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An axe that used by Drake, Captain of Drake Pirates. Gives +16 to strength, +10 damage, and has a 10% chance on hit to maim the target, reducing speed.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06G]
+Name=|c00ff0303God's Sphere|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Sphere of unknown substance. Grants the power of God. Gives +999 mana bonus when attacking, +250 to All Stats, Permanent Invisibility, and Unlimited Spell Shield."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07G]
+Name=Shinigami's Cloak (shop)
+Hotkey=W
+Tip=Purchase Shinigami's Cloak [|cffffcc00W|r]
+Ubertip=A cloak made of a magic material that works to dispel any magic cast on it. Increases magic resistance by 10%.
+Description=A cloak made of a magic material that works to dispel any magic cast on it. Increases magic resistance by 10%.
+Art=ReplaceableTextures\CommandButtons\BTNCloak.blp
+[I00H]
+Name=Gold Coins
+Tip=Purchase Gol|cffffcc00d|r Coins
+Ubertip=Gives 1000 gold to player.
+Description=Gives gold to player.
+Art=ReplaceableTextures\CommandButtons\BTNChestOfGold.blp
+Hotkey=D
+[I01H]
+Name=Shihoin's Claws
+Hotkey=
+Tip=Purchase Shihoin's Claws
+Ubertip="A pair of claws that used by Shihoin Clan. Adds +16 agility, +10% attack speed and +10% movement speed."
+Description="A pair of claws that used by Shihoin Clan. Adds +16 agility, +10% attack speed and +10% movement speed."
+Art=ReplaceableTextures\CommandButtons\BTNShamanMaster.blp
+[I02H]
+Name=Diffusal Lance (recipe)
+Hotkey=D
+Tip=|cffffcc00D|riffusal Lance
+Ubertip="|cffffcc00Gives:|r|n+20 Agility|n+10 Intelligence|n35 points Mana Break (orb, passive)|n|cffffcc00Requires:|r|nClaw of Alacrity|nRobe of the Magi|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+20 Agility|n+10 Intelligence|n35 points Mana Break (orb, passive)|n|cffffcc00Requires:|r|nClaw of Alacrity|nRobe of the Magi|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I03H]
+Name=Radiance - 3200
+Hotkey=R
+Tip=|cffffcc00R|radiance - 3200
+Ubertip=|cffffcc00Gives:|r|n+120 damage|n+8% Evasion|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nNejibana
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNTransmute.blp
+[I04H]
+Name=Force Staff
+Tip=Purchase Force Staff 
+Ubertip="Increases attack damage by 40, attack speed by 15%, and Intelligence by 20.|nCan be cast to push the targeted unit to the direction he/she is facing. Maximum range of (100 + (4x INT)).|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="Increases attack damage by 40, attack speed by 15%, and Intelligence by 20.|nCan be cast to push the targeted unit to the direction he/she is facing. Maximum range of (100 + (4x INT)).|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNWitchDoctorAdept.blp
+[I05H]
+Name=Frozen Hollow Mask
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06H]
+Name=|c00fffc01Ultima Sword|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Considered the most powerful weapon in the world. Gives +350 damage and a 20% Critical Strike for 3x damage, 20% chance to deal 400 bonus damage, 16% Evasion, and a black burning effect that damages nearby units for 250 damage a second."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07H]
+Name=Robe of the Magi (shop)
+Hotkey=R
+Tip=Purchase |cffffcc00R|robe of the Magi
+Ubertip=A creepy looking robe. Increases the Intelligence of the Hero by 6 when worn.
+Description=A creepy looking robe. Increases the Intelligence of the Hero by 6 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNRobeOfTheMagi.blp
+[ankh]
+Name=Aegis of Reincarnation
+Hotkey=A
+Tip=Purchase Aegis of Reincarnation
+Ubertip=Automatically brings the Hero back to life with 100% hit points and mana when the Hero wearing the Aegis dies.|nCannot be combined.
+Description=Allows reincarnation upon death.
+Art=ReplaceableTextures\CommandButtons\BTNArcaniteArmor.blp
+[manh]
+Name=Manual of Health
+Tip=Purchase Manual of Health [|cffffcc00H|r]
+Ubertip=Permanently increases the hit points of the Hero by 45 when used.
+Description=Permanent +45 hit points.
+Art=ReplaceableTextures\CommandButtons\BTNManual.blp
+Hotkey=H
+[tgrh]
+Name=Tiny Great Hall
+Hotkey=G
+Tip=Purchase Tiny |cffffcc00G|rreat Hall
+Ubertip="Creates a Great Hall at a target location. Human, Night Elf, and Undead players will get their racial equivalent town hall."
+Description="Creates a Great Hall."
+Buttonpos=1,2
+Requires=ofrt
+Art=ReplaceableTextures\CommandButtons\BTNGreathall.blp
+[I00I]
+Name=|c000042ffFrostmourne|r
+Tip=Purchase |c000042ffFrostmourne|r
+Ubertip="The Frostmourne was created to lock the Hell Gate. Grants +700 damage, +100 to all stats, 20% Vampiric Aura (melee lifesteal), armor reduce by -25, gives 40% chance on an attack to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffff0000Drops upon death|r"
+Description=The Ice-based Sword.|n|n|cffff0000Orb effects do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNfrostmourne2.tga
+[I01I]
+Name=Permanent Attribute Bonus
+Tip=Purchase Permanent Attribute Bonus
+Ubertip=|cffffcc00Gives:|r|nPermanently increases the additional attribute points of the Hero by 100.|n|n|cffffcc00Requires:|r|nHero level 50++
+Description=|cffffcc00Gives:|r|nPermanently increases the additional attribute points of the Hero by 100.|n|n|cffffcc00Requires:|r|nHero level 50++
+Art=ReplaceableTextures\CommandButtons\BTNStatUp.blp
+[I02I]
+Name=Tome of Power (level gain)
+Hotkey=T
+Tip=Purchase |cffffcc00T|rome of Power
+Ubertip=|cffffcc00Gives:|r|nIncreases the level of the Hero by 1|n|n|cffffcc00Requires:|r|nHero level under 30
+Description=Gives the Hero an experience level.
+Art=ReplaceableTextures\CommandButtons\BTNSorceressMaster.blp
+[I03I]
+Name=Reiatsu Orb - 1200
+Hotkey=A
+Tip=Reiatsu Orb [|cffffcc00A|r] - 1200
+Ubertip=|cffffcc00Gives:|r|n+5 Armor|n+500 Mana|nFully Replenish Mana (active)|n|cffffcc00Requires:|r|nReiatsu Booster|nRing of Protection
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNpebble.blp
+[I04I]
+Name=Mace of Zeus II
+Tip=Purchase Mace of Zeus II
+Ubertip="Mace of Zeus' final form. Gives +20 Strength, +20 Agility, +40 Intelligence, +200 damage, and has a 25% chance on hit to cast Soul Wrath (Bounces up to 6  times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|nWhen used, the caster will release a wave of energetic plasma. The further the plasma wave from caster, the more damage it has. Minimum (10x INT) damage and (25x INT) damage maximum, hits twice.|n|n|cffc3dbffCooldown:|r 60 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Description="Mace of Zeus' final form. Gives +20 Strength, +20 Agility, +40 Intelligence, +200 damage, and has a 25% chance on hit to cast Soul Wrath (Bounces up to 6  times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|nWhen used, the caster will release a wave of energetic plasma. The further the plasma wave from caster, the more damage it has. Minimum (10x INT) damage and (25x INT) damage maximum, hits twice.|n|n|cffc3dbffCooldown:|r 60 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNmaceofzeusII.blp
+[I05I]
+Name=Heart of the Bountou
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Preserved heart of an extinct creature. Bolsters the bearer's fortitude. Adds 35 strength, 300 hit points, and regenerates 20 hit points per second."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07I]
+Name=Mantle of Intelligence (shop)
+Hotkey=I
+Tip=Purchase Mantle of |cffffcc00I|rntelligence
+Ubertip=A cool mantle. Increases the Intelligence of the Hero by 3 when worn.
+Description=A cool mantle. Increases the Intelligence of the Hero by 3 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNMantle.blp
+[ciri]
+Name=Robe of the Magi
+Hotkey=R
+Tip=Purchase |cffffcc00R|robe of the Magi
+Ubertip=A creepy looking robe. Increases the Intelligence of the Hero by 6 when worn.
+Description=Provides a bonus to Intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNRobeOfTheMagi.blp
+[I00J]
+Name=Sokyoku (recipe)
+Hotkey=B
+Tip=Sokyoku [|cffffcc00B|r]
+Ubertip=|cffffcc00Gives:|r|n+100 damage|n20% Critical Strike (2x)|n|cffffcc00Requires:|r|nVizard's Zanpakuto|nSuzumebachi (level 3 shop)
+Description=|cffffcc00Gives:|r|n+100 damage|n20% Critical Strike (2x)|n|cffffcc00Requires:|r|nVizard's Zanpakutou|nSuzumebachi (level 3 shop)
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I01J]
+Name=The Butterfly
+Hotkey=
+Tip=Purchase The Butterfly
+Ubertip="The Butterfly is a blade that was magically created for use in the Defense of the Ancients, grants its bearer +30 Agility, 30 damage, +20% increased attack speed, and 20% Evasion."
+Description="The Butterfly is a blade that was magically created for use in the Defense of the Ancients, grants its bearer +30 Agility, 30 damage, +20% increased attack speed, and 20% Evasion."
+Art=ReplaceableTextures\CommandButtons\BTNthebutterfly.tga
+[I02J]
+Name=Windrunner
+Tip=Purchase Windrunner
+Ubertip="A very light material, it holds the power of legendary wind walker. Gives +35 Agility, +25 damage, and Wind Walk ability (invisible for lasts 7 seconds).|n|n|cffc3dbffCooldown:|r 20 seconds."
+Description="A very light material, it holds the power of legendary wind walker. Gives +35 Agility, +25 damage, and Wind Walk ability (invisible for lasts 7 seconds).|n|n|cffc3dbffCooldown:|r 20 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNRallyPointNightElf.blp
+[I03J]
+Name=The Butterfly - 1800
+Hotkey=T
+Tip=|cffffcc00T|rhe Butterfly - 1800
+Ubertip=|cffffcc00Gives:|r|n+30 Agility|n+30 Damage|n+20% Attack Speed|n+20% Evasion|n|cffffcc00Requires:|r|nBow of the Quincy|nNami's Staff
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNthebutterfly.tga
+[I04J]
+Name=Bladebane Armor
+Tip=Purchase Bladebane Armor
+Ubertip="Increases attack damage by 20, armor by 5. When used, for 5 seconds the caster will returns 75% of enemy's damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="Increases attack damage by 20, armor by 5. When used, for 5 seconds the caster will returns 75% of enemy's damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNbladebanearmor.blp
+[I05J]
+Name=Helm of the Life Stealer
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The powerful headpiece of a dead lifestealer. Gives +5 armor, +20 damage, and 13% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06J]
+Name=|cffffcc00Hell Crusher|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="It crushes not only skull, but also Hell! Grants +120 damage, +25 Strength, and a 9% chance on an attack to deal 750 bonus damage and stun an opponent for 2 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07J]
+Name=Hollow's Claw (shop)
+Hotkey=A
+Tip=Purchase Hollow's Cl|cffffcc00a|rw
+Ubertip=A claw of hollow. Increases the attack damage of the Hero by 9 when worn.
+Description=A claw of hollow. Increases the attack damage of the Hero by 9 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNClawsOfAttack.blp
+[I00K]
+Name=|cffffcc00Hell Crusher|r
+Tip=Purchase |cffffcc00Hell Crusher|r
+Ubertip="It crushes not only skull, but also Hell! Grants +120 damage, +25 Strength, and a 9% chance on an attack to deal 750 bonus damage and stun an opponent for 2 seconds."
+Description="It crushes not only skull, but also Hell! Grants +120 damage, +25 Strength, and a 9% chance on an attack to deal 750 bonus damage and stun an opponent for 2 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNcraniumbasher.tga
+[I01K]
+Name=Soul-devourer Stones
+Hotkey=
+Tip=Purchase Soul-devourer Stones
+Ubertip="A stones that has been imbued time and time again. Gives +20 Intelligence, +40 damage, and Soul Wrath ability (Bounces up to 12 times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|n|n|cffc3dbffCooldown:|r 60 seconds."
+Description="A stones that has been imbued time and time again. Gives +20 Intelligence, +40 damage, and Soul Wrath ability (Bounces up to 12 times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|n|n|cffc3dbffCooldown:|r 60 seconds."
+Art=ReplaceableTextures\CommandButtons\BTN3M3.blp
+[I02K]
+Name=Windrunner (recipe)
+Hotkey=W
+Tip=|cffffcc00W|rindrunner
+Ubertip=|cffffcc00Gives:|r|n+35 Agility|n+25 damage|nWind Walk (active)|n|cffffcc00Requires:|r|nBow of the Quincy
+Description=|cffffcc00Gives:|r|n+35 Agility|n+25 damage|nWind Walk (active)|n|cffffcc00Requires:|r|nBow of the Quincy
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03K]
+Name=Shihoin's Claws - 800
+Hotkey=Y
+Tip=Shihoin's Claws [|cffffcc00Y|r] - 800
+Ubertip=|cffffcc00Gives:|r|n+16 Agility|n10% increased movement speed|n10% increased attack speed|n|cffffcc00Requires:|r|nClaw of Alacrity|nBoots of the Quincy
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNShamanMaster.blp
+[I04K]
+Name=Sacrificial Wand
+Tip=Purchase Sacrificial Wand
+Ubertip="A corrupted ancient wand that holds extraordinary magical power. Increases Intelligence by 60, Strength by 35, Hit Points by 500 and Hit Points regeneration by 20. When used, the caster will converts 90% base Strength plus 90% base Agility into a pure Intelligent points for 15 seconds.|n|n|cffc3dbffCooldown:|r 75 seconds."
+Description="A corrupted ancient wand that holds extraordinary magical power. Increases Intelligence by 60, Strength by 35, Hit Points by 500 and Hit Points regeneration by 20. When used, the caster will converts 90% base Strength plus 90% base Agility into a pure Intelligent points for 15 seconds.|n|n|cffc3dbffCooldown:|r 75 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNsacrificialwand.blp
+[I05K]
+Name=Hollow Shield
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The discarded mantlet of one of Pseudo-Arrancar, Hollow Shield defends its wielder from even the most vicious of attacks with ease. Gives +300 hit points, 5 hit points regenerated per second and 65% chance to block 60 damage."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06K]
+Name=|c00fffc01Divine Rapier|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip=The Divine Rapier was known as an ancient weapon from the Defense of the Ancients. Grants +500 damage.|n|n|cffff0000This item can't be dropped but it will dropped when carrier dies|r
+Description=Boosts attack damage by 500.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07K]
+Name=Hollow Mask (shop)
+Hotkey=B
+Tip=Purchase Hollow Mask [|cffffcc00B|r]
+Ubertip=A mask of medium hollow. Increases mana bonus by 2 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=A mask of medium hollow. Increases mana bonus by 2 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Art=ReplaceableTextures\CommandButtons\BTNSobiMask.blp
+[I00L]
+Name=Nejibana
+Tip=Purchase Nejibana [|cffffcc00S|r]
+Ubertip=A shikai form zanpakuto from fallen vice-captain. Gives +60 damage.
+Description=Boosts attack damage by 60.
+Art=ReplaceableTextures\CommandButtons\BTNNagaWeaponUp3.blp
+Hotkey=S
+[I01L]
+Name=Gold Coins
+Tip=Purchase Gol|cffffcc00d|r Coins
+Ubertip=Gives 100 gold to player.
+Description=Gives gold to player.
+Art=ReplaceableTextures\CommandButtons\BTNChestOfGold.blp
+Hotkey=D
+[I02L]
+Name=|c00ff0303God's Sphere|r (recipe)
+Hotkey=G
+Tip=|c00ff0303God's Sphere|r [|cffffcc00G|r]
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nGhost Ring (Dropped Item)|nDarkness Sphere (level 3 shop)
+Description=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nGhost Ring (Dropped Item)|nDarkness Sphere (level 3 shop)
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I03L]
+Name=Silver Helm - 8000
+Hotkey=S
+Tip=|cffffcc00S|rilver Helm - 8000
+Ubertip="|cffffcc00Gives:|r|n28% lifesteal (orb, passive)|n+50 damage|n+15 armor|n+20% magic resistance|n|cffffcc00Requires:|r|nHelm of the Life Stealer (level 2 shop)|nHood of Kairoseki (level 2 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNsilverhelm.tga
+[I04L]
+Name=Shiva's Guard
+Tip=Purchase Shiva's Guard
+Ubertip="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNAdvancedMoonArmor.blp
+[I05L]
+Name=Hood of Kairouseki
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A furred, magic resistant headpiece. Gives +15% magic resistance, +5 armor and +8 hp regeneration."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07L]
+Name=Gloves of Haste (shop)
+Hotkey=G
+Tip=Purchase |cffffcc00G|rloves of Haste
+Ubertip=A pair of gloves that imbued with Haki. Increases the attack speed of the Hero by 15% when worn.
+Description=A pair of gloves that imbued with Haki. Increases the attack speed of the Hero by 15% when worn.
+Art=ReplaceableTextures\CommandButtons\BTNGlove.blp
+[plcl]
+Name=Lesser Clarity Potion
+Hotkey=C
+Tip=Purchase Lesser |cffffcc00C|rlarity Potion
+Ubertip="|cff87ceebNon-Combat Consumable|r|nRegenerates the Hero's mana by <AIpl,DataB1> over <AIpl,Dur1> seconds when used."
+Description=Regenerates mana over time.
+Buttonpos=1,0
+Art=ReplaceableTextures\CommandButtons\BTNLesserClarityPotion.blp
+[gcel]
+Name=Gloves of Haste
+Tip=Purchase |cffffcc00G|rloves of Haste
+Ubertip=A pair of gloves that imbued with Haki. Increases the attack speed of the Hero by 15% when worn.
+Description=Increases attack speed.
+Art=ReplaceableTextures\CommandButtons\BTNGlove.blp
+Hotkey=G
+[skul]
+Name=Sacrificial Skull
+Hotkey=K
+Tip=Purchase Sacrificial S|cffffcc00k|rull
+Ubertip="Creates an area of Blight at a target location."
+Description=Creates Blight at a target location.
+ButtonPos=2,0
+Requires=ugrv
+Art=ReplaceableTextures\CommandButtons\BTNSacrificialSkull.blp
+[I00M]
+Name=Radiance
+Tip=Purchase Radiance
+Ubertip=A divine weapon that gives +120 damage and a bright burning effect that damages nearby units for 80 damage a second and cause them to miss on 8% of their attacks against Radiance's bearer.
+Description=A divine weapon that gives +120 damage and a bright burning effect that damages nearby units for 80 damage a second and cause them to miss on 8% of their attacks against Radiance's bearer.
+Art=ReplaceableTextures\CommandButtons\BTNTransmute.blp
+[I01M]
+Name=Orb of Lightning - 1100
+Hotkey=L
+Tip=Orb of |cffffcc00L|rightning - 1100
+Ubertip="|cffffcc00Gives:|r|n+40 Damage|n+10 All Stats|n20% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nJidanbou's Maul|nSoul Orb|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfLightning.blp
+[I02M]
+Name=|c00ff0303God's Sphere|r
+Tip=Purchase |c00ff0303God's Sphere|r
+Ubertip="Sphere of unknown substance. Grants the power of God. Gives +999 mana bonus when attacking, +250 to All Stats, Unlimited Spell Shield and passive invisibility.|n|n|cffc3dbffCooldown:|r 5 seconds."
+Description="Sphere of unknown substance. Grants the power of God. Gives +999 mana bonus when attacking, +250 to All Stats, Unlimited Spell Shield and passive invisibility.|n|n|cffc3dbffCooldown:|r 5 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNorb.blp
+[I03M]
+Name=Sokyoku - 4000
+Hotkey=B
+Tip=Sokyoku [|cffffcc00B|r] - 4000
+Ubertip=|cffffcc00Gives:|r|n+100 damage|n20% Critical Strike (2x)|n|cffffcc00Requires:|r|nVizard's Zanpakuto|nSuzumebachi (level 3 shop)
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNArcaniteMelee.blp
+[I04M]
+Name=Chainmail
+Tip=Purchase Chainmail
+Ubertip=Increases armor of the hero by 5 when worn.
+Description=Increases armor of the hero by 5 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNchainmail.blp
+[I05M]
+Name=Horn of Mana
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A long forgotten horn. Gives +30 to agility, +20 to intelligence, +600 Mana, Replenish Mana (Fully restore Mana), Mana Break (burn 100 mana per hit), and Mana Void (6% chance on an attack to deal 0.85 pure dmg/target's mana loss).|nIllusions can't do Mana Break.|n|n|cffc3dbffCooldown:|r 45 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07M]
+Name=Ring of Protection (shop)
+Hotkey=R
+Tip=Purchase |cffffcc00R|ring of Protection
+Ubertip=Ring that magically boots your armor. Increases the armor of the Hero by 3 when worn.
+Description=Ring that magically boots your armor. Increases the armor of the Hero by 3 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNRingPurple.blp
+[I00N]
+Name=Sentomaru's Axe
+Tip=Purchase Sentomaru's Axe
+Ubertip="An axe that used by Sentomaru from Marine Headquarter. The user becomes a powerful killing machine. Increases mana bonus by 9 when attacking, 6 hit points regenerated per second, +75 damage, and 20% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="An axe that used by Sentomaru from Marine Headquarter. The user becomes a powerful killing machine. Increases mana bonus by 9 when attacking, 6 hit points regenerated per second, +75 damage, and 20% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNbattlefury.tga
+[I01N]
+Name=Orb of Lightning
+Hotkey=
+Tip=Purchase Orb of Lightning
+Ubertip="Orb that holds the power of lightning. Gives +10 to all stats, +40 damage, and has a 20% chance on hit to release 175 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Description="Orb that holds the power of lightning. Gives +10 to all stats, +40 damage, and has a 20% chance on hit to release 175 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfLightning.blp
+[I02N]
+Name=Katen Kyokotsu (shop)
+Hotkey=
+Tip=Katen Kyokotsu
+Ubertip="|cffffcc00Gives:|r|n+20 Agility|n+20 Strength|n+50 damage|n15% chance to Maim (orb, passive)|n15% increased movement speed|n15% increased attack speed|n|cffffcc00Requires:|r|nDrake's Axe (level 2 shop)|nShihoin's Claws (level 2 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNsangeandyasha.tga
+[I03N]
+Name=Soul-devourer Stones - 3250
+Hotkey=G
+Tip=Soul-devourer Stones [|cffffcc00G|r] - 3250
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|nSoul Wrath (active)|n|cffffcc00Requires:|r|nStaff of Wizardry|nVizard's Zanpakuto
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTN3M3.blp
+[I04N]
+Name=|c00000000Ultima Weapon|r
+Hotkey=
+Tip=Purchase |cffffcc00F|rrostguard
+Ubertip=Considered as the most powerful weapon in the world. Gives +1000 damage and +200 to all stats.
+Description=Considered as the most powerful weapon in the world. Gives +1000 damage and +200 to all stats.
+Art=ReplaceableTextures\CommandButtons\BTNultimaweapon.blp
+[I05N]
+Name=Katen Kyoukotsu
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Katen Kyoukotsu, a wind based zanpakutou capable of calling a massive storm. Gives +20 agility, +20 strength, +50 damage, +15% movement speed, +15% attack speed, and a 15% chance to maim the target.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07N]
+Name=Circlet of Nobility (shop)
+Hotkey=C
+Tip=Purchase |cffffcc00C|rirclet of Nobility
+Ubertip="An elegant circlet designed for Alabasta princesses. Increases the Strength, Agility and Intelligence of the Hero by 2 when worn."
+Description="An elegant circlet designed for Alabasta princesses. Increases the Strength, Agility and Intelligence of the Hero by 2 when worn."
+Art=ReplaceableTextures\CommandButtons\BTNCirclet.blp
+[pman]
+Name=Potion of Mana
+Hotkey=M
+Tip=Purchase Potion of |cffffcc00M|rana
+Ubertip="Restores <AIm1,DataA1> mana when used."
+Description=Restores lost mana.
+Requires=TWN2
+Buttonpos=1,1
+Art=ReplaceableTextures\CommandButtons\BTNPotionBlueSmall.blp
+[oven]
+Name=Orb of Venom
+Hotkey=V
+Tip=Purchase Orb of |cffffcc00V|renom
+Ubertip="Adds <AIpb,DataA1> bonus damage to the attack of a Hero when carried. The Hero's attacks also become ranged when attacking air and poison enemy units for <Apo2,Dur1> seconds."
+Description=Attacks cause poison damage.
+Buttonpos=0,2
+Requires=etoe
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfVenom.blp
+[moon]
+Name=;
+Hotkey=N
+Tip=Purchase Moo|cffffcc00n|rstone
+Ubertip="Causes an eclipse that blocks out the sun and creates an artificial night. |nLasts <AIct,Dur1> seconds."
+Description=Makes it night time.
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNMoonStone.blp
+[I00O]
+Name=Perseverance
+Hotkey=
+Tip=Purchase Perseverance
+Ubertip="A gem that grants heart to the bearer. Increases mana bonus by 6 when attacking, 5 hit point regeneration per second, and +10 damage.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="A gem that grants heart to the bearer. Increases mana bonus by 6 when attacking, 5 hit point regeneration per second, and +10 damage.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Buttonpos=3,0
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfFire.blp
+[I01O]
+Name=Mask of Vizard
+Tip=Purchase Mask of Vizard
+Ubertip="This mask can drives you insane. Grants 20% life steal and allows you to go Berserk. The Berserk state adds 100% attack speed and 15% movement speed, but you take 20% extra damage.|n|n|cffff0000Orb effects do not stack|r|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="This mask can drives you insane. Grants 20% life steal and allows you to go Berserk. The Berserk state adds 100% attack speed and 15% movement speed, but you take 20% extra damage.|n|n|cffff0000Orb effects do not stack|r|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNHollowMask.blp
+[I02O]
+Name=Sentomaru's Axe (shop)
+Hotkey=
+Tip=Sentomaru's Axe
+Ubertip=|cffffcc00Gives:|r|n+75 damage|n+9 mana bonus when attacking|n+6 HP/sec regen|n20% Cleaving Attack (|cffff0000melee|r)|n|cffffcc00Requires:|r|nJidanbo's Maul|nBroadsword|nPerseverance (level 1 shop)|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNbattlefury.tga
+[I03O]
+Name=Suzumebachi - 500
+Hotkey=C
+Tip=Suzumeba|cffffcc00c|rhi - 500
+Ubertip=|cffffcc00Gives:|r|n+25 Damage|n15% Critical Strike (1.5x)|n|cffffcc00Requires:|r|nBroadsword|nHollow's Claw
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNThoriumMelee.blp
+[I04O]
+Name=|c000080C0The Heaven Butterfly|r
+Hotkey=
+Tip=Purchase |cffffcc00F|rrostguard
+Ubertip="An extremely powerful weapon, the last piece of the second most powerful weapon in the entire world. Increases attack damage by 300, Agility by 300, attack speed by 100% and 60% chance to dodge attacks."
+Description="An extremely powerful weapon, the last piece of the second most powerful weapon in the entire world. Increases attack |ndamage by 300, Agility by 300, attack speed by 100% and 60% chance to dodge attacks."
+Art=ReplaceableTextures\CommandButtons\BTNtheheavenbutterfly.blp
+[I05O]
+Name=Killer Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A powerful axe used by a famous killer. Grants +150 damage, 55% increased attack speed, and a 35% chance to deal 200 bonus damage on every attack stopping channeling or casting spells."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07O]
+Name=Boots of the Quincy (shop)
+Hotkey=E
+Tip=Purchase Boots of th|cffffcc00e|r Quincy
+Ubertip=A pair of boots often used for hunting. Increases the Agility of the Hero by 6 when worn.
+Description=A pair of boots often used for hunting. Increases the Agility of the Hero by 6 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNBoots.blp
+[tkno]
+Name=Tome of Power
+Hotkey=T
+Tip=Purchase |cffffcc00T|rome of Power
+Ubertip=|cffffcc00Gives:|r|nIncreases the level of the Hero by 1|n|n|cffffcc00Requires:|r|nHero level under 50
+Description=Gives the Hero an experience level.
+Art=ReplaceableTextures\CommandButtons\BTNSorceressMaster.blp
+[ofro]
+Name=Orb of Frost
+Hotkey=R
+Tip=Purchase Orb of F|cffffcc00r|rost
+Ubertip=Adds frost attack to the bearer. Also give 40% chance to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Description=Attacks cause Frost Shock.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfFrost.blp
+[spro]
+Name=Scroll of Protection
+Hotkey=R
+Tip=Purchase Scroll of P|cffffcc00r|rotection
+Ubertip="Increases the armor of all friendly units in an area around your Hero by <AIda,DataA1> for <AIda,Dur1> seconds."
+Description=Temporarily increases the armor of nearby units.
+Art=ReplaceableTextures\CommandButtons\BTNScroll.blp
+[I00P]
+Name=Ring of Health
+Hotkey=I
+Tip=Purchase R|cffffcc00i|rng of Health
+Ubertip=A shiny ring. Gives +5 HP regeneration.
+Description=Provides regeneration.
+Art=ReplaceableTextures\CommandButtons\BTNGoldRing.blp
+[I01P]
+Name=Ring of the Arrancar
+Hotkey=
+Tip=Purchase Ring of the Arrancar
+Ubertip="Ring given to medium level Arrancar. Grants a 0.75 Brilliance Aura, a +3 Devotion Aura, and 10 damage."
+Description="Ring given to medium level Arrancar. Grants a 0.75 Brilliance Aura, a +3 Devotion Aura, and 10 damage."
+Art=ReplaceableTextures\CommandButtons\BTNRingJadeFalcon.blp
+[I02P]
+Name=Alleria's Sacred Sight
+Tip=Purchase Alleria's Sacred Sight
+Ubertip="Alleria's sacred weapon. Increases base ranged damage by 30%, attack damage by +50, and agility by +30.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Description="Alleria's sacred weapon. Increases base ranged damage by 30%, attack damage by +50, and agility by +30.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNAdvancedStrengthOfTheMoon.blp
+[I03P]
+Name=Mirage Tempo
+Hotkey=I
+Tip=Purchase Wand of |cffffcc00I|rllusion
+Ubertip="Create an illusory double of the targeted unit when used. The illusory double deals no damage to enemy units, takes <AIil,DataB1> times the damage from enemy attacks, and will disappear after <AIil,Dur1> seconds or when its hit points reach zero. |nContains <will,uses> charges."
+Description=Creates a phantom double.
+Art=ReplaceableTextures\CommandButtons\BTNWand.blp
+[I04P]
+Name=|c008000FFKyoka Suigetsu|r
+Hotkey=
+Tip=Purchase |cffffcc00F|rrostguard
+Ubertip="Aizen Sosuke's zanpakuto. Gives +500 damage, +100 to all stats and ability to create a complete copy of the targeted object for 40 seconds.|n|n|cffc3dbffCooldown:|r 100 seconds."
+Description="Aizen Sosuke's zanpakuto. Gives +500 damage, +100 to all stats and ability to create a complete copy of the targeted object for 40 seconds.|n|n|cffc3dbffCooldown:|r 100 seconds."
+Art=ReplaceableTextures\CommandButtons\BTN_Platinum_Dagger.blp
+[I05P]
+Name=Mace of Zeus
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Zeus' sacred weapon. After transformed back to its original state at the Realm of the Ancients, Zeus' sacred mace holds so much power even the original wielder can't bear it anymore. Gives +15 to all stats, +140 damage, and has a 25% chance on hit to release 350 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07P]
+Name=Boots of Speed (shop)
+Hotkey=S
+Tip=Purchase Boots of |cffffcc00S|rpeed
+Ubertip=Generic sneakers. Increases the movement speed of the Hero by 50 when worn.|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Power Treads|r
+Description=Generic sneakers. Increases the movement speed of the Hero by 50 when worn.|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Power Treads|r
+Art=ReplaceableTextures\CommandButtons\BTNBootsOfSpeed.blp
+[stwp]
+Name=Scroll of Town Portal
+Hotkey=T
+Tip=Purchase Scroll of |cffffcc00T|rown Portal
+Ubertip="Teleports the Hero and any of its nearby troops to a target friendly town hall."
+Description=Transports troops to friendly town hall.
+Requires=TWN2
+Buttonpos=2,1
+Art=ReplaceableTextures\CommandButtons\BTNScrollUber.blp
+[texp]
+Name=Tome of Experience
+Hotkey=E
+Tip=Purchase Tome of |cffffcc00E|rxperience
+Ubertip="Gives <AIem,DataA1> experience to the Hero when used."
+Description=Gives bonus experience points.
+Art=ReplaceableTextures\CommandButtons\BTNTomeBrown.blp
+[I00Q]
+Name=Reiatsu Stone
+Hotkey=V
+Tip=Purchase Reiatsu Stone [|cffffcc00V|r]
+Ubertip=A stone of seemingly endless reiatsu power. Increases mana bonus by 5 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=Increases mana regeneration rate.
+Buttonpos=2,0
+Art=ReplaceableTextures\CommandButtons\BTNPeriapt.blp
+[I01Q]
+Name=Hood of Kairoseki
+Hotkey=
+Tip=Purchase Hood of Kairoseki
+Ubertip="A furred, magic resistant headpiece. Gives +15% magic resistance, +4 armor and +8 hp regeneration."
+Description="A furred, magic resistant headpiece. Gives +15% magic resistance, +4 armor and +8 hp regeneration."
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNHoodOfCunning.blp
+[I02Q]
+Name=Totem of Might
+Tip=Purchase Totem of Might
+Ubertip="Sven's sacred symbol. Increases base melee damage by 30%, and attack damage by +100.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Description="Sven's sacred symbol. Increases base melee damage by 30%, and attack damage by +100.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNEntrapmentWard.blp
+[I03Q]
+Name=Maximillian - 11400
+Hotkey=A
+Tip=M|cffffcc00a|rximillian - 11400
+Ubertip=|cffffcc00Gives:|r|n+50 Strength|n+30 HP/second regen|n+500 HP|n+15 Armor|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nEro Statue
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNmaximillian.tga
+[I04Q]
+Name=Force Staff - 3500
+Hotkey=
+Tip=Force Staff - 3500
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|n+15% Attack Speed|nForce (active)|n|cffffcc00Requires:|r|nNami's Staff|nStaff of Wizardry
+Description=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|n+15% Attack Speed|nForce (active)|n|cffffcc00Requires:|r|nNami's Staff|nStaff of Wizardry
+Art=ReplaceableTextures\CommandButtons\BTNWitchDoctorAdept.blp
+[I05Q]
+Name=Mask of Vizard
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="This mask can drives you insane. Grants 20% life steal and allows you to go Berserk. The Berserk state adds 100% attack speed and 15% movement speed, but you take 20% extra damage.|n|n|cffff0000Orb effects do not stack|r|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I07Q]
+Name=Belt of Giant Strength (shop)
+Hotkey=B
+Tip=Purchase |cffffcc00B|relt of Giant Strength
+Ubertip=Stripped down from Giants fallen in Elbaf. Increases the Strength of the Hero by 6 when worn.
+Description=Stripped down from Giants fallen in Elbaf. Increases the Strength of the Hero by 6 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNBelt.blp
+[I00R]
+Name=|cffffcc00Corrupted Desolator|r
+Tip=Purchase |cffffcc00Corrupted Desolator|r
+Ubertip="It cuts no armor, but it cuts soul! Grants +500 damage and Extreme Desolate (-100 armor penalty).|n|n|cffff0000Orb effects do not stack|r|n|cffff0000Drops upon death|r"
+Description="It cuts no armor, but it cuts soul! Grants +500 damage and Extreme Desolate (-100 armor penalty).|n|n|cffff0000Orb effects do not stack|r|n|cffff0000Drops upon death|r"
+Art=ReplaceableTextures\CommandButtons\BTNstygiandesolator.tga
+[I01R]
+Name=Hollow Shield
+Hotkey=
+Tip=Purchase Hollow Shield
+Ubertip="The discarded mantlet of one of Pseudo-Arrancar, Hollow Shield defends its wielder from even the most vicious of attacks with ease. Gives +300 hit points, 5 hit points regenerated per second and 65% chance to block 60 damage."
+Description="The discarded mantlet of one of Pseudo-Arrancar, Hollow Shield defends its wielder from even the most vicious of attacks with ease. Gives +300 hit points, 5 hit points regenerated per second and 65% chance to block 60 damage."
+Art=ReplaceableTextures\CommandButtons\BTNGrimWard.blp
+[I02R]
+Name=Mace of Zeus
+Tip=Purchase Mace of Zeus
+Ubertip="Zeus' sacred weapon. After transformed back to its original state at the Realm of the Ancients, Zeus' sacred mace holds so much power even the original wielder can't bear it anymore. Gives +15 to all stats, +140 damage, and has a 25% chance on hit to release 350 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Description="Zeus' sacred weapon. After transformed back to its original state at the Realm of the Ancients, Zeus' sacred mace holds so much power even the original wielder can't bear it anymore. Gives +15 to all stats, +140 damage, and has a 25% chance on hit to release 350 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNmjollnir.blp
+[I03R]
+Name=The Red Butterfly - 11400
+Hotkey=T
+Tip=|cffffcc00T|rhe Red Butterfly - 11400
+Ubertip=|cffffcc00Gives:|r|n+50 Agility|n+100 Damage|n+55% Attack Speed|n+35% Evasion|n|cffffcc00Requires:|r|nThe Butterfly (level 4 shop)|nHaki Stone
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNtheredbutterfly.tga
+[I04R]
+Name=Shiva's Guard - 15000
+Hotkey=
+Tip=Purchase Shiva's Guard - 15000
+Ubertip=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Description=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Art=ReplaceableTextures\CommandButtons\BTNImprovedMoonArmor.blp
+[I05R]
+Name=Maximillian
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A metal heavy armor, named after the one of the greatest champion in famous legend. Gives +50 Strength, +500 hit points, +15 armor, +30 HP regeneration."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06R]
+Name=Vitality Booster (shop)
+Hotkey=B
+Tip=Purchase Vitality |cffffcc00B|rooster
+Ubertip=A material that makes you fell more thougher. Increases the hit points of the Hero by 300 when worn.
+Description=A material that makes you fell more thougher. Increases the hit points of the Hero by 300 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNSoulGem.blp
+[I07R]
+Name=Broadsword (shop)
+Hotkey=B
+Tip=Purchase Broadsword [|cffffcc00B|r]
+Ubertip=Any warrior worth a damn should have one of these. Gives +18 Damage.
+Description=Any warrior worth a damn should have one of these. Gives +18 Damage.
+Art=ReplaceableTextures\CommandButtons\BTNSteelMelee.blp
+[lmbr]
+Name=Honorless Medal
+Tip=Purchase Honorless Medal
+Ubertip=Gives 30 medal to the player.
+Description=Gives medal to player.
+Art=ReplaceableTextures\CommandButtons\BTNMedalionOfCourage.blp
+[iwbr]
+Name=Ironwood Branch
+Tip=Purchase Iro|cffffcc00n|rwood Branch
+Ubertip=Just for fun. Gives +1 to all stats.
+Description=Boosts all stats by 1.
+Art=ReplaceableTextures\CommandButtons\BTNNatureTouchGrow.blp
+Hotkey=N
+[ocor]
+Name=Orb of Corruption
+Hotkey=B
+Tip=Purchase Or|cffffcc00b|r of Corruption
+Ubertip="Adds <AIcb,DataA1> bonus damage to the attack of a Hero when carried. The Hero's attacks also become ranged when attacking air and reduce the armor of enemy units for <AIcb,Dur1> seconds."
+Description=Attacks reduce armor.
+Buttonpos=0,2
+Requires=unp2
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfCorruption.blp
+[I00S]
+Name=Elbaf's Reaver
+Hotkey=R
+Tip=Purchase Elbaf's |cffffcc00R|reaver
+Ubertip=A massive axe from Elbaf capable of tearing whole mountains down. Gives +25 Strength.
+Description=Provides a bonus to Strength.
+Art=ReplaceableTextures\CommandButtons\BTNSpiritWalkerMasterTraining.blp
+[I01S]
+Name=|c00fffc01Ultima Sword|r
+Tip=Purchase Ultima Sword
+Ubertip="Considered the second most powerful weapon in the world. Gives +350 damage and a 20% Critical Strike for 3x damage, 20% chance to deal 400 bonus damage, 16% Evasion, and a black burning effect that damages nearby units for 250 damage a second."
+Description="Considered the second most powerful weapon in the world. Gives +350 damage and a 20% Critical Strike for 3x damage, 20% chance to deal 400 bonus damage, 16% Evasion, and a black burning effect that damages nearby units for 250 damage a second."
+Art=ReplaceableTextures\CommandButtons\BTNultimasword.tga
+[I02S]
+Name=Orb of Fire
+Tip=Purchase Orb of Fire
+Ubertip="Orb that holds the power of fire. Gives +20 Intelligence, +15 to all stats, and Chaos Meteor ability (Deals (8 x INT) chaos dmg/sec).|n|n|cffc3dbffCooldown:|r 35 seconds."
+Description="Orb that holds the power of fire. Gives +20 Intelligence, +15 to all stats, and Chaos Meteor ability (Deals (8 x INT) chaos dmg/sec).|n|n|cffc3dbffCooldown:|r 35 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNorboffire2.blp
+[I03S]
+Name=Totem of Might - 2100
+Hotkey=G
+Tip=Totem of Mi|cffffcc00g|rht - 2100
+Ubertip=|cffffcc00Gives:|r|n+100 Damage|n+30% Attack Damage (|cffff0000melee|r)|n|cffffcc00Requires:|r|nNejibana|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNEntrapmentWard.blp
+[I04S]
+Name=Mace of Zeus II - 25000
+Hotkey=
+Tip=Purchase Mace of Zeus II - 25000
+Ubertip="|cffffcc00Gives:|r|n+40 Intelligence|n+20 Agility|n+20 Strength|n+200 Damage|n25% Energy Wrath (orb, passive)|nPlasma Field (active)|n|cffffcc00Requires:|r|nMace of Zeus (level 4 shop)|nSoul-Devourer Stone (level 3 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+40 Intelligence|n+20 Agility|n+20 Strength|n+200 Damage|n25% Energy Wrath (orb, passive)|nPlasma Field (active)|n|cffffcc00Requires:|r|nMace of Zeus (level 4 shop)|nSoul-Devourer Stone (level 3 shop)|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNmaceofzeusII.blp
+[I05S]
+Name=Orb of Fire
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Orb that holds the power of fire. Gives +20 Intelligence, +15 to all stats, and Chaos Meteor ability (Deals (8 x INT) chaos dmg/sec).|n|n|cffc3dbffCooldown:|r 35 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06S]
+Name=Staff of Wizardry (shop)
+Hotkey=W
+Tip=Purchase Staff of |cffffcc00W|rizardry
+Ubertip=A powerful staff used by a fallen wizard. Increases the Intelligence of the Hero by 10 when worn.
+Description=A powerful staff used by a fallen wizard. Increases the Intelligence of the Hero by 10 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNWandOfCyclone.blp
+[I07S]
+Name=Gauntlets of Strength (shop)
+Hotkey=S
+Tip=Purchase Gauntlets of |cffffcc00S|rtrength
+Ubertip=Gauntlets of a warrior. Increases the Strength of the Hero by 3 when worn.
+Description=Gauntlets of a warrior. Increases the Strength of the Hero by 3 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNGauntletsOfOgrePower.blp
+[shas]
+Name=Scroll of Speed
+Hotkey=S
+Tip=Purchase Scroll of |cffffcc00S|rpeed
+Ubertip="Increases the movement speed of the Hero and nearby allied units to the maximum movement speed. |nLasts <AIsa,Dur1> seconds."
+Description=Increases movement speed of units.
+Buttonpos=1,0
+Art=ReplaceableTextures\CommandButtons\BTNScrollOfHaste.blp
+[pres]
+Name=Elixir
+Hotkey=
+Tip=Purchase Elixir
+Ubertip=Restores 4000 hit points and 1500 mana of the Hero when used.|nDoesn't stack in inventory.|n|n|cffc3dbffCooldown:|r 90 seconds.
+Description=Restores lost hit points and mana.
+Art=ReplaceableTextures\CommandButtons\BTNRejuvenationPotion.blp
+[rres]
+Name=Restoration
+Hotkey=R
+Tip=Purchase Restoration
+Ubertip=Restores 2000 hit points and 1000 mana.
+Description=Restores 2000 hit points and 1000 mana.
+Art=ReplaceableTextures\CommandButtons\BTNRune.blp
+[pams]
+Name=Anti-magic Potion
+Hotkey=A
+Tip=Purchase |cffffcc00A|rnti-magic Potion
+Ubertip="Gives the Hero immunity to magical spells for <AIxs,Dur1> seconds."
+Description=Renders Hero immune to magic.
+Requires=etoe
+Buttonpos=1,2
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyPotion.blp
+[I00T]
+Name=Bow of the Quincy
+Hotkey=G
+Tip=Purchase Bow of the Quincy [|cffffcc00G|r]
+Ubertip="A swift, true-firing bow that holds the true power of Quincy. Gives +25 Agility."
+Description=Provides a bonus to Agility.
+Art=ReplaceableTextures\CommandButtons\BTNImprovedBows.blp
+[I01T]
+Name=Silver Helm
+Tip=Purchase Silver Helm
+Ubertip="The helm that once protected the legendary Paladin from famous tale. Gives +15 armor, +50 damage, 20% magic resistance, and 28% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Description="The helm that once protected the legendary Paladin from famous tale. Gives +15 armor, +50 damage, 20% magic resistance, and 28% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNsilverhelm.tga
+[I02T]
+Name=Mace of Zeus (recipe)
+Hotkey=Z
+Tip=Mace of |cffffcc00Z|reus
+Ubertip="|cffffcc00Gives:|r|n+140 Damage|n+15 All Stats|n25% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nOrb of Lightning (level 3 shop)|nNejibana|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+140 Damage|n+15 All Stats|n25% Chain Lightning (orb, passive)|n|cffffcc00Requires:|r|nOrb of Lightning (level 3 shop)|nNejibana|n|n|cffff0000Orb effects do not stack|r"
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03T]
+Name=Urahara's Offering - 950
+Hotkey=V
+Tip=Urahara's Offering [|cffffcc00V|r] - 950
+Ubertip=|cffffcc00Gives:|r|n+16% Lifesteal Aura (|cffff0000melee|r)|n+1.5 Mana Regen Aura|n+4 Armor Aura|n|cffffcc00Requires:|r|nRing of the Arrancar (level 1 shop)|nMask of Death
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNCloakOfFlames.blp
+[I04T]
+Name=Bladebane Armor - 4000
+Hotkey=B
+Tip=|cffffcc00B|rladebane Armor - 4000
+Ubertip=|cffffcc00Gives:|r|n+5 Armor|n+20 damage|nBerserker's Call (Active)|n|cffffcc00Requires:|r|nChainmail|nBroadsword
+Description=|cffffcc00Gives:|r|n+5 Armor|n+20 damage|nBerserker's Call (Active)|n|cffffcc00Requires:|r|nChainmail|nBroadsword
+Art=ReplaceableTextures\CommandButtons\BTNbladebanearmor.blp
+[I05T]
+Name=Orb of Lightning
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Orb that holds the power of lightning. Gives +10 to all stats, +40 damage, and has a 20% chance on hit to release 175 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06T]
+Name=Soul Orb (shop)
+Hotkey=O
+Tip=Purchase Soul |cffffcc00O|rrb
+Ubertip="A mystical orb containing the essence of life. Increases the Strength, Agility and Intelligence of the Hero by 10 when worn."
+Description="A mystical orb containing the essence of life. Increases the Strength, Agility and Intelligence of the Hero by 10 when worn."
+Art=ReplaceableTextures\CommandButtons\BTNOrbofSlowness.blp
+[I07T]
+Name=Bow of the Quincy (shop)
+Hotkey=G
+Tip=Purchase Bow of the Quincy [|cffffcc00G|r]
+Ubertip="A swift, true-firing bow that holds the true power of Quincy. Gives +25 Agility."
+Description="A swift, true-firing bow that holds the true power of Quincy. Gives +25 Agility."
+Art=ReplaceableTextures\CommandButtons\BTNImprovedBows.blp
+[modt]
+Name=Mask of Death
+Tip=Purchase |cffffcc00M|rask of Death
+Ubertip="The phattest lewt, definitely. Gives +10% Life Steal.|n|n|cffff0000Orb effects do not stack|r"
+Description="This mask causes the Hero's attacks to drain life."
+Art=ReplaceableTextures\CommandButtons\BTNMaskOfDeath.blp
+Hotkey=M
+[TALT]
+Name=An Altar
+DependencyOr=halt,oalt,eate,uaod
+[gemt]
+Name=Gem of True Seeing
+Hotkey=T
+Tip=Purchase Gem of |cffffcc00T|rrue Seeing
+Ubertip="A crystal that grants the hero true sight, which reveals nearby invisible units.|n|n|cffff0000Drops upon death|r"
+Description=Permits invisible units to be seen.
+Art=ReplaceableTextures\CommandButtons\BTNGem.blp
+[bgst]
+Name=Belt of Giant Strength
+Hotkey=B
+Tip=Purchase |cffffcc00B|relt of Giant Strength
+Ubertip=Stripped down from Giants fallen in Elbaf. Increases the Strength of the Hero by 6 when worn.
+Description=Provides a bonus to Strength.
+Art=ReplaceableTextures\CommandButtons\BTNBelt.blp
+[dust]
+Name=Dust of Appearance
+Hotkey=D
+Tip=Purchase |cffffcc00D|rust of Appearance
+Ubertip="Reveals enemy invisible units in an area around the Hero. |nContains <dust,uses> charges. |nLasts <AItb,Dur1> seconds."
+Description=Reveals invisible units.
+Art=ReplaceableTextures\CommandButtons\BTNDustOfAppearance.blp
+Buttonpos=3,0
+[I00U]
+Name=Broadsword
+Tip=Purchase Broadsword [|cffffcc00B|r]
+Ubertip=Any warrior worth a damn should have one of these. Gives +18 Damage.
+Description=Boosts attack damage by 18.
+Art=ReplaceableTextures\CommandButtons\BTNSteelMelee.blp
+Hotkey=B
+[I01U]
+Name=Maximillian
+Hotkey=
+Tip=Purchase Maximillian
+Ubertip="A metal heavy armor, named after the one of the greatest champion in famous legend. Gives +50 Strength, +500 hit points, +15 armor, +30 HP regeneration."
+Description="A metal heavy armor, named after the one of the greatest champion in famous legend. Gives +50 Strength, +500 hit points, +15 armor, +30 HP regeneration."
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNmaximillian.tga
+[I02U]
+Name=Heart of the Bount - 2500
+Hotkey=A
+Tip=He|cffffcc00a|rrt of the Bount - 2500
+Ubertip=|cffffcc00Gives:|r|n+35 Strength|n+20 HP/second regen|n+300 HP|n|cffffcc00Requires:|r|nElbaf's Reaver|nVitality Booster
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNHeartOfAszune.blp
+[I03U]
+Name=Windrunner - 3750
+Hotkey=W
+Tip=|cffffcc00W|rindrunner - 3750
+Ubertip=|cffffcc00Gives:|r|n+30 Agility|n+25 damage|nWind Walk (active)|n|cffffcc00Requires:|r|nBow of the Quincy
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNRallyPointNightElf.blp
+[I04U]
+Name=Sacrificial Wand - 20000
+Hotkey=W
+Tip=Sacrificial |cffffcc00W|rand - 20000
+Ubertip=|cffffcc00Gives:|r|n+35 Strength|n+60 Intelligence|n+500 Hit Points|n+20 HP regen/sec|nSacrifice (Active)|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nMystic Staff
+Description=|cffffcc00Gives:|r|n+35 Strength|n+60 Intelligence|n+500 Hit Points|n+20 HP regen/sec|nSacrifice (Active)|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nMystic Staff
+Art=ReplaceableTextures\CommandButtons\BTNsacrificialwand.blp
+[I05U]
+Name=Perseverance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A gem that grants heart to the bearer. Increases mana bonus by 6 when attacking, 5 hit point regeneration per second, and +10 damage.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06U]
+Name=Ring of Health (shop)
+Hotkey=I
+Tip=Purchase R|cffffcc00i|rng of Health
+Ubertip=A shiny ring. Gives +5 HP regeneration.
+Description=A shiny ring. Gives +5 HP regeneration.
+Art=ReplaceableTextures\CommandButtons\BTNGoldRing.blp
+[I07U]
+Name=Vizard's Zanpakuto (shop)
+Hotkey=D
+Tip=Purchase Vizar|cffffcc00d|r's Zanpakuto
+Ubertip=A common vizard sword. Gives +36 Damage.
+Description=A common vizard sword. Gives +36 Damage.
+Art=ReplaceableTextures\CommandButtons\BTNFrostmourne.blp
+[I00V]
+Name=Jidanbo's Maul
+Tip=Purchase Jidanbo's Maul [|cffffcc00C|r]
+Ubertip="Hammer used by Seireitei's gate keeper, Jidanbo. Gives +21 damage."
+Description=Boosts attack damage by 21.
+Art=ReplaceableTextures\CommandButtons\BTNHammer.blp
+Hotkey=C
+[I01V]
+Name=The Red Butterfly
+Hotkey=
+Tip=Purchase The Red Butterfly
+Ubertip="The Red Butterfly is a blade that once used by the most feared assassin, the blood from his victims makes the weapon stronger and become more stronger than its mate, the green one. It grants its bearer +50 Agility, 100 damage, +55% increased attack speed, and 35% Evasion."
+Description="The Red Butterfly is a blade that once used by the most feared assassin, the blood from his victims makes the weapon stronger and become more stronger than its mate, the green one. It grants its bearer +50 Agility, 100 damage, +55% increased attack speed, and 35% Evasion."
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNtheredbutterfly.tga
+[I02V]
+Name=Totem of Might (recipe)
+Hotkey=G
+Tip=Totem of Mi|cffffcc00g|rht
+Ubertip=|cffffcc00Gives:|r|n+100 Damage|n+30% Attack Damage (|cffff0000melee|r)|n|cffffcc00Requires:|r|nNejibana|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Description=|cffffcc00Gives:|r|n+100 Damage|n+30% Attack Damage (|cffff0000melee|r)|n|cffffcc00Requires:|r|nNejibana|nVizard's Zanpakuto|n|n|cffff0000Damage bonus do not stack with same type of item.|r
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I03V]
+Name=|c000042ffFrostmourne|r - 40000
+Hotkey=F
+Tip=|c000042ffFrostmourne|r [|cffffcc00F|r] - 40000
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nFrozen Hollow Mask|nDivine Rapier (Dropped Item)|nOrb of Frost (Dropped Item)
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNfrostmourne2.tga
+[I04V]
+Name=Chainmail (shop)
+Hotkey=M
+Tip=Purchase Chain|cffffcc00m|rail
+Ubertip=Increases armor of the hero by 5 when worn.
+Description=Increases armor of the hero by 5 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNchainmail.blp
+[I05V]
+Name=Radiance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A divine weapon that gives +120 damage and a bright burning effect that damages nearby units for 80 damage a second and cause them to miss on 8% of their attacks against Radiance's bearer.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06V]
+Name=Reiatsu Stone (shop)
+Hotkey=V
+Tip=Purchase Reiatsu Stone [|cffffcc00V|r]
+Ubertip=A stone of seemingly endless reiatsu power. Increases mana bonus by 5 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=A stone of seemingly endless reiatsu power. Increases mana bonus by 5 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Art=ReplaceableTextures\CommandButtons\BTNPeriapt.blp
+[belv]
+Name=Boots of the Quincy
+Hotkey=E
+Tip=Purchase Boots of th|cffffcc00e|r Quincy
+Ubertip=A pair of boots often used for hunting. Increases the Agility of the Hero by 6 when worn.
+Description=Provides a bonus to Agility.
+Art=ReplaceableTextures\CommandButtons\BTNBoots.blp
+[hslv]
+Name=Healing Salve
+Hotkey=H
+Tip=Purchase |cffffcc00H|realing Salve
+Ubertip="|cff87ceebNon-Combat Consumable|r|nRegenerates a target unit's hit points by <AIrl,DataA1> over <AIrl,Dur1> seconds when used. |nContains <hslv,uses> charges."
+Description=Regenerates lost hit points over time.
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNHealingSalve.blp
+[pinv]
+Name=Potion of Invisibility
+Hotkey=I
+Tip=Purchase Potion of |cffffcc00I|rnvisibility
+Ubertip="|cff87ceebNon-Combat Consumable|r|nRenders the Hero invisible for <AIv1,Dur1> seconds when used. An invisible Hero is untargetable by the enemy unless detected. If the Hero attacks, uses an ability, or casts a spell, the invisibility effect is lost."
+Description=Renders Hero temporarily invisible.
+Art=ReplaceableTextures\CommandButtons\BTNLesserInvisibility.blp
+[I00W]
+Name=Reiatsu Orb
+Hotkey=
+Tip=Purchase Reiatsu Orb
+Ubertip=A powerful orb that glows with intense magical energy. Gives +5 Armor and +500 Mana. Can cast Replenish (Fully restore Mana).|n|n|cffc3dbffCooldown:|r 45 seconds.
+Description=A powerful orb that glows with intense magical energy. Gives +5 Armor and +500 Mana. Can cast Replenish (Fully restore Mana).|n|n|cffc3dbffCooldown:|r 45 seconds.
+Art=ReplaceableTextures\CommandButtons\BTNpebble.blp
+[I01W]
+Name=|c000042ffFrostmourne|r (recipe)
+Hotkey=F
+Tip=|c000042ffFrostmourne|r [|cffffcc00F|r]
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nFrozen Hollow Mask|nDivine Rapier (Dropped Item)|nOrb of Frost (Dropped Item)
+Description=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nFrozen Hollow Mask|nDivine Rapier (Dropped Item)|nOrb of Frost (Dropped Item)
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+[I02W]
+Name=Soul Booster (shop)
+Hotkey=
+Tip=Soul Booster
+Ubertip=|cffffcc00Gives:|r|n+500 HP|n+500 mana|n+2 mana bonus when attacking|n+2 HP regen/second|n|cffffcc00Requires:|r|nVitality Booster|nReiatsu Booster|nPoint Booster|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNPhilosophersStone.blp
+[I03W]
+Name=|c00ff0303Blood Sword|r - 25000
+Hotkey=B
+Tip=|c00ff0303Blood Sword|r [|cffffcc00B|r] - 25000
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNbloodrapier.tga
+[I04W]
+Name=Sacrificial Wand (recipe)
+Hotkey=
+Tip=""
+Ubertip=|cffffcc00Gives:|r|n+35 Strength|n+60 Intelligence|n+500 Hit Points|n+20 HP regen/sec|nSacrifice (Active)|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nMystic Staff
+Description=|cffffcc00Gives:|r|n+35 Strength|n+60 Intelligence|n+500 Hit Points|n+20 HP regen/sec|nSacrifice (Active)|n|cffffcc00Requires:|r|nHeart of the Bount (level 4 shop)|nMystic Staff
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I05W]
+Name=Reiatsu Orb
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A powerful orb that glows with intense magical energy. Gives +5 Armor and +500 Mana. Can cast Replenish (Fully restore Mana).|n|n|cffc3dbffCooldown:|r 45 seconds.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06W]
+Name=Reiatsu Booster (shop)
+Hotkey=E
+Tip=Purchase Reiatsu Booster [|cffffcc00E|r]
+Ubertip=A material that gives you much energy. Increases the mana capacity of the Hero by 250 when worn.
+Description=A material that gives you much energy. Increases the mana capacity of the Hero by 250 when worn.
+Art=ReplaceableTextures\CommandButtons\BTNEnchantedGemstone.blp
+[I07W]
+Name=Ancient Staff of Mythology
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Ancient staff found in the ruin of Skypiea (maybe). Gives +20 to all stats, +60 intelligence, +500 hp, +500 mp, and Global HEX ability (turn all enemy heroes into random shit for lasts 4 seconds).|nWew!|n|n|cffc3dbffCooldown:|r 70 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[tpow]
+Name=Tome of Knowledge
+Tip=Purchase Tome of Knowledge [|cffffcc00C|r]
+Ubertip="Permanently increases the Strength, Agility and Intelligence of the Hero by 1 when used. "
+Description="Permanently increases Strength, Agility and Intelligence."
+Art=ReplaceableTextures\CommandButtons\BTNTomeRed.blp
+Hotkey=C
+[I00X]
+Name=Giant Axe
+Hotkey=X
+Tip=Purchase Giant A|cffffcc00x|re
+Ubertip=Axe that used by Giants for duel. Increases the Strength of the Hero by 10 when worn.
+Description=Provides a bonus to Strength.
+Art=ReplaceableTextures\CommandButtons\BTNSpiritWalkerAdeptTraining.blp
+[I01X]
+Name=Urahara's Offering
+Tip=Purchase Urahara's Offering
+Ubertip="An eerie mask that is haunted with the malice of a fallen Arrancar. Grants a +16% Lifesteal Aura (melee), +4 Armor Aura, and +1.5 Mana Regen Aura."
+Description="An eerie mask that is haunted with the malice of a fallen Arrancar. Grants a +16% Lifesteal Aura (melee), +4 Armor Aura, and +1.5 Mana Regen Aura."
+Art=ReplaceableTextures\CommandButtons\BTNCloakOfFlames.blp
+[I02X]
+Name=Perseverance (shop)
+Hotkey=
+Tip=Perseverance
+Ubertip=|cffffcc00Gives:|r|n+10 damage|n+5 HP regen/second|n+6 mana bonus when attacking|n|cffffcc00Requires:|r|nRing of Health|nReiatsu Stone|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfFire.blp
+[I03X]
+Name=|c00ff0303God's Sphere|r - 99999
+Hotkey=G
+Tip=|c00ff0303God's Sphere|r [|cffffcc00G|r] - 99999
+Ubertip=|cffffcc00Gives:|r|nunknown|n|cffffcc00Requires:|r|nGhost Ring (Dropped Item)|nDarkness Sphere (level 3 shop)
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNorb.blp
+[I04X]
+Name=Mace of Zeus II (recipe)
+Hotkey=
+Tip=""
+Ubertip="|cffffcc00Gives:|r|n+40 Intelligence|n+20 Agility|n+20 Strength|n+200 Damage|n25% Energy Wrath (orb, passive)|nPlasma Field (active)|n|cffffcc00Requires:|r|nMace of Zeus (level 4 shop)|nSoul-Devourer Stone (level 3 shop)|n|n|cffff0000Orb effects do not stack|r"
+Description="|cffffcc00Gives:|r|n+40 Intelligence|n+20 Agility|n+20 Strength|n+200 Damage|n25% Energy Wrath (orb, passive)|nPlasma Field (active)|n|cffffcc00Requires:|r|nMace of Zeus (level 4 shop)|nSoul-Devourer Stone (level 3 shop)|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I05X]
+Name=Ring of the Arrancar
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Ring given to medium level Arrancar. Grants a 0.75 Brilliance Aura, a +3 Devotion Aura, and 10 damage."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06X]
+Name=Point Booster (shop)
+Hotkey=P
+Tip=Purchase |cffffcc00P|roint Booster
+Ubertip=This material increases the reservoir of points that a hero has available to it when carried. Gives +200 Hit Points and +150 Mana.
+Description=This material increases the reservoir of points that a hero has available to it when carried. Gives +200 Hit Points and +150 Mana.
+Art=ReplaceableTextures\CommandButtons\BTNUsedSoulGem.blp
+[I07X]
+Name=Sentoumaru's Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An axe that used by Sentoumaru from Marine Headquarter. The user becomes a powerful killing machine. Increases mana bonus by 9 when attacking, 6 hit points regenerated per second, +75 damage, and 20% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I00Y]
+Name=Claw of Alacrity
+Hotkey=Y
+Tip=Purchase Claw of Alacrit|cffffcc00y|r
+Ubertip=A clay imbued with Haki. Increases the Agility of the Hero by 10 when worn.
+Description=Provides a bonus to Agility.
+Art=ReplaceableTextures\CommandButtons\BTNShamanAdept.blp
+[I01Y]
+Name=Radiance (recipe)
+Hotkey=R
+Tip=|cffffcc00R|radiance
+Ubertip=|cffffcc00Gives:|r|n+120 damage|n+8% Evasion|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nNejibana
+Description=|cffffcc00Gives:|r|n+120 damage|n+8% Evasion|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nNejibana
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I02Y]
+Name=Ring of the Arrancar (shop)
+Hotkey=
+Tip=Ring of the Arrancar
+Ubertip=|cffffcc00Gives:|r|n+10 damage|n+0.75 Mana Regen Aura|n+3 Armor Aura|n|cffffcc00Requires:|r|nHollow Mask|nRing of Protection
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNRingJadeFalcon.blp
+[I03Y]
+Name=|c00fffc01Ultima Sword|r - 40000
+Hotkey=U
+Tip=|c00fffc01Ultima Sword|r [|cffffcc00U|r] - 40000
+Ubertip=|cffffcc00Gives:|r|n+350 Damage|n+16% Evasion|n20% Critical Strike (3x)|n20% chance to deal 400 damage (passive)|nDamages all nearby opponents (passive)|n|cffffcc00Requires:|r|nSokyoku (level 4 shop)|nRadiance (level 4 shop)|nExcalibur
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNultimasword.tga
+[I04Y]
+Name=Force Staff (recipe)
+Hotkey=
+Tip=""
+Ubertip=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|n+15% Attack Speed|nForce (active)|n|cffffcc00Requires:|r|nNami's Staff|nStaff of Wizardry
+Description=|cffffcc00Gives:|r|n+20 Intelligence|n+40 Damage|n+15% Attack Speed|nForce (active)|n|cffffcc00Requires:|r|nNami's Staff|nStaff of Wizardry
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollGreen.blp
+[I05Y]
+Name=Bracer
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A decorated wrist band. Gives +3 to all attributes, and an additional +3 to strength."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06Y]
+Name=Nejibana (shop)
+Hotkey=S
+Tip=Purchase Nejibana [|cffffcc00S|r]
+Ubertip=A shikai form zanpakuto from fallen vice-captain. Gives +60 damage.
+Description=A shikai form zanpakuto from fallen vice-captain. Gives +60 damage.
+Art=ReplaceableTextures\CommandButtons\BTNNagaWeaponUp3.blp
+[I00Z]
+Name=Staff of Wizardry
+Hotkey=W
+Tip=Purchase Staff of |cffffcc00W|rizardry
+Ubertip=A powerful staff used by a fallen wizard. Increases the Intelligence of the Hero by 10 when worn.
+Description=Provides a bonus to Intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNWandOfCyclone.blp
+[I01Z]
+Name=Heart of the Bount (recipe)
+Hotkey=A
+Tip=He|cffffcc00a|rrt of the Bount
+Ubertip=|cffffcc00Gives:|r|n+35 Strength|n+20 HP/second regen|n+300 HP|n|cffffcc00Requires:|r|nElbaf's Reaver|nVitality Booster
+Description=|cffffcc00Gives:|r|n+35 Strength|n+20 HP/second regen|n+300 HP|n|cffffcc00Requires:|r|nElbaf's Reaver|nVitality Booster
+Buttonpos=0,0
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+[I02Z]
+Name=Shihoin's Boots (shop)
+Hotkey=
+Tip=Shihoin's Boots
+Ubertip=|cffffcc00Gives:|r|n+65 movement speed|n+20% attack speed|n+5 all stats|n|cffffcc00Requires:|r|nBoots of Speed|nGloves of Haste|n Boots of the Quincy|n  |c00fffc01or|r|n Robe of the Magi|n  |c00fffc01or|r|n Belt of Giant Strength|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Power Treads|r
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNWirtsLeg.blp
+[I03Z]
+Name=|cffffcc00Corrupted Desolator|r - 22000
+Hotkey=D
+Tip=|cffffcc00Corrupted Desolator|r [|cffffcc00D|r] - 22000
+Ubertip="|cffffcc00Gives:|r|n+500 damage|nExtreme Desolate (orb, passive)|n|cffffcc00Requires:|r|nDivine Rapier (Dropped Item)|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r|n|cffff0000Drops upon death|r"
+Description=""
+Art=ReplaceableTextures\CommandButtons\BTNstygiandesolator.tga
+[I04Z]
+Name=Kuma's Unique Book (shop)
+Hotkey=K
+Tip=Purchase |cffffcc00K|ruma's Unique Book
+Ubertip=Allows the Hero to teleport a short distance.
+Description=Allows the Hero to teleport a short distance.
+Art=ReplaceableTextures\CommandButtons\BTNSpellBookBLS.blp
+[I05Z]
+Name=Shihouin's Boots
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=Increases movement and attack rate.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+[I06Z]
+Name=Nami's Staff (shop)
+Hotkey=Q
+Tip=Purchase Nami's Staff [|cffffcc00Q|r]
+Ubertip=Staff looking weapon that used by navigator of Strawhat Pirates.|nGives +10 damage and +10% attack speed.
+Description=Staff looking weapon that used by navigator of Strawhat Pirates.|nGives +10 damage and +10% attack speed.
+Art=ReplaceableTextures\CommandButtons\BTNAlleriaFlute.blp
+[rwiz]
+Name=Hollow Mask
+Hotkey=B
+Tip=Purchase Hollow Mask [|cffffcc00B|r]
+Ubertip=A mask of medium hollow. Increases mana bonus by 2 when attacking.|n|n|cffff0000Mana bonus do not stack with same type of item.|r
+Description=Increases mana regeneration rate.
+Buttonpos=2,0
+Art=ReplaceableTextures\CommandButtons\BTNSobiMask.blp
