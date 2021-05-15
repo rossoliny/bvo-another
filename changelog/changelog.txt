@@ -1,6 +1,6 @@
 BUGS
 Fixed Ichigo's T forcing to wait extra time even after cooldown is finished.
-
+Fixed kill streak sounds not playing. Now they play.
 
 HERO CHANGES
 
