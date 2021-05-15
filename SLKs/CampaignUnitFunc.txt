@@ -2904,8 +2904,9 @@ Missileart=Abilities\Weapons\ChimaeraAcidMissile\ChimaeraAcidMissile.mdl,Abiliti
 Missilearc=0.0,0.0
 Missilespeed=1200,1500
 Attachmentanimprops=large
+
 [oshm]
-Name=Bankai
+Name=Bankai: Tensa Zangetsu
 Hotkey=S
 Tip=Train |cffffcc00S|rhaman
 Ubertip="Primary spellcaster. Can initially cast Purge, which slows and dispels positive and negative buffs. Can also learn Lightning Shield and Bloodlust. |n|n|cffffcc00Attacks land and air units.|r"
@@ -2919,6 +2920,7 @@ Missilespeed=1200
 MissileHoming=1
 Specialart=Objects\Spawnmodels\Orc\OrcSmallDeathExplode\OrcSmallDeathExplode.mdl
 Casterupgradeart=UI\Widgets\Console\Human\infocard-shaman.blp
+
 [ncim]
 Name=Centaur Impaler
 Tip=Hire Centaur Impaler

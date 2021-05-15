@@ -1348,8 +1348,10 @@ Art=ReplaceableTextures\CommandButtons\BTNsilverhelm.tga
 [I04L]
 Name=Shiva's Guard
 Tip=Purchase Shiva's Guard
-Ubertip="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
-Description="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Ubertip="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional 
+|nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional 
+|nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
 Art=ReplaceableTextures\CommandButtons\BTNAdvancedMoonArmor.blp
 [I05L]
 Name=Hood of Kairouseki
@@ -1542,7 +1544,8 @@ Name=|c000080C0The Heaven Butterfly|r
 Hotkey=
 Tip=Purchase |cffffcc00F|rrostguard
 Ubertip="An extremely powerful weapon, the last piece of the second most powerful weapon in the entire world. Increases attack damage by 300, Agility by 300, attack speed by 100% and 60% chance to dodge attacks."
-Description="An extremely powerful weapon, the last piece of the second most powerful weapon in the entire world. Increases attack |ndamage by 300, Agility by 300, attack speed by 100% and 60% chance to dodge attacks."
+Description="An extremely powerful weapon, the last piece of the second most powerful weapon in the entire world. Increases attack 
+|ndamage by 300, Agility by 300, attack speed by 100% and 60% chance to dodge attacks."
 Art=ReplaceableTextures\CommandButtons\BTNtheheavenbutterfly.blp
 [I05O]
 Name=Killer Axe

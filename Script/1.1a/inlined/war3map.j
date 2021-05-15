@@ -28862,7 +28862,7 @@ function l8v takes nothing returns boolean
     return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_HERO))),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(GetManipulatingUnit())))),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(vo,GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(xo,GetFilterUnit())==false)),(GetBooleanAnd(((IsUnitHidden(GetFilterUnit())==false)),((IsUnitPaused(GetFilterUnit())==false)))))))))))))))
 endfunction
 
-function l9v takes nothing returns nothing
+function Hex_Action takes nothing returns nothing
     call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(GetManipulatingUnit()),GetUnitLoc(GetEnumUnit()),bj_UNIT_FACING)
     call UnitAddAbility(bj_lastCreatedUnit,'A05M')
     call IssueTargetOrderById(bj_lastCreatedUnit,852502,GetEnumUnit())
@@ -28870,7 +28870,7 @@ function l9v takes nothing returns nothing
 endfunction
 
 function Lvv takes nothing returns nothing
-    call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function l8v)),function l9v)
+    call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function l8v)),function Hex_Action)
 endfunction
 
 function Lev takes nothing returns nothing
@@ -35175,9 +35175,9 @@ function WWv takes nothing returns nothing
     call TriggerAddAction(Q5,function Wwv)
 endfunction
 
-function Wyv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(0))
-endfunction
+//function Wyv takes nothing returns boolean
+//    return(GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(0))
+//endfunction
 
 function WYv takes nothing returns boolean
     return(((GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(0))))
@@ -35198,9 +35198,9 @@ function WZv takes nothing returns nothing
     call TriggerAddAction(Gy,function Wzv)
 endfunction
 
-function W_v takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(1))
-endfunction
+//function W_v takes nothing returns boolean
+//    return(GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(1))
+//endfunction
 
 function W0v takes nothing returns boolean
     return(((GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(1))))
@@ -38407,7 +38407,7 @@ function rle takes nothing returns nothing
         call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
         call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
-        // probably
+        // probably hollow bug
         call ModifyHeroStat(0,Xg,1,50)
         call ModifyHeroStat(1,Xg,1,50)
     endif
@@ -38699,6 +38699,7 @@ function Ichigo_Bankai_Action takes nothing returns nothing
             call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
             call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
+            call BJDebugMsg("Take back 50 STR and AGI")
             call ModifyHeroStat(0,Xg,1,50)
             call ModifyHeroStat(1,Xg,1,50)
         endif
@@ -39492,8 +39493,11 @@ endfunction
 
 function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
+    local real hollowDuration
+    local unit dummy
     set Xg=GetTriggerUnit()
     set abilityLevel = GetUnitAbilityLevelSwapped('A04A',Xg)
+    set hollowDuration = (15.+(1.*I2R(abilityLevel)))
     set fh=(160.-(10.*I2R(abilityLevel)))
     set r9[1000]=GetUnitLoc(Xg)
     set r9[1001]=GetRectCenter(io)
@@ -39538,7 +39542,6 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call ModifyHeroStat(0,Ck,2,(Ek[1] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give str bonus
     call ModifyHeroStat(1,Ck,2,(Ek[2] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give agi bonus
     call ModifyHeroStat(2,Ck,2,Ek[3])     // copy INT
-    call UnitApplyTimedLifeBJ(2.,'BTLF',t9[1])
     call PauseUnit(Ck,false)
     call SetUnitInvulnerable(Ck,false)
     call UnitRemoveBuffsBJ(1,Ck)
@@ -39897,6 +39900,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call EnableTrigger(ua)
     set eh=false
     set fh=.0
+    set dummy = null
 endfunction
 
 
@@ -40128,6 +40132,7 @@ function Ichigo_Die_Action takes nothing returns nothing
     call ModifyHeroStat(0,Xg,2,(Ek[1]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
     call ModifyHeroStat(1,Xg,2,(Ek[2]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
     call ModifyHeroStat(2,Xg,2,Ek[3])
+    call SetUnitLifePercentBJ(Xg, 40)
     call PauseUnit(Xg,false)
     call SetUnitInvulnerable(Xg,false)
     call UnitRemoveBuffsBJ(1,Xg)
@@ -40151,6 +40156,8 @@ function Ichigo_Die_Action takes nothing returns nothing
             call UnitAddAbility(Xg,'A028')
         endif
     endif
+    // after timed life is expired must auto select ichigo
+    call SelectUnitForPlayerSingle(Xg,GetOwningPlayer(Xg))
     if(((Ck==x)))then
         set x=Xg
     endif
