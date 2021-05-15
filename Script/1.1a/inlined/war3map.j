@@ -28539,6 +28539,7 @@ function lxv takes nothing returns nothing
     call AddSpecialEffectTargetUnitBJ("origin",GetManipulatingUnit(),"Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     call UnitAddItemByIdSwapped('I01T',GetManipulatingUnit())
+    // wtf
     if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function lvv)
         call DisableTrigger(GetTriggeringTrigger())
@@ -39046,28 +39047,37 @@ endfunction
 
 function Ichigo_Hollow_Learned_Action takes nothing returns nothing
     local integer unitID = 'H01F'
+    local integer abilityLevel
     set dh=GetLearningUnit()
     set Sd=GetRectCenter(io)
+    set abilityLevel = GetUnitAbilityLevel(dh, 'A04A')
 
     if(GetUnitAbilityLevel(dh, 'A04A') != 1) then
         call RemoveUnit(Ck)
         set Ck = null
     endif
-  
-    if(GetUnitAbilityLevel(dh, 'A04A') == 2) then
+
+    // TODO: check if these units can but blink  
+    if(abilityLevel == 2) then
         set unitID = 'H01G'
-    elseif(GetUnitAbilityLevel(dh, 'A04A') == 3) then
+    elseif(abilityLevel == 3) then
         set unitID = 'H01H'
-    elseif(GetUnitAbilityLevel(dh, 'A04A') == 4) then
+    elseif(abilityLevel == 4) then
         set unitID = 'H01I'
-    elseif(GetUnitAbilityLevel(dh, 'A04A') == 5) then
+    elseif(abilityLevel == 5) then
         set unitID = 'H01J'
     endif
 
-    // check if can but blink
     call CreateNUnitsAtLoc(1,unitID,Player(15),Sd,bj_UNIT_FACING)
     set Ck=bj_lastCreatedUnit
-    call UnitAddAbility(Ck,'Agho')
+    call UnitAddAbility(Ck, 'Agho')
+
+    // magic resistance
+    if(abilityLevel > 1) then
+        call UnitAddAbility(Ck, 'A101')
+        call SetUnitAbilityLevel(Ck, 'A101', abilityLevel - 1)
+    endif
+
     call PauseUnit(Ck,true)
     call SetUnitInvulnerable(Ck,true)
     call RemoveLocation(Sd)
@@ -39528,6 +39538,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call ModifyHeroStat(0,Ck,2,(Ek[1] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give str bonus
     call ModifyHeroStat(1,Ck,2,(Ek[2] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give agi bonus
     call ModifyHeroStat(2,Ck,2,Ek[3])     // copy INT
+    call UnitApplyTimedLifeBJ(2.,'BTLF',t9[1])
     call PauseUnit(Ck,false)
     call SetUnitInvulnerable(Ck,false)
     call UnitRemoveBuffsBJ(1,Ck)

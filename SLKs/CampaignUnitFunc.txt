@@ -2015,6 +2015,7 @@ Art=ReplaceableTextures\CommandButtons\BTNFleshGolem.blp
 Buttonpos=0,0
 Specialart=Objects\Spawnmodels\Undead\UndeadLargeDeathExplode\UndeadLargeDeathExplode.mdl
 Attachmentanimprops=large
+
 [H01F]
 Name=Substitute Shinigami
 Propernames=Kurosaki Ichigo
@@ -2023,14 +2024,83 @@ Tip=Summon Pa|cffffcc00l|radin
 Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
 Revivetip=Revive Pa|cffffcc00l|radin
 Awakentip=Revive Pa|cffffcc00l|radin
-Art=ReplaceableTextures\CommandButtons\BTNichi.blp
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
 Buttonpos=0,0
 Requirescount=3
 Requires=
 Requires1=hkee
 Requires2=hcas
 Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
-ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNichi.blp
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+
+[H01G]
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Buttonpos=0,0
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+
+[H01H]
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Buttonpos=0,0
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+
+[H01I]
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Buttonpos=0,0
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+
+[H01J]
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Hotkey=L
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+Revivetip=Revive Pa|cffffcc00l|radin
+Awakentip=Revive Pa|cffffcc00l|radin
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Buttonpos=0,0
+Requirescount=3
+Requires=
+Requires1=hkee
+Requires2=hcas
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+
 [nshf]
 Name=Flying Sheep
 Tip=Invoke Uber Sheep
