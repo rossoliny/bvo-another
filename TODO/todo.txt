@@ -1,0 +1,2 @@
+Fix Hollow Form with ability level more than 1 allows to buy Blink.
+Fix Ichigo is able to move during duel if during dues he transformed back from Hollow Form.
