@@ -1,11 +1,13 @@
 FIXES
 
-Fix Hollow Form with ability level more than 1 allows to buy Blink.
-Prohibit anyone from dropping Kuma's Unique Book into Zaraki.
+Hollow Form with ability level more than 1 allows to buy Kuma's Unique Book.
+Fix Ichigo Hollow Form refreshes all item cooldowns.
+Prohibit anyone from putting Kuma's Unique Book into Zaraki.
 Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.
-Fix Ichigo is able to move during duel if during duel he transformed back from Hollow Form.
-Fix OZ zone portals still allow to leave zone when final OZ is spawned.
-Forbid rapire based items to be combined outside of base so nobody can build item right after leaving rapire zone.
+Fix Ichigo is able to move during duel if during duel he transformed from Hollow Form back to normal.
+Fix OZ-zone portals allow to leave zone when final OZ is spawned.
+Forbid rapire based items to be combined outside of base so nobody can build item right after leaving rapire-zone.
+
 
 
 
