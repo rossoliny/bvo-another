@@ -41220,6 +41220,9 @@ function XAe takes nothing returns nothing
     set a[402]=GetSpellTargetUnit()
     set C[400]=(2+GetUnitAbilityLevelSwapped('A060',A[405]))
     set l[(1+GetPlayerId(GetOwningPlayer(A[405])))]=true
+    
+    call PlayThematicMusicBJ("Sounds\\Bleach\\Evil_Ichigo\\Evil_Ichigo_T.mp3")
+
     call UnitAddType(A[405],UNIT_TYPE_MAGIC_IMMUNE)
     call ResetUnitAnimation(A[405])
     call SetUnitTimeScalePercent(A[405],100.)
