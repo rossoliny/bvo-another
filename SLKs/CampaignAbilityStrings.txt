@@ -1857,7 +1857,7 @@ Tooltip=True Hollow Form
 
 [B01B]
 Buffart=ReplaceableTextures\CommandButtons\BTNZangetsuE.blp
-Bufftip=Bankai: Tensa Zangetsu
+Bufftip=Bankai
 Buffubertip=This hero is using Bankai
 
 [A02B]

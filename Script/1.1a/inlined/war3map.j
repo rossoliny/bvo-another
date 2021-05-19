@@ -71234,6 +71234,7 @@ function d6x takes nothing returns nothing
     call UG(1000.,dg[58],function d5x)
     set Km[98]=GetUnitLoc(A[106])
     call PlaySoundAtPointBJ(fr,100,Km[98],0)
+    call PlayThematicMusicBJ("Sounds\\OnePiece\\Mihawk\\Mihawk_R.wav")
     call RemoveLocation(Km[98])
     set Km[98]=null
     set A[106]=null
@@ -71295,6 +71296,7 @@ function DVx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
+// mihawk R?
 function DEx takes nothing returns nothing
     set A[107]=GetTriggerUnit()
     set a[67]=GetSpellTargetUnit()
@@ -71312,6 +71314,7 @@ function DEx takes nothing returns nothing
     call PauseUnit(a[67],true)
     call SetUnitInvulnerable(A[107],true)
     call SetUnitInvulnerable(a[67],true)
+    call PlayThematicMusicBJ("Sounds\\OnePiece\\Mihawk\\Mihawk_T_1.mp3")
     set Km[99]=GetUnitLoc(A[107])
     call PlaySoundAtPointBJ(gr,100,Km[99],0)
     call RemoveLocation(Km[99])
@@ -71352,6 +71355,7 @@ function DEx takes nothing returns nothing
         set b[39]=b[39]+1
     endloop
     call PauseUnit(a[67],false)
+    call PlayThematicMusicBJ("Sounds\\OnePiece\\Mihawk\\Mihawk_T_2.mp3")
     set q4[2]=(2000.+(I2R(GetHeroStatBJ(0,A[107],false))*(11.*I2R(GetUnitAbilityLevelSwapped('A04Y',A[107])))))
     call UnitDamageTargetBJ(A[107],a[67],q4[2],ATTACK_TYPE_HERO,DAMAGE_TYPE_NORMAL)
     set dg[60]=GetUnitLoc(A[107])
