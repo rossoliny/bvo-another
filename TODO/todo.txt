@@ -1,2 +1,32 @@
+FIXES
+
 Fix Hollow Form with ability level more than 1 allows to buy Blink.
-Fix Ichigo is able to move during duel if during dues he transformed back from Hollow Form.
+Prohibit anyone from dropping Kuma's Unique Book into Zaraki.
+Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.
+Fix Ichigo is able to move during duel if during duel he transformed back from Hollow Form.
+Fix OZ zone portals still allow to leave zone when final OZ is spawned.
+Forbid rapire based items to be combined outside of base so nobody can build item right after leaving rapire zone.
+
+
+
+CHANGES
+
+-Change Manual of Health to give 60 HP per book instead of 45.
+-Add 50% lifesteal to Blood Sword.
+-Change Hell Crusher bash chance from 9% to 8%.
+-Starting from level 50 right and left bosses will have 100% change to drop gold + standard chance to also drop elixir.
+-Change Ultima Sword cost from 40000 to 35000 gold.
+-Reduce Ancient Staff of Mythology recipe price from 13400 to 11400 gold.
+-Reduce Sacrificial Wand recipe price from 20000 to 18000 gold.
+-Reduce Mace of Zeus recipe price from 4000 to 3000 gold.
+-Reduce Orb of Lightning recipe price from 1100 to 500 gold.
+-Improve Sorcerer's Scepter as it becomes too weak and useless in late game, make it more expensive but more usefull.
+-Somehow improve old unused items such as Orb of Fire, Soul-devourer Stone, Mask of Vizard, Bladebane Armor, Hollow Shield to make them more usefull so player want to buy them, add new based items or add them into requirements to some exising.
+
+
+
+ADDITIONS
+
+Create new rapire-based item for INT characters.
+Add new boots item based on Shihoins's Boots.
+Add improved item based on Darkness Sphere.
