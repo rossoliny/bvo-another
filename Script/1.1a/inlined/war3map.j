@@ -38699,7 +38699,7 @@ function Ichigo_Bankai_Action takes nothing returns nothing
             call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
             call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
-            call BJDebugMsg("Take back 50 STR and AGI")
+            call BJDebugMsg("Take back 50 STR and AGI From Ichigo. (FIX)")
             call ModifyHeroStat(0,Xg,1,50)
             call ModifyHeroStat(1,Xg,1,50)
         endif
@@ -38931,6 +38931,7 @@ function iWe takes nothing returns boolean
     return(IsUnitInGroup(A[7],C4))
 endfunction
 
+// ichigo R
 function iye takes nothing returns nothing
     set A[7]=GetTriggerUnit()
     set a[1]=GetSpellTargetUnit()
@@ -38944,6 +38945,7 @@ function iye takes nothing returns nothing
         set C[2]=5
     endif
     set l[(1+GetPlayerId(GetOwningPlayer(A[7])))]=true
+    call PlayThematicMusicBJ("Sounds\\Bleach\\Ichigo\\Ichigo_R.mp3")
     call ResetUnitAnimation(A[7])
     call SetUnitTimeScalePercent(A[7],100.)
     call SetUnitVertexColorBJ(A[7],100,100,100,50.)
@@ -39491,6 +39493,30 @@ function Get_HollowForm_Stat_Bonus takes integer abilityLevel returns integer
     return (20 * abilityLevel)
 endfunction
 
+function Get_Ichigo_T_Sound takes nothing returns string
+    local integer which_sound = GetRandomInt(1, 3)
+    local string path
+    if(which_sound == 1) then
+        set path = "Sounds\\Bleach\\Ichigo\\Ichigo_T_1.mp3"
+    elseif(which_sound == 2) then
+        set path = "Sounds\\Bleach\\Ichigo\\Ichigo_T_2.mp3"
+    else
+        set path = "Sounds\\Bleach\\Ichigo\\Ichigo_T_3.mp3"
+    endif
+    return path
+endfunction
+
+function Get_Vastolorde_Q_Sound takes nothing returns string
+    local integer which_sound = GetRandomInt(1, 2)
+    local string path
+    if(which_sound == 1) then
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_1.mp3"
+    else
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_2.mp3"
+    endif
+    return path
+endfunction
+
 function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
     local real hollowDuration
@@ -39536,6 +39562,9 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call AddSpecialEffectLocBJ(r9[1000],"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     set m[(1+GetPlayerId(GetOwningPlayer(Ck)))]=Ck
+    //if(not ck) then
+    call PlayThematicMusicBJ(Get_Ichigo_T_Sound())
+    //endif
     call SetUnitPositionLocFacingBJ(Ck,r9[1000],I2R(Ek[0]))
     call SetHeroXP(Ck,Ek[4],false)
     call SetHeroLevelBJ(Ck,Ek[5],false)
@@ -40301,7 +40330,7 @@ function Init_Ichigo_Die_Trig takes nothing returns nothing
 endfunction
 
 
-function VIe takes nothing returns boolean
+function Ichigo_HollowForm_Cero_Condition takes nothing returns boolean
     return(GetSpellAbilityId()=='A0BS')
 endfunction
 
@@ -40309,7 +40338,7 @@ function VAe takes nothing returns boolean
     return(IsTriggerEnabled(ya)==false)
 endfunction
 
-function VNe takes nothing returns nothing
+function Ichigo_HollowForm_Cero_Action takes nothing returns nothing
     set t9[100]=GetTriggerUnit()
     set r9[100]=GetUnitLoc(t9[100])
     set r9[101]=GetSpellTargetLoc()
@@ -40320,6 +40349,7 @@ function VNe takes nothing returns nothing
     call EnableTrigger(ya)
     set Km[3]=GetUnitLoc(t9[100])
     call PlaySoundAtPointBJ(yp,100,Km[3],0)
+    call PlayThematicMusicBJ(Get_Vastolorde_Q_Sound())
     call RemoveLocation(Km[3])
     set Km[3]=null
     loop
@@ -40337,8 +40367,8 @@ endfunction
 
 function Vbe takes nothing returns nothing
     set xa=CreateTrigger()
-    call TriggerAddCondition(xa,Condition(function VIe))
-    call TriggerAddAction(xa,function VNe)
+    call TriggerAddCondition(xa,Condition(function Ichigo_HollowForm_Cero_Condition))
+    call TriggerAddAction(xa,function Ichigo_HollowForm_Cero_Action)
 endfunction
 
 function VBe takes nothing returns boolean
@@ -40416,7 +40446,7 @@ function Vke takes nothing returns nothing
     call TriggerAddAction(ya,function VJe)
 endfunction
 
-function VKe takes nothing returns boolean
+function Ichigo_HollowForm_Getsuga_Condition takes nothing returns boolean
     return(GetSpellAbilityId()=='A0BT')
 endfunction
 
@@ -40464,11 +40494,14 @@ function Vte takes nothing returns nothing
     call KillDestructable(GetEnumDestructable())
 endfunction
 
-function VTe takes nothing returns nothing
+function Ichigo_HollowForm_Getsuga_Action takes nothing returns nothing
     set t9[102]=GetTriggerUnit()
     set Ek[12]=0
     set r9[102]=GetUnitLoc(t9[102])
     set Cj[71]=1
+
+    call PlayThematicMusicBJ("Sounds\\Bleach\\Ichigo\\Vastolorde_W.mp3")
+
     loop
         exitwhen Cj[71]>30
         set Ek[12]=(Ek[12]+12)
@@ -40505,8 +40538,8 @@ endfunction
 
 function Vue takes nothing returns nothing
     set za=CreateTrigger()
-    call TriggerAddCondition(za,Condition(function VKe))
-    call TriggerAddAction(za,function VTe)
+    call TriggerAddCondition(za,Condition(function Ichigo_HollowForm_Getsuga_Condition))
+    call TriggerAddAction(za,function Ichigo_HollowForm_Getsuga_Action)
 endfunction
 
 function VUe takes nothing returns boolean
@@ -40929,6 +40962,7 @@ function Eqe takes nothing returns nothing
     set c[401]=AngleBetweenPoints(B[403],B[404])
     set N[400]=0
     set l[(1+GetPlayerId(GetOwningPlayer(A[403])))]=true
+    call PlayThematicMusicBJ("Sounds\\Bleach\\Evil_Ichigo\\Evil_Ichigo_R.mp3")
     call TriggerSleepAction(.01)
     call PauseUnit(A[403],true)
     call SetUnitInvulnerable(A[403],true)
