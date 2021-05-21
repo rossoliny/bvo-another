@@ -71318,7 +71318,7 @@ function Get_Random_Sound_Mihawk_R takes nothing returns sound
     return Sound_Effect_Mihawk_R_1
 endfunction
 
-function d6x takes nothing returns nothing
+function Mihawk_R takes nothing returns nothing
     set A[106]=GetTriggerUnit()
     call Play_Spell_Sound_Effect( Get_Random_Sound_Mihawk_R() , A[106])
     set H[37]=.0
@@ -71354,7 +71354,7 @@ endfunction
 function d7x takes nothing returns nothing
     set B3=CreateTrigger()
     call TriggerAddCondition(B3,Condition(function d4x))
-    call TriggerAddAction(B3,function d6x)
+    call TriggerAddAction(B3,function Mihawk_R)
 endfunction
 
 function d8x takes nothing returns boolean
@@ -71400,7 +71400,7 @@ function Dnx takes nothing returns boolean
     return(((z)and(A[107]!=x)and(A[107]!=y)))
 endfunction
 
-function DVx takes nothing returns nothing
+function Remove_Enum_Unit takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
@@ -71412,8 +71412,8 @@ function Get_Random_Sound_Mihawk_T_p2 takes nothing returns sound
     return Sound_Effect_Mihawk_T_1_p2
 endfunction
 
-// mihawk R?
-function DEx takes nothing returns nothing
+// mihawk T
+function Mihawk_T takes nothing returns nothing
     set A[107]=GetTriggerUnit()
     call Play_Spell_Sound_Effect( Get_Random_Sound_Mihawk_T_p1(), A[107])
     set a[67]=GetSpellTargetUnit()
@@ -71529,7 +71529,7 @@ function DEx takes nothing returns nothing
     set B[67]=null
     set B[68]=null
     set eg[60]=g6('h00G')
-    call ForGroupBJ(eg[60],function DVx)
+    call ForGroupBJ(eg[60],function Remove_Enum_Unit)
     call DestroyGroup(eg[60])
     set eg[60]=null
 endfunction
@@ -71537,7 +71537,7 @@ endfunction
 function DXx takes nothing returns nothing
     set C3=CreateTrigger()
     call TriggerAddCondition(C3,Condition(function Dxx))
-    call TriggerAddAction(C3,function DEx)
+    call TriggerAddAction(C3,function Mihawk_T)
 endfunction
 
 function DOx takes nothing returns boolean
