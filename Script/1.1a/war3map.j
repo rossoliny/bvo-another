@@ -15,6 +15,8 @@ globals
     sound Sound_Effect_Mihawk_T_1_p2 = null
     sound Sound_Effect_Mihawk_R_1 = null
 
+    integer Hex_Mana_Cost = 600
+
     trigger Yo=null
     trigger Zo=null
     unit FG=null
@@ -28862,7 +28864,13 @@ function lUv takes nothing returns nothing
     call TriggerAddAction(Yv,function luv)
 endfunction
 
-function lwv takes nothing returns boolean
+function Is_Unit_Vastolorde takes unit who returns boolean
+    local integer Unit = GetUnitTypeId(who)
+    return (Unit == 'H01F' or Unit == 'H01G' or Unit == 'H01H' or Unit == 'H01I' or Unit == 'H01J')
+endfunction
+
+
+function Is_Hex_Used takes nothing returns boolean
     return(GetItemTypeId(GetManipulatedItem())=='I00G')
 endfunction
 
@@ -28922,26 +28930,33 @@ function l7v takes nothing returns boolean
     return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_HERO))),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(GetManipulatingUnit())))),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(vo,GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(xo,GetFilterUnit())==false)),(GetBooleanAnd(((IsUnitHidden(GetFilterUnit())==false)),((IsUnitPaused(GetFilterUnit())==false)))))))))))))
 endfunction
 
-function l8v takes nothing returns boolean
+function Can_Unit_Be_Hexed takes nothing returns boolean
     return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_HERO))),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(GetManipulatingUnit())))),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(vo,GetFilterUnit())==false)),(GetBooleanAnd(((RectContainsUnit(xo,GetFilterUnit())==false)),(GetBooleanAnd(((IsUnitHidden(GetFilterUnit())==false)),((IsUnitPaused(GetFilterUnit())==false)))))))))))))))
 endfunction
 
-function Hex_Action takes nothing returns nothing
+function Do_Hex_Action takes nothing returns nothing
     call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(GetManipulatingUnit()),GetUnitLoc(GetEnumUnit()),bj_UNIT_FACING)
     call UnitAddAbility(bj_lastCreatedUnit,'A05M')
     call IssueTargetOrderById(bj_lastCreatedUnit,852502,GetEnumUnit())
     call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
 endfunction
 
-function Lvv takes nothing returns nothing
-    call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function l8v)),function Hex_Action)
+function Hex_Action takes nothing returns nothing
+    local unit trigUnit = GetTriggerUnit()
+    if( Is_Unit_Vastolorde(trigUnit) ) then
+        call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Hollow Form cannot use this item|r")
+        call SetUnitManaBJ(trigUnit, GetUnitState(trigUnit, UNIT_STATE_MANA) + I2R(Hex_Mana_Cost))
+    else
+        call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function Can_Unit_Be_Hexed)),function Do_Hex_Action)
+    endif
+    set trigUnit = null
 endfunction
 
-function Lev takes nothing returns nothing
+function Init_Hex_Trig takes nothing returns nothing
     set Zv=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Zv,EVENT_PLAYER_UNIT_USE_ITEM)
-    call TriggerAddCondition(Zv,Condition(function lwv))
-    call TriggerAddAction(Zv,function Lvv)
+    call TriggerAddCondition(Zv,Condition(function Is_Hex_Used))
+    call TriggerAddAction(Zv,function Hex_Action)
 endfunction
 
 function Lxv takes nothing returns boolean
@@ -35189,6 +35204,7 @@ function Takeback_Kumas_Unique_Book takes nothing returns nothing
     call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Your hero cannot use this item|r")
     call AdjustPlayerStateBJ(2500,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_GOLD)
 endfunction
+
 
 function Trig_Dont_Buy_Kumas_Unique_Book takes nothing returns nothing
     set Ey=CreateTrigger()
@@ -71401,6 +71417,7 @@ function Dnx takes nothing returns boolean
 endfunction
 
 function Remove_Enum_Unit takes nothing returns nothing
+    call BJDebugMsg("Mihawk: removing enum unit " + GetUnitName(GetEnumUnit()))
     call RemoveUnit(GetEnumUnit())
 endfunction
 
@@ -71414,6 +71431,7 @@ endfunction
 
 // mihawk T
 function Mihawk_T takes nothing returns nothing
+    local integer i = 0
     set A[107]=GetTriggerUnit()
     call Play_Spell_Sound_Effect( Get_Random_Sound_Mihawk_T_p1(), A[107])
     set a[67]=GetSpellTargetUnit()
@@ -71439,18 +71457,18 @@ function Mihawk_T takes nothing returns nothing
     call TriggerSleepAction(.2)
     call DisableTrigger(c3)
     call ShowUnitHide(A[107])
-    set b[38]=1
+    set i = 1
     loop
-        exitwhen b[38]>5
+        exitwhen i>5
         set H[68]=(H[68]+72.)
         call CreateNUnitsAtLoc(1,'h00G',GetOwningPlayer(A[107]),B[67],H[68])
-        set A[(107+b[38])]=bj_lastCreatedUnit
-        call AddSpecialEffectTargetUnitBJ("hand right",A[(107+b[38])],"Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl")
-        call SetUnitPathing(A[(107+b[38])],false)
-        call SetUnitTimeScalePercent(A[(107+b[38])],50.)
-        call SetUnitAnimation(A[(107+b[38])],"spell")
-        call SetUnitVertexColorBJ(A[(107+b[38])],100,100,100,50.)
-        set b[38]=b[38]+1
+        set A[107+i]=bj_lastCreatedUnit
+        call AddSpecialEffectTargetUnitBJ("hand right",A[107+i],"Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl")
+        call SetUnitPathing(A[107+i],false)
+        call SetUnitTimeScalePercent(A[107+i],50.)
+        call SetUnitAnimation(A[107+i],"spell")
+        call SetUnitVertexColorBJ(A[107+i],100,100,100,50.)
+        set i=i+1
     endloop
     call TriggerSleepAction(.01)
     call EnableTrigger(D3)
@@ -71458,17 +71476,18 @@ function Mihawk_T takes nothing returns nothing
     call SetUnitInvulnerable(a[67],false)
     call TriggerSleepAction(.01)
     call DisableTrigger(D3)
-    set b[39]=1
+    set i=1
     loop
-        exitwhen b[39]>5
-        set dg[60]=GetUnitLoc(A[(107+b[39])])
+        exitwhen i>5
+        set dg[60]=GetUnitLoc(A[(107+i)])
         call AddSpecialEffectLocBJ(dg[60],"Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-        call RemoveUnit(A[(107+b[39])])
-        set A[(107+b[39])]=null
+        call BJDebugMsg("Mihawk: removing unit " + GetUnitName(A[107+i]))
+        call RemoveUnit(A[(107+i)])
+        set A[(107+i)]=null
         call RemoveLocation(dg[60])
         set dg[60]=null
-        set b[39]=b[39]+1
+        set i=i+1
     endloop
     call PauseUnit(a[67],false)
     call Play_Spell_Sound_Effect( Get_Random_Sound_Mihawk_T_p2(), A[107])
@@ -79683,7 +79702,7 @@ function Q3x takes nothing returns nothing
     call lkv()
     call ltv()
     call lUv()
-    call Lev()
+    call Init_Hex_Trig()
     call Lrv()
     call Lnv()
     call LXv()
