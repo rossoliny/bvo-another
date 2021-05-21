@@ -1,16 +1,21 @@
+----
 BUGS
+----
 Fixed: Ichigo's T forcing to wait extra time even after cooldown is finished. Now Activates properly.
 Fixed: Kill streak sound effects now play.
 Fixed: Zaraki no longer spents gold when tries to buy Kuma's Unique Book.
 Fixed: Now it is not possible to put/drop Kuma's Unique Book into Zaraki.
 
-
+------------
 HERO CHANGES
+------------
 
+_____
 Renji
 	[E] 
 		Now does not disarm Renji for two seconds after hitting target and allows Renji to attack right after spell hits the target.
 
+_______________
 Kurosaki Ichigo
 	[T]
 		Requirements changed from 40% HP or less to 60% or less. Now Hollow Form always start from 40% HP. Hollow Form bonuses now grow with ability level. Added magic resistance bonus.
@@ -25,4 +30,15 @@ Kurosaki Ichigo
 		+0/15/20/25/30% magic resistance.
 		Grants maximum movement speed.
 
+	Added sound effects for T and R.
+	Added sound effects for Hollow Form's Q and W. 
 
+_________________
+Juraquille Mihawk
+
+	Added sound effects for T and R.
+
+________
+Zangetsu
+
+	Added sound effects for T and R.
