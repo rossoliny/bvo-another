@@ -1,5 +1,6 @@
 FIXES
 
+-Make sound effect multi threaded so that one sound effect does not interrupt others.
 -Hollow Form with ability level more than 1 allows to buy Kuma's Unique Book.
 -Fix Ichigo Hollow Form refreshes all item cooldowns.
 -Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.

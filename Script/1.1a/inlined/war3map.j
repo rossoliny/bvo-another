@@ -39490,17 +39490,6 @@ function Get_Ichigo_T_Sound takes nothing returns string
     return path
 endfunction
 
-function Get_Vastolorde_Q_Sound takes nothing returns string
-    local integer which_sound = GetRandomInt(1, 2)
-    local string path
-    if(which_sound == 1) then
-        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_1.mp3"
-    else
-        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_2.mp3"
-    endif
-    return path
-endfunction
-
 function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
     local real hollowDuration
@@ -40322,6 +40311,17 @@ function VAe takes nothing returns boolean
     return(IsTriggerEnabled(ya)==false)
 endfunction
 
+function Get_Vastolorde_Q_Sound takes nothing returns string
+    local integer which_sound = GetRandomInt(1, 2)
+    local string path
+    if(which_sound == 1) then
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_1.mp3"
+    else
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_Q_2.mp3"
+    endif
+    return path
+endfunction
+
 function Ichigo_HollowForm_Cero_Action takes nothing returns nothing
     set t9[100]=GetTriggerUnit()
     set r9[100]=GetUnitLoc(t9[100])
@@ -40478,13 +40478,24 @@ function Vte takes nothing returns nothing
     call KillDestructable(GetEnumDestructable())
 endfunction
 
+function Get_Vastolorde_W_Sound takes nothing returns string
+    local integer which_sound = GetRandomInt(1, 2)
+    local string path
+    if(which_sound == 1) then
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_W_1.mp3"
+    else
+        set path = "Sounds\\Bleach\\Ichigo\\Vastolorde_W_2.mp3"
+    endif
+    return path
+endfunction
+
 function Ichigo_HollowForm_Getsuga_Action takes nothing returns nothing
     set t9[102]=GetTriggerUnit()
     set Ek[12]=0
     set r9[102]=GetUnitLoc(t9[102])
     set Cj[71]=1
 
-    call PlayThematicMusicBJ("Sounds\\Bleach\\Ichigo\\Vastolorde_W.mp3")
+    call PlayThematicMusicBJ(Get_Vastolorde_W_Sound())
 
     loop
         exitwhen Cj[71]>30
