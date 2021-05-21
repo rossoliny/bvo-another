@@ -2,7 +2,6 @@ FIXES
 
 -Hollow Form with ability level more than 1 allows to buy Kuma's Unique Book.
 -Fix Ichigo Hollow Form refreshes all item cooldowns.
--Prohibit anyone from putting Kuma's Unique Book into Zaraki.
 -Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.
 -Fix Ichigo is able to move during duel if during duel he transformed from Hollow Form back to normal.
 -Fix OZ-zone portals allow to leave zone when final OZ is spawned.
@@ -10,6 +9,15 @@ FIXES
 -Fix Hell Crusher stacking.
 -Fix Nami dissapear after Mihawk's T.
 -Fix character dissapear after repick.
+-Fix Ichigo drops items if Enel's Mamaragan kills him during Hollow form or Bankai.
+-Fix Inoue's T does not deal damage if the enemy sleeps from Tousen's Q or Brook's Q.
+-Fix not receiving medals if buying when being hexed.
+-Fix Ace's R and Renji's E disappear if you run far away.
+-Fix Ace's R and Renji's E can be escaped with help of portals.
+-Fix Kenpachi's Passive Stack with waygates or -return.
+-Fix if Renji's R climbs the walls then Renji cannot move until he dies.
+-Fix If Renji casts E and the target died before E reached the target then Renji cannot use Q and R until he dies and -return does not help.
+-Fix Robin's R can be escaped with help of blink or an ability with fast animation.
 
 
 

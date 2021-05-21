@@ -2278,7 +2278,7 @@ Name=Kuma's Unique Book (shop)
 Hotkey=K
 Tip=Purchase |cffffcc00K|ruma's Unique Book
 Ubertip=Allows the Hero to teleport a short distance.
-Description=Allows the Hero to teleport a short distance.
+Description=Allows the Hero to teleport a short distance.|nCooldown 10 seconds.
 Art=ReplaceableTextures\CommandButtons\BTNSpellBookBLS.blp
 [I05Z]
 Name=Shihouin's Boots

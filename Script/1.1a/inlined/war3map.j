@@ -35117,67 +35117,51 @@ function WMv takes nothing returns nothing
     call TriggerAddAction(Dy,function Wmv)
 endfunction
 
-function Wpv takes nothing returns boolean
-    return(GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')
+function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book takes nothing returns boolean
+    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='U004')))))
 endfunction
 
-function WPv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')))
-endfunction
-
-function Wqv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')))))
-endfunction
-
-function WQv takes nothing returns nothing
+function Takeback_Kumas_Unique_Book takes nothing returns nothing
     call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Your hero cannot use this item|r")
     call AdjustPlayerStateBJ(2500,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_GOLD)
 endfunction
 
-function Wsv takes nothing returns nothing
+function Trig_Dont_Buy_Kumas_Unique_Book takes nothing returns nothing
     set Ey=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Ey,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(Ey,Condition(function Wqv))
-    call TriggerAddAction(Ey,function WQv)
+    call TriggerAddCondition(Ey,Condition(function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book))
+    call TriggerAddAction(Ey,function Takeback_Kumas_Unique_Book)
 endfunction
 
-function WSv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetUnitTypeId(GetManipulatingUnit())!='EC08')and(GetUnitTypeId(GetManipulatingUnit())!='E005')and(GetUnitTypeId(GetManipulatingUnit())!='EC12')and(GetUnitTypeId(GetManipulatingUnit())!='E003')and(GetUnitTypeId(GetManipulatingUnit())!='H00I')and(GetUnitTypeId(GetManipulatingUnit())!='H00J')and(GetUnitTypeId(GetManipulatingUnit())!='H003')and(GetUnitTypeId(GetManipulatingUnit())!='H00E')and(GetUnitTypeId(GetManipulatingUnit())!='H01B')and(GetUnitTypeId(GetManipulatingUnit())!='H01C')and(GetUnitTypeId(GetManipulatingUnit())!='H01D')and(GetUnitTypeId(GetManipulatingUnit())!='H01E')and(GetUnitTypeId(GetManipulatingUnit())!='H01F')and(GetUnitTypeId(GetManipulatingUnit())!='H01Q')and(GetUnitTypeId(GetManipulatingUnit())!='O002')and(GetUnitTypeId(GetManipulatingUnit())!='O003')and(GetUnitTypeId(GetManipulatingUnit())!='OC10')and(GetUnitTypeId(GetManipulatingUnit())!='O000')and(GetUnitTypeId(GetManipulatingUnit())!='UC13')and(GetUnitTypeId(GetManipulatingUnit())!='UC11')and(GetUnitTypeId(GetManipulatingUnit())!='U00A')and(GetUnitTypeId(GetManipulatingUnit())!='N002')and(GetUnitTypeId(GetManipulatingUnit())!='N00C')and(GetUnitTypeId(GetManipulatingUnit())!='N006')and(GetUnitTypeId(GetManipulatingUnit())!='N00W')and(GetUnitTypeId(GetManipulatingUnit())!='N00X')and(GetUnitTypeId(GetManipulatingUnit())!='E000')and(GetUnitTypeId(GetManipulatingUnit())!='E002')and(GetUnitTypeId(GetManipulatingUnit())!='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')
-endfunction
-
-function Wtv takes nothing returns boolean
+function Unit_Allowed_To_Use_Kumas_Unique_Book takes nothing returns boolean
     return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetUnitTypeId(GetManipulatingUnit())!='EC08')and(GetUnitTypeId(GetManipulatingUnit())!='E005')and(GetUnitTypeId(GetManipulatingUnit())!='EC12')and(GetUnitTypeId(GetManipulatingUnit())!='E003')and(GetUnitTypeId(GetManipulatingUnit())!='H00I')and(GetUnitTypeId(GetManipulatingUnit())!='H00J')and(GetUnitTypeId(GetManipulatingUnit())!='H003')and(GetUnitTypeId(GetManipulatingUnit())!='H00E')and(GetUnitTypeId(GetManipulatingUnit())!='H01B')and(GetUnitTypeId(GetManipulatingUnit())!='H01C')and(GetUnitTypeId(GetManipulatingUnit())!='H01D')and(GetUnitTypeId(GetManipulatingUnit())!='H01E')and(GetUnitTypeId(GetManipulatingUnit())!='H01F')and(GetUnitTypeId(GetManipulatingUnit())!='H01Q')and(GetUnitTypeId(GetManipulatingUnit())!='O002')and(GetUnitTypeId(GetManipulatingUnit())!='O003')and(GetUnitTypeId(GetManipulatingUnit())!='OC10')and(GetUnitTypeId(GetManipulatingUnit())!='O000')and(GetUnitTypeId(GetManipulatingUnit())!='UC13')and(GetUnitTypeId(GetManipulatingUnit())!='UC11')and(GetUnitTypeId(GetManipulatingUnit())!='U00A')and(GetUnitTypeId(GetManipulatingUnit())!='N002')and(GetUnitTypeId(GetManipulatingUnit())!='N00C')and(GetUnitTypeId(GetManipulatingUnit())!='N006')and(GetUnitTypeId(GetManipulatingUnit())!='N00W')and(GetUnitTypeId(GetManipulatingUnit())!='N00X')and(GetUnitTypeId(GetManipulatingUnit())!='E000')and(GetUnitTypeId(GetManipulatingUnit())!='E002')and(GetUnitTypeId(GetManipulatingUnit())!='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')))
 endfunction
 
-function WTv takes nothing returns nothing
+function Unit_Give_Kumas_Unique_Book takes nothing returns nothing
     call UnitAddItemByIdSwapped('desc',GetManipulatingUnit())
 endfunction
 
-function Wuv takes nothing returns nothing
+function Trig_Buy_Kumas_Unique_Book takes nothing returns nothing
     set Fy=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Fy,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(Fy,Condition(function Wtv))
-    call TriggerAddAction(Fy,function WTv)
+    call TriggerAddCondition(Fy,Condition(function Unit_Allowed_To_Use_Kumas_Unique_Book))
+    call TriggerAddAction(Fy,function Unit_Give_Kumas_Unique_Book)
 endfunction
 
-function WUv takes nothing returns boolean
-    return(UnitHasItemOfTypeBJ(GetTriggerUnit(),'desc'))and(MG(GetTriggerUnit(),UNIT_TYPE_HERO))and((GetUnitTypeId(GetTriggerUnit())=='EC08')or(GetUnitTypeId(GetTriggerUnit())=='E005')or(GetUnitTypeId(GetTriggerUnit())=='EC12')or(GetUnitTypeId(GetTriggerUnit())=='E003')or(GetUnitTypeId(GetTriggerUnit())=='H00I')or(GetUnitTypeId(GetTriggerUnit())=='H00J')or(GetUnitTypeId(GetTriggerUnit())=='H003')or(GetUnitTypeId(GetTriggerUnit())=='H00E')or(GetUnitTypeId(GetTriggerUnit())=='H01B')or(GetUnitTypeId(GetTriggerUnit())=='H01C')or(GetUnitTypeId(GetTriggerUnit())=='H01D')or(GetUnitTypeId(GetTriggerUnit())=='H01E')or(GetUnitTypeId(GetTriggerUnit())=='H01F')or(GetUnitTypeId(GetTriggerUnit())=='H01Q')or(GetUnitTypeId(GetTriggerUnit())=='O002')or(GetUnitTypeId(GetTriggerUnit())=='O003')or(GetUnitTypeId(GetTriggerUnit())=='OC10')or(GetUnitTypeId(GetTriggerUnit())=='O000')or(GetUnitTypeId(GetTriggerUnit())=='UC13')or(GetUnitTypeId(GetTriggerUnit())=='UC11')or(GetUnitTypeId(GetTriggerUnit())=='U00A')or(GetUnitTypeId(GetTriggerUnit())=='N002')or(GetUnitTypeId(GetTriggerUnit())=='N00C')or(GetUnitTypeId(GetTriggerUnit())=='N006')or(GetUnitTypeId(GetTriggerUnit())=='N00W')or(GetUnitTypeId(GetTriggerUnit())=='N00X')or(GetUnitTypeId(GetTriggerUnit())=='E000')or(GetUnitTypeId(GetTriggerUnit())=='E002')or(GetUnitTypeId(GetTriggerUnit())=='O001'))and(GetUnitTypeId(GetManipulatingUnit())!='U004')
+function Unit_Not_Allowed_To_Pickup_Kumas_Unique_Book takes nothing returns boolean
+    return(UnitHasItemOfTypeBJ(GetTriggerUnit(),'desc'))and(MG(GetTriggerUnit(),UNIT_TYPE_HERO))and((GetUnitTypeId(GetTriggerUnit())=='EC08')or(GetUnitTypeId(GetTriggerUnit())=='E005')or(GetUnitTypeId(GetTriggerUnit())=='EC12')or(GetUnitTypeId(GetTriggerUnit())=='E003')or(GetUnitTypeId(GetTriggerUnit())=='H00I')or(GetUnitTypeId(GetTriggerUnit())=='H00J')or(GetUnitTypeId(GetTriggerUnit())=='H003')or(GetUnitTypeId(GetTriggerUnit())=='H00E')or(GetUnitTypeId(GetTriggerUnit())=='H01B')or(GetUnitTypeId(GetTriggerUnit())=='H01C')or(GetUnitTypeId(GetTriggerUnit())=='H01D')or(GetUnitTypeId(GetTriggerUnit())=='H01E')or(GetUnitTypeId(GetTriggerUnit())=='H01F')or(GetUnitTypeId(GetTriggerUnit())=='H01Q')or(GetUnitTypeId(GetTriggerUnit())=='O002')or(GetUnitTypeId(GetTriggerUnit())=='O003')or(GetUnitTypeId(GetTriggerUnit())=='OC10')or(GetUnitTypeId(GetTriggerUnit())=='O000')or(GetUnitTypeId(GetTriggerUnit())=='UC13')or(GetUnitTypeId(GetTriggerUnit())=='UC11')or(GetUnitTypeId(GetTriggerUnit())=='U00A')or(GetUnitTypeId(GetTriggerUnit())=='N002')or(GetUnitTypeId(GetTriggerUnit())=='N00C')or(GetUnitTypeId(GetTriggerUnit())=='N006')or(GetUnitTypeId(GetTriggerUnit())=='N00W')or(GetUnitTypeId(GetTriggerUnit())=='N00X')or(GetUnitTypeId(GetTriggerUnit())=='E000')or(GetUnitTypeId(GetTriggerUnit())=='E002')or(GetUnitTypeId(GetTriggerUnit())=='O001'))or(GetUnitTypeId(GetManipulatingUnit())=='U004')
 endfunction
 
-function Wwv takes nothing returns nothing
+function Unit_Remove_Kumas_Unique_Book takes nothing returns nothing
     call UnitRemoveItemSwapped(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'desc'),GetTriggerUnit())
 endfunction
 
-function WWv takes nothing returns nothing
+function Trig_Remove_Kumas_Unique_Book takes nothing returns nothing
     set Q5=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Q5,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(Q5,Condition(function WUv))
-    call TriggerAddAction(Q5,function Wwv)
+    call TriggerAddCondition(Q5,Condition(function Unit_Not_Allowed_To_Pickup_Kumas_Unique_Book))
+    call TriggerAddAction(Q5,function Unit_Remove_Kumas_Unique_Book)
 endfunction
-
-//function Wyv takes nothing returns boolean
-//    return(GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(0))
-//endfunction
 
 function WYv takes nothing returns boolean
     return(((GetItemTypeId(GetManipulatedItem())=='I00G')and(GetOwningPlayer(GetManipulatingUnit())==Player(0))))
@@ -79416,7 +79400,7 @@ endfunction
 function Q3x takes nothing returns nothing
     call dYx()
     call d0x()
-    call WWv()
+    call Trig_Remove_Kumas_Unique_Book()
     call CH()
     call DH()
     call GH()
@@ -79736,8 +79720,8 @@ function Q3x takes nothing returns nothing
     call WHv()
     call WKv()
     call WMv()
-    call Wsv()
-    call Wuv()
+    call Trig_Dont_Buy_Kumas_Unique_Book()
+    call Trig_Buy_Kumas_Unique_Book()
     call WZv()
     call W2v()
     call W6v()
