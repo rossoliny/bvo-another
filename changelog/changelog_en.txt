@@ -5,6 +5,7 @@ Fixed: Ichigo's T forcing to wait extra time even after cooldown is finished. No
 Fixed: Kill streak sound effects now play.
 Fixed: Zaraki no longer spents gold when tries to buy Kuma's Unique Book.
 Fixed: Now it is not possible to put/drop Kuma's Unique Book into Zaraki.
+Fixed: Ability sound effects are now multi channel so no longer one sound effect interrupts others.
 
 ------------
 HERO CHANGES
