@@ -6,7 +6,7 @@ Fixed: Kill streak sound effects now play.
 Fixed: Zaraki no longer spents gold when tries to buy Kuma's Unique Book.
 Fixed: Now it is not possible to put/drop Kuma's Unique Book into Zaraki.
 Fixed: Ability sound effects are now multi channel so no longer one sound effect interrupts others.
-Fixed: Ichigo's True Hollow Form can no longer use Ancient Staf of Mythilogy.
+Fixed: Ichigo's True Hollow Form no longer resreshes item cooldowns.
 ------------
 HERO CHANGES
 ------------
