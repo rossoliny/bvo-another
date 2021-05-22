@@ -28864,16 +28864,6 @@ function lUv takes nothing returns nothing
     call TriggerAddAction(Yv,function luv)
 endfunction
 
-function Is_Unit_Vastolorde takes unit who returns boolean
-    local integer Unit = GetUnitTypeId(who)
-    return (Unit == 'H01F' or Unit == 'H01G' or Unit == 'H01H' or Unit == 'H01I' or Unit == 'H01J')
-endfunction
-
-
-function Is_Hex_Used takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I00G')
-endfunction
-
 function lWv takes nothing returns boolean
     return(MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)
 endfunction
@@ -28941,15 +28931,47 @@ function Do_Hex_Action takes nothing returns nothing
     call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
 endfunction
 
+function Is_Unit_Vastolorde takes unit who returns boolean
+    local integer Unit = GetUnitTypeId(who)
+    return (Unit == 'H01F' or Unit == 'H01G' or Unit == 'H01H' or Unit == 'H01I' or Unit == 'H01J')
+endfunction
+
+function Is_Unit_Ichigo takes unit who returns boolean
+    local integer Unit = GetUnitTypeId(who)
+    return (Unit == 'H003' or Unit == 'H00E' or Unit == 'H01B' or Unit == 'H01C' or Unit == 'H01D' or Unit == 'H01E')
+endfunction
+
+function Is_Hex_Used takes nothing returns boolean
+    return(GetItemTypeId(GetManipulatedItem())=='I00G')
+endfunction
+
 function Hex_Action takes nothing returns nothing
     local unit trigUnit = GetTriggerUnit()
+    local item HexItem = null
+    local item TempItem = null
     if( Is_Unit_Vastolorde(trigUnit) ) then
-        call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Hollow Form cannot use this item|r")
-        call SetUnitManaBJ(trigUnit, GetUnitState(trigUnit, UNIT_STATE_MANA) + I2R(Hex_Mana_Cost))
-    else
-        call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function Can_Unit_Be_Hexed)),function Do_Hex_Action)
+        //call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Hollow Form cannot use this item|r")
+        //call SetUnitManaBJ(trigUnit, GetUnitState(trigUnit, UNIT_STATE_MANA) + I2R(Hex_Mana_Cost))
+        call BJDebugMsg("Hollow used Hex")
     endif
-    set trigUnit = null
+    if(Is_Unit_Ichigo(trigUnit) and Ck != null and false) then
+        call BJDebugMsg("Ichigo used Hex")
+        call PauseUnit(Ck, false)
+        call SetUnitOwner(Ck, GetOwningPlayer(trigUnit), true)
+        set HexItem = UnitAddItemById(Ck, 'I00G')
+        set TempItem = UnitAddItemById(Ck, 'I01O')
+        call UnitUseItem(Ck, HexItem)
+        call UnitUseItem(Ck, TempItem)
+        call SetItemDroppable(UnitItemInSlot(Ck, 1), true)
+        call SetItemLifeBJ(UnitRemoveItemFromSlot(Ck, 1), 0)
+        //call RemoveItem(HexItem)
+        //call RemoveItem(UnitHasItemOfTypeBJ(Ck,'I00G'))
+        call SetUnitOwner(Ck,Player(15),true)
+        call PauseUnit(Ck, true)
+    endif
+        call ForGroupBJ(YG(bj_mapInitialPlayableArea,Condition(function Can_Unit_Be_Hexed)),function Do_Hex_Action)
+    //endif
+    //set trigUnit = null
 endfunction
 
 function Init_Hex_Trig takes nothing returns nothing
@@ -39578,22 +39600,23 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
     local real hollowDuration
     local unit dummy
+    local integer i = -1
     set Xg=GetTriggerUnit()
     set abilityLevel = GetUnitAbilityLevelSwapped('A04A',Xg)
     set hollowDuration = (15.+(1.*I2R(abilityLevel)))
     set fh=(160.-(10.*I2R(abilityLevel)))
     set r9[1000]=GetUnitLoc(Xg)
     set r9[1001]=GetRectCenter(io)
-    set Cj[70]=1
+    set i=1
     loop
-        exitwhen Cj[70]>6
-        if((UnitItemInSlotBJ(Xg,Cj[70])==oG)and(Xg==T))then
-            call UnitRemoveItemFromSlotSwapped(Cj[70],Xg)
+        exitwhen i>6
+        if((UnitItemInSlotBJ(Xg,i)==oG)and(Xg==T))then
+            call UnitRemoveItemFromSlotSwapped(i,Xg)
         else
-            set Dk[Cj[70]]=GetItemTypeId(UnitItemInSlotBJ(Xg,Cj[70]))
-            call RemoveItem(UnitItemInSlotBJ(Xg,Cj[70]))
+            set Dk[i]=GetItemTypeId(UnitItemInSlotBJ(Xg,i))
+            call RemoveItem(UnitItemInSlotBJ(Xg,i))
         endif
-        set Cj[70]=Cj[70]+1
+        set i=i+1
     endloop
     set Ek[0]=R2I(GetUnitFacing(Xg))
     set Ek[1]=GetHeroStatBJ(0,Xg,false)
@@ -39633,19 +39656,19 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call SetUnitLifePercentBJ(Ck,40)
     call SetUnitManaBJ(Ck,0)
     call UnitRemoveAbility(Ck,'Agho')
-    set Cj[70]=1
+    set i=1
     loop
-        exitwhen Cj[70]>6
-        call UnitAddItemByIdSwapped(Dk[Cj[70]],Ck)
-        set Dk[Cj[70]]='moon'
-        set Ek[Cj[70]]=0
-        if(((Xg==Y[Cj[70]])))then
-            set Y[Cj[70]]=Ck
+        exitwhen i>6
+        call UnitAddItemByIdSwapped(Dk[i],Ck)
+        set Dk[i]='moon'
+        set Ek[i]=0
+        if(((Xg==Y[i])))then
+            set Y[i]=Ck
         endif
-        if(((Xg==Z[Cj[70]])))then
-            set Z[Cj[70]]=Ck
+        if(((Xg==Z[i])))then
+            set Z[i]=Ck
         endif
-        set Cj[70]=Cj[70]+1
+        set i=i+1
     endloop
     if((o4[(1+GetPlayerId(GetOwningPlayer(Ck)))])and(GetUnitAbilityLevelSwapped('A028',Ck)==0))then
         if(((r4[(1+GetPlayerId(GetOwningPlayer(Ck)))])))then
@@ -39789,16 +39812,16 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         set ck=false
         set r9[1000]=GetUnitLoc(Ck)
         set r9[1001]=GetRectCenter(io)
-        set Cj[70]=1
+        set i=1
         loop
-            exitwhen Cj[70]>6
-            if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
-                call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
+            exitwhen i>6
+            if(((((UnitItemInSlotBJ(Ck,i)==oG)and(Ck==T)))))then
+                call UnitRemoveItemFromSlotSwapped(i,Ck)
             else
-                set Dk[Cj[70]]=GetItemTypeId(UnitItemInSlotBJ(Ck,Cj[70]))
-                call RemoveItem(UnitItemInSlotBJ(Ck,Cj[70]))
+                set Dk[i]=GetItemTypeId(UnitItemInSlotBJ(Ck,i))
+                call RemoveItem(UnitItemInSlotBJ(Ck,i))
             endif
-            set Cj[70]=Cj[70]+1
+            set i=i+1
         endloop
         set Ek[0]=R2I(GetUnitFacing(Ck))
         set Ek[1]=GetHeroStatBJ(0,Ck,false)
@@ -39834,19 +39857,19 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         call SetUnitLifePercentBJ(Xg, 40)
         call SetUnitManaBJ(Xg,0)
         call UnitRemoveAbility(Xg,'Agho')
-        set Cj[70]=1
+        set i=1
         loop
-            exitwhen Cj[70]>6
-            call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
-            set Dk[Cj[70]]='moon'
-            set Ek[Cj[70]]=0
-            if(((Ck==Y[Cj[70]])))then
-                set Y[Cj[70]]=Xg
+            exitwhen i>6
+            call UnitAddItemByIdSwapped(Dk[i],Xg)
+            set Dk[i]='moon'
+            set Ek[i]=0
+            if(((Ck==Y[i])))then
+                set Y[i]=Xg
             endif
-            if(((Ck==Z[Cj[70]])))then
-                set Z[Cj[70]]=Xg
+            if(((Ck==Z[i])))then
+                set Z[i]=Xg
             endif
-            set Cj[70]=Cj[70]+1
+            set i=i+1
         endloop
         if(((((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))))then
             if(((r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
