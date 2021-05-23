@@ -17,7 +17,6 @@ globals
 
     integer Hex_Mana_Cost = 600
 
-    trigger Ichigo_Item_Use_Trig = null
     trigger Yo=null
     trigger Zo=null
     unit FG=null
@@ -28947,46 +28946,6 @@ function Init_Hex_Trig takes nothing returns nothing
     call TriggerAddAction(Zv,function Hex_Action)
 endfunction
 
-function Is_Unit_Vastolorde takes unit who returns boolean
-    local integer Unit = GetUnitTypeId(who)
-    return (Unit == 'H01F' or Unit == 'H01G' or Unit == 'H01H' or Unit == 'H01I' or Unit == 'H01J')
-endfunction
-
-function Item_User_Is_Ichigo takes nothing returns boolean
-    local integer Unit = GetUnitTypeId(GetTriggerUnit())
-    return (Unit == 'H003' or Unit == 'H00E' or Unit == 'H01B' or Unit == 'H01C' or Unit == 'H01D' or Unit == 'H01E')
-endfunction
-
-// fixed Vastolorde item refresh
-function Vastolorde_Use_Item takes nothing returns nothing
-    local unit Ichigo = GetTriggerUnit()
-    local unit Vastolorde = Ck
-    local item usedItem = GetManipulatedItem()
-
-    call BJDebugMsg("Ichigo used " + GetItemName(usedItem))
-    call UnitRemoveItem(Ichigo, usedItem)
-    call UnitAddItem(Vastolorde, usedItem)
-
-    call PauseUnit(Vastolorde, false)
-    call UnitUseItem(Vastolorde, usedItem)
-    call BJDebugMsg("Hollow must used " + GetItemName(usedItem))
-
-    call UnitRemoveItem(Vastolorde, usedItem)
-    call UnitAddItem(Ichigo, usedItem)
-    call PauseUnit(Vastolorde, true)
-
-    set Ichigo = null
-    set Vastolorde = null
-    set usedItem = null
-endfunction
-
-function Init_Ichigo_Item_Use_Trig takes nothing returns nothing
-    set Ichigo_Item_Use_Trig=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(Ichigo_Item_Use_Trig,EVENT_PLAYER_UNIT_USE_ITEM)
-    call TriggerAddCondition(Ichigo_Item_Use_Trig, Condition(function Item_User_Is_Ichigo))
-    call TriggerAddAction(Ichigo_Item_Use_Trig,function Vastolorde_Use_Item)
-endfunction
-
 function Lxv takes nothing returns boolean
     return(UnitHasItemOfTypeBJ(GetManipulatingUnit(),'I01J'))and(UnitHasItemOfTypeBJ(GetManipulatingUnit(),'I017'))and(UnitHasItemOfTypeBJ(GetManipulatingUnit(),'I02E'))
 endfunction
@@ -35224,11 +35183,16 @@ function WMv takes nothing returns nothing
     call TriggerAddAction(Dy,function Wmv)
 endfunction
 
-function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='U004')))))
+function Is_Unit_Vastolorde takes unit who returns boolean
+    local integer UnitID = GetUnitTypeId(who)
+    return (UnitID == 'H01F' or UnitID == 'H01G' or UnitID == 'H01H' or UnitID == 'H01I' or UnitID == 'H01J')
 endfunction
 
-function Takeback_Kumas_Unique_Book takes nothing returns nothing
+function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book takes nothing returns boolean
+    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((Is_Unit_Vastolorde(GetManipulatingUnit())) or (GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='E005')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='U004')))))
+endfunction
+
+function Display_Message_And_Return_Gold_For_Kumas_Unique_Book takes nothing returns nothing
     call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Your hero cannot use this item|r")
     call AdjustPlayerStateBJ(2500,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_GOLD)
 endfunction
@@ -35238,11 +35202,11 @@ function Trig_Dont_Buy_Kumas_Unique_Book takes nothing returns nothing
     set Ey=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Ey,EVENT_PLAYER_UNIT_PICKUP_ITEM)
     call TriggerAddCondition(Ey,Condition(function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book))
-    call TriggerAddAction(Ey,function Takeback_Kumas_Unique_Book)
+    call TriggerAddAction(Ey,function Display_Message_And_Return_Gold_For_Kumas_Unique_Book)
 endfunction
 
 function Unit_Allowed_To_Use_Kumas_Unique_Book takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetUnitTypeId(GetManipulatingUnit())!='EC08')and(GetUnitTypeId(GetManipulatingUnit())!='E005')and(GetUnitTypeId(GetManipulatingUnit())!='EC12')and(GetUnitTypeId(GetManipulatingUnit())!='E003')and(GetUnitTypeId(GetManipulatingUnit())!='H00I')and(GetUnitTypeId(GetManipulatingUnit())!='H00J')and(GetUnitTypeId(GetManipulatingUnit())!='H003')and(GetUnitTypeId(GetManipulatingUnit())!='H00E')and(GetUnitTypeId(GetManipulatingUnit())!='H01B')and(GetUnitTypeId(GetManipulatingUnit())!='H01C')and(GetUnitTypeId(GetManipulatingUnit())!='H01D')and(GetUnitTypeId(GetManipulatingUnit())!='H01E')and(GetUnitTypeId(GetManipulatingUnit())!='H01F')and(GetUnitTypeId(GetManipulatingUnit())!='H01Q')and(GetUnitTypeId(GetManipulatingUnit())!='O002')and(GetUnitTypeId(GetManipulatingUnit())!='O003')and(GetUnitTypeId(GetManipulatingUnit())!='OC10')and(GetUnitTypeId(GetManipulatingUnit())!='O000')and(GetUnitTypeId(GetManipulatingUnit())!='UC13')and(GetUnitTypeId(GetManipulatingUnit())!='UC11')and(GetUnitTypeId(GetManipulatingUnit())!='U00A')and(GetUnitTypeId(GetManipulatingUnit())!='N002')and(GetUnitTypeId(GetManipulatingUnit())!='N00C')and(GetUnitTypeId(GetManipulatingUnit())!='N006')and(GetUnitTypeId(GetManipulatingUnit())!='N00W')and(GetUnitTypeId(GetManipulatingUnit())!='N00X')and(GetUnitTypeId(GetManipulatingUnit())!='E000')and(GetUnitTypeId(GetManipulatingUnit())!='E002')and(GetUnitTypeId(GetManipulatingUnit())!='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')))
+    return(((GetItemTypeId(GetManipulatedItem())=='I04Z')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(not Is_Unit_Vastolorde(GetManipulatingUnit()))and(GetUnitTypeId(GetManipulatingUnit())!='EC08')and(GetUnitTypeId(GetManipulatingUnit())!='E005')and(GetUnitTypeId(GetManipulatingUnit())!='EC12')and(GetUnitTypeId(GetManipulatingUnit())!='E003')and(GetUnitTypeId(GetManipulatingUnit())!='H00I')and(GetUnitTypeId(GetManipulatingUnit())!='H00J')and(GetUnitTypeId(GetManipulatingUnit())!='H003')and(GetUnitTypeId(GetManipulatingUnit())!='H00E')and(GetUnitTypeId(GetManipulatingUnit())!='H01B')and(GetUnitTypeId(GetManipulatingUnit())!='H01C')and(GetUnitTypeId(GetManipulatingUnit())!='H01D')and(GetUnitTypeId(GetManipulatingUnit())!='H01E')and(GetUnitTypeId(GetManipulatingUnit())!='H01F')and(GetUnitTypeId(GetManipulatingUnit())!='H01Q')and(GetUnitTypeId(GetManipulatingUnit())!='O002')and(GetUnitTypeId(GetManipulatingUnit())!='O003')and(GetUnitTypeId(GetManipulatingUnit())!='OC10')and(GetUnitTypeId(GetManipulatingUnit())!='O000')and(GetUnitTypeId(GetManipulatingUnit())!='UC13')and(GetUnitTypeId(GetManipulatingUnit())!='UC11')and(GetUnitTypeId(GetManipulatingUnit())!='U00A')and(GetUnitTypeId(GetManipulatingUnit())!='N002')and(GetUnitTypeId(GetManipulatingUnit())!='N00C')and(GetUnitTypeId(GetManipulatingUnit())!='N006')and(GetUnitTypeId(GetManipulatingUnit())!='N00W')and(GetUnitTypeId(GetManipulatingUnit())!='N00X')and(GetUnitTypeId(GetManipulatingUnit())!='E000')and(GetUnitTypeId(GetManipulatingUnit())!='E002')and(GetUnitTypeId(GetManipulatingUnit())!='O001')and(GetUnitTypeId(GetManipulatingUnit())!='U004')))
 endfunction
 
 function Unit_Give_Kumas_Unique_Book takes nothing returns nothing
@@ -39605,8 +39569,6 @@ endfunction
 function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
     local real hollowDuration
-    local unit dummy
-    local integer i = -1
     local item currItem = null
     set Xg=GetTriggerUnit()
     set abilityLevel = GetUnitAbilityLevelSwapped('A04A',Xg)
@@ -39614,17 +39576,17 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     set fh=(160.-(10.*I2R(abilityLevel)))
     set r9[1000]=GetUnitLoc(Xg)
     set r9[1001]=GetRectCenter(io)
-    set i=1
+    set Cj[70]=1
     loop
-        exitwhen i>6
-        if((UnitItemInSlotBJ(Xg,i)==oG)and(Xg==T))then
-            call UnitRemoveItemFromSlotSwapped(i,Xg)
+        exitwhen Cj[70]>6
+        if((UnitItemInSlotBJ(Xg,Cj[70])==oG)and(Xg==T))then
+            call UnitRemoveItemFromSlotSwapped(Cj[70],Xg)
         else
-            set currItem = UnitItemInSlotBJ(Xg,i)
+            set currItem = UnitItemInSlotBJ(Xg,Cj[70])
             call UnitRemoveItem(Xg, currItem)
             call UnitAddItem(Ck, currItem)
         endif
-        set i=i+1
+        set Cj[70]=Cj[70]+1
     endloop
     set currItem = null
     set Ek[0]=R2I(GetUnitFacing(Xg))
@@ -39665,22 +39627,20 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call SetUnitLifePercentBJ(Ck,40)
     call SetUnitManaBJ(Ck,0)
     call UnitRemoveAbility(Ck,'Agho')
-    set i=1
-    if(i == 2) then
+    set Cj[70]=1
     loop
-        exitwhen i>6
+        exitwhen Cj[70]>6
         //call UnitAddItemByIdSwapped(Dk[i],Ck)
-        set Dk[i]='moon'
-        set Ek[i]=0
-        if(((Xg==Y[i])))then
-            set Y[i]=Ck
+        set Dk[Cj[70]]='moon'
+        set Ek[Cj[70]]=0
+        if(((Xg==Y[Cj[70]])))then
+            set Y[Cj[70]]=Ck
         endif
-        if(((Xg==Z[i])))then
-            set Z[i]=Ck
+        if(((Xg==Z[Cj[70]])))then
+            set Z[Cj[70]]=Ck
         endif
-        set i=i+1
+        set Cj[70]=Cj[70]+1
     endloop
-    endif
 
     if((o4[(1+GetPlayerId(GetOwningPlayer(Ck)))])and(GetUnitAbilityLevelSwapped('A028',Ck)==0))then
         if(((r4[(1+GetPlayerId(GetOwningPlayer(Ck)))])))then
@@ -39824,17 +39784,17 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         set ck=false
         set r9[1000]=GetUnitLoc(Ck)
         set r9[1001]=GetRectCenter(io)
-        set i=1
+        set Cj[70]=1
         loop
-            exitwhen i>6
-            if(((((UnitItemInSlotBJ(Ck,i)==oG)and(Ck==T)))))then
-                call UnitRemoveItemFromSlotSwapped(i,Ck)
+            exitwhen Cj[70]>6
+            if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
+                call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
             else
-                set currItem = UnitItemInSlotBJ(Ck,i)
+                set currItem = UnitItemInSlotBJ(Ck,Cj[70])
                 call UnitRemoveItem(Ck, currItem)
                 call UnitAddItem(Xg, currItem)
             endif
-            set i=i+1
+            set Cj[70]=Cj[70]+1
         endloop
         set currItem = null
         set Ek[0]=R2I(GetUnitFacing(Ck))
@@ -39871,19 +39831,19 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         call SetUnitLifePercentBJ(Xg, 40)
         call SetUnitManaBJ(Xg,0)
         call UnitRemoveAbility(Xg,'Agho')
-        set i=1
+        set Cj[70]=1
         loop
-            exitwhen i>6
-            //call UnitAddItemByIdSwapped(Dk[i],Xg)
-            set Dk[i]='moon'
-            set Ek[i]=0
-            if(((Ck==Y[i])))then
-                set Y[i]=Xg
+            exitwhen Cj[70]>6
+            //call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
+            set Dk[Cj[70]]='moon'
+            set Ek[Cj[70]]=0
+            if(((Ck==Y[Cj[70]])))then
+                set Y[Cj[70]]=Xg
             endif
-            if(((Ck==Z[i])))then
-                set Z[i]=Xg
+            if(((Ck==Z[Cj[70]])))then
+                set Z[Cj[70]]=Xg
             endif
-            set i=i+1
+            set Cj[70]=Cj[70]+1
         endloop
         if(((((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))))then
             if(((r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
@@ -40021,7 +39981,6 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call EnableTrigger(ua)
     set eh=false
     set fh=.0
-    set dummy = null
 endfunction
 
 
@@ -40216,6 +40175,7 @@ endfunction
 
 function Ichigo_Die_Action takes nothing returns nothing
     local integer abilityLevel = GetUnitAbilityLevel(Xg, 'A04A')
+    local item currItem = null
     set ck=false
     set Gk=GetKillingUnit()
     set r9[1000]=GetUnitLoc(Ck)
@@ -40226,11 +40186,13 @@ function Ichigo_Die_Action takes nothing returns nothing
         if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
             call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
         else
-            set Dk[Cj[70]]=GetItemTypeId(UnitItemInSlotBJ(Ck,Cj[70]))
-            call RemoveItem(UnitItemInSlotBJ(Ck,Cj[70]))
+            set currItem = UnitItemInSlotBJ(Xg,Cj[70])
+            call UnitRemoveItem(Xg, currItem)
+            call UnitAddItem(Ck, currItem)
         endif
         set Cj[70]=Cj[70]+1
     endloop
+    set currItem = null
     set Ek[0]=R2I(GetUnitFacing(Ck))
     set Ek[1]=GetHeroStatBJ(0,Ck,false)
     set Ek[2]=GetHeroStatBJ(1,Ck,false)
@@ -40261,7 +40223,7 @@ function Ichigo_Die_Action takes nothing returns nothing
     set Cj[70]=1
     loop
         exitwhen Cj[70]>6
-        call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
+        //call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
         set Dk[Cj[70]]='moon'
         set Ek[Cj[70]]=0
         if(((Ck==Y[Cj[70]])))then
