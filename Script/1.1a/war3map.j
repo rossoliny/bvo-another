@@ -35221,7 +35221,7 @@ function Trig_Buy_Kumas_Unique_Book takes nothing returns nothing
 endfunction
 
 function Unit_Not_Allowed_To_Pickup_Kumas_Unique_Book takes nothing returns boolean
-    return(UnitHasItemOfTypeBJ(GetTriggerUnit(),'desc'))and(MG(GetTriggerUnit(),UNIT_TYPE_HERO))and((GetUnitTypeId(GetTriggerUnit())=='EC08')or(GetUnitTypeId(GetTriggerUnit())=='E005')or(GetUnitTypeId(GetTriggerUnit())=='EC12')or(GetUnitTypeId(GetTriggerUnit())=='E003')or(GetUnitTypeId(GetTriggerUnit())=='H00I')or(GetUnitTypeId(GetTriggerUnit())=='H00J')or(GetUnitTypeId(GetTriggerUnit())=='H003')or(GetUnitTypeId(GetTriggerUnit())=='H00E')or(GetUnitTypeId(GetTriggerUnit())=='H01B')or(GetUnitTypeId(GetTriggerUnit())=='H01C')or(GetUnitTypeId(GetTriggerUnit())=='H01D')or(GetUnitTypeId(GetTriggerUnit())=='H01E')or(GetUnitTypeId(GetTriggerUnit())=='H01F')or(GetUnitTypeId(GetTriggerUnit())=='H01Q')or(GetUnitTypeId(GetTriggerUnit())=='O002')or(GetUnitTypeId(GetTriggerUnit())=='O003')or(GetUnitTypeId(GetTriggerUnit())=='OC10')or(GetUnitTypeId(GetTriggerUnit())=='O000')or(GetUnitTypeId(GetTriggerUnit())=='UC13')or(GetUnitTypeId(GetTriggerUnit())=='UC11')or(GetUnitTypeId(GetTriggerUnit())=='U00A')or(GetUnitTypeId(GetTriggerUnit())=='N002')or(GetUnitTypeId(GetTriggerUnit())=='N00C')or(GetUnitTypeId(GetTriggerUnit())=='N006')or(GetUnitTypeId(GetTriggerUnit())=='N00W')or(GetUnitTypeId(GetTriggerUnit())=='N00X')or(GetUnitTypeId(GetTriggerUnit())=='E000')or(GetUnitTypeId(GetTriggerUnit())=='E002')or(GetUnitTypeId(GetTriggerUnit())=='O001'))or(GetUnitTypeId(GetManipulatingUnit())=='U004')
+    return(UnitHasItemOfTypeBJ(GetTriggerUnit(),'desc'))and(MG(GetTriggerUnit(),UNIT_TYPE_HERO))and((Is_Unit_Vastolorde(GetManipulatingUnit())) or (GetUnitTypeId(GetTriggerUnit())=='EC08')or(GetUnitTypeId(GetTriggerUnit())=='E005')or(GetUnitTypeId(GetTriggerUnit())=='EC12')or(GetUnitTypeId(GetTriggerUnit())=='E003')or(GetUnitTypeId(GetTriggerUnit())=='H00I')or(GetUnitTypeId(GetTriggerUnit())=='H00J')or(GetUnitTypeId(GetTriggerUnit())=='H003')or(GetUnitTypeId(GetTriggerUnit())=='H00E')or(GetUnitTypeId(GetTriggerUnit())=='H01B')or(GetUnitTypeId(GetTriggerUnit())=='H01C')or(GetUnitTypeId(GetTriggerUnit())=='H01D')or(GetUnitTypeId(GetTriggerUnit())=='H01E')or(GetUnitTypeId(GetTriggerUnit())=='H01F')or(GetUnitTypeId(GetTriggerUnit())=='H01Q')or(GetUnitTypeId(GetTriggerUnit())=='O002')or(GetUnitTypeId(GetTriggerUnit())=='O003')or(GetUnitTypeId(GetTriggerUnit())=='OC10')or(GetUnitTypeId(GetTriggerUnit())=='O000')or(GetUnitTypeId(GetTriggerUnit())=='UC13')or(GetUnitTypeId(GetTriggerUnit())=='UC11')or(GetUnitTypeId(GetTriggerUnit())=='U00A')or(GetUnitTypeId(GetTriggerUnit())=='N002')or(GetUnitTypeId(GetTriggerUnit())=='N00C')or(GetUnitTypeId(GetTriggerUnit())=='N006')or(GetUnitTypeId(GetTriggerUnit())=='N00W')or(GetUnitTypeId(GetTriggerUnit())=='N00X')or(GetUnitTypeId(GetTriggerUnit())=='E000')or(GetUnitTypeId(GetTriggerUnit())=='E002')or(GetUnitTypeId(GetTriggerUnit())=='O001'))or(GetUnitTypeId(GetManipulatingUnit())=='U004')
 endfunction
 
 function Unit_Remove_Kumas_Unique_Book takes nothing returns nothing
@@ -39109,7 +39109,7 @@ function Ichigo_Hollow_Learned_Condition takes nothing returns boolean
 endfunction
 
 function Ichigo_Hollow_Learned_Action takes nothing returns nothing
-    local integer unitID = 'H01F'
+    local integer unitID 
     local integer abilityLevel
     set dh=GetLearningUnit()
     set Sd=GetRectCenter(io)
@@ -39120,8 +39120,11 @@ function Ichigo_Hollow_Learned_Action takes nothing returns nothing
         set Ck = null
     endif
 
-    // TODO: check if these units can but blink  
-    if(abilityLevel == 2) then
+    // TODO: check if these units can but blink 
+
+    if(abilityLevel == 1) then
+        set unitID = 'H01F'
+    elseif(abilityLevel == 2) then
         set unitID = 'H01G'
     elseif(abilityLevel == 3) then
         set unitID = 'H01H'
@@ -39135,7 +39138,7 @@ function Ichigo_Hollow_Learned_Action takes nothing returns nothing
     set Ck=bj_lastCreatedUnit
     call UnitAddAbility(Ck, 'Agho')
 
-    // magic resistance
+    // magic resistance 0/5/10/15/20%
     if(abilityLevel > 1) then
         call UnitAddAbility(Ck, 'A101')
         call SetUnitAbilityLevel(Ck, 'A101', abilityLevel - 1)
@@ -39617,8 +39620,8 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call Play_Spell_Sound_Effect( Get_Random_Sound_Ichigo_T(), Ck)
     call SetHeroXP(Ck,Ek[4],false)
     call SetHeroLevelBJ(Ck,Ek[5],false)
-    call ModifyHeroStat(0,Ck,2,(Ek[1] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give str bonus
-    call ModifyHeroStat(1,Ck,2,(Ek[2] +  (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give agi bonus
+    call ModifyHeroStat(0,Ck,2,(Ek[1] +  (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give str bonus
+    call ModifyHeroStat(1,Ck,2,(Ek[2] +  (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give agi bonus
     call ModifyHeroStat(2,Ck,2,Ek[3])     // copy INT
     call PauseUnit(Ck,false)
     call SetUnitInvulnerable(Ck,false)
@@ -39821,8 +39824,8 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         call SetHeroXP(Xg,Ek[4],false)
         call SetHeroLevelBJ(Xg,Ek[5],false)
         // take stat bonus back
-        call ModifyHeroStat(0,Xg,2,(Ek[1]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-        call ModifyHeroStat(1,Xg,2,(Ek[2]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
+        call ModifyHeroStat(0,Xg,2,(Ek[1]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
+        call ModifyHeroStat(1,Xg,2,(Ek[2]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
         call ModifyHeroStat(2,Xg,2,Ek[3])
         call PauseUnit(Xg,false)
         call SetUnitInvulnerable(Xg,false)
@@ -40212,8 +40215,8 @@ function Ichigo_Die_Action takes nothing returns nothing
     call SetHeroXP(Xg,Ek[4],false)
     call SetHeroLevelBJ(Xg,Ek[5],false)
     // reset stat if Hollow killed
-    call ModifyHeroStat(0,Xg,2,(Ek[1]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-    call ModifyHeroStat(1,Xg,2,(Ek[2]- (60 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
+    call ModifyHeroStat(0,Xg,2,(Ek[1]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
+    call ModifyHeroStat(1,Xg,2,(Ek[2]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
     call ModifyHeroStat(2,Xg,2,Ek[3])
     call SetUnitLifePercentBJ(Xg, 40)
     call PauseUnit(Xg,false)

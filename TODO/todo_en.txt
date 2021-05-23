@@ -1,6 +1,5 @@
 FIXES
 
--Hollow Form with ability level more than 1 allows to buy Kuma's Unique Book.
 -Fix Ichigo Hollow Form refreshes all item cooldowns.
 -Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.
 -Fix Ichigo is able to move during duel if during duel he transformed from Hollow Form back to normal.
