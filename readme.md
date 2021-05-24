@@ -26,5 +26,5 @@ You can directly contact me in Discord if you want:
 #### *[All releases](https://github.com/rossoliny/bvo-another/releases)*
 
 #### Game does not see the map?
-##### *It is recomended to put map file into "Map/Download".*
-##### *If game does not see the map it means that the name of the file if too long and you need to rename it to something shorter.*
+#####   *It is recomended to put map file into "Map/Download".*
+#####   *If game does not see the map it means that the name of the file if too long and you need to rename it to something shorter.*
