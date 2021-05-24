@@ -21,5 +21,5 @@ You can directly contact me if you want:
 * *[VK](https://vk.com/rossoliny)*
 
 # Releases
-### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/latest)*
+### *[Latest release](https://github.com/rossoliny/bvo-another/releases/latest)*
 ### *[All releases](https://github.com/rossoliny/bvo-another/releases)*
