@@ -14,7 +14,8 @@ Or you can contribute to this project to help me with development.
 
 # Bugs and Features
 
-If you want to report some bugs, glitches, abuses or share some ideas about new features and enhancements please create new issue __*[here](https://github.com/rossoliny/bvo-another/issues)*__, but don't forget to add an appropriate tag.
+If you want to report some bugs, glitches, abuses or share some ideas about new features and enhancements please create new issue __*[here](https://github.com/rossoliny/bvo-another/issues)*__.  
+Please don't forget to add an appropriate tag if you create a new issue.
 
 # Contacts
 You can directly contact me if you want:
