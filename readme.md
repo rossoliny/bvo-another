@@ -12,7 +12,7 @@ The original BvO from Kurogane was protected in many ways so it is not possible 
 
 Or you can contribute to this project to help me with development.
 
-# Bug Reports
+# Bugs and Features
 
 If you want to report some bugs, glitches, abuses or share some ideas about new features and enhancements please create new issue *[here](https://github.com/rossoliny/bvo-another/issues)*
 
