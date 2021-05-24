@@ -1,1 +1,1 @@
-###### This is an <h6> tag
+[Latest version](https://github.com/rossoliny/bvo-another/releases)
