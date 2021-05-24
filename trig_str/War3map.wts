@@ -16,6 +16,7 @@ Modelers/animators/skinners:
 Unryze, Bandai Namco, Black Stan, Callahan, Conny Bengtsson, Daelin, Falcke, Gothar_Esp, JetFangInferno, kkangtemplar, Lady Kelaodesi, MOD, NarutoJ, Pyritie, RED BARON, Shinigami12, Tranquil, Vestras, WILLTHEALMIGHTY, Rossoliny
 
 If you use models from this map, please add this names to your credit section!
+
 }
 STRING 110
 {
@@ -98,7 +99,7 @@ Thanks to the following sites:
 -Unryze
 
 
-Huge thanks to Unryze for helping when I only started with this map.
+Big thanks to Unryze for his help when I only started with this map.
 
 -Rossoliny
 
@@ -183,13 +184,10 @@ STRING 5694
 }
 STRING 6743
 {
-If you have any suggestions, comments, or bug reports please write to Unryze in Garena:
-|c001ce6b9Unryze|r
+If you have any suggestions, comments, or bug reports please write to me in Discord:
+|c001ce6b9Rossoliny#0686|r
 
-Or if you want to share ideas, bugs/glitches, you can visit Unryze's forums at:
-|c001ce6b9https://vendev.info/|r or |c001ce6b9https://vk.com/acfwc3|r
-
-You can also share your ideas and report bugs/glitches to Rossoliny's GitHub:
+Or if you want to share ideas, bugs/glitches go and create new issues in my GitHub page:
 |c001ce6b9https://github.com/rossoliny/bvo-another/issues|r
 
 }
@@ -207,7 +205,7 @@ I would appreciate any kind of feedback about the map on my vk group: https://vk
 
 -Unryze
 
-This version was updated by Rossoliny.
+This version was updated by Rossoliny. Unryze's contacts are deleted due to be invalid.
 
 -Rossoliny
 
@@ -226,9 +224,7 @@ Specific Commands:
 }
 STRING 8580
 {
-Found a bug? Write to Unryze in Garena:
-|c001ce6b9Unryze|r
+Found a bug? Write to me in Discord:
+|c001ce6b9Rossoliny#0686|r
 
-Or write to Rossoliny in GitHub:
-|c001ce6b9https://github.com/rossoliny/|r
 }
