@@ -2,7 +2,7 @@
   
   Hello, my name is *[Rossoliny](https://github.com/rossoliny)* and this is a *__NEW__* dev page of ***__Bleach vs One Piece Another__*** map.
   
-  Many years ago Kuragane created the original BvO map, but then he abandoned it and Unryze continued development and we got BvO Another 1.1a that is considered to most balanced and bugfree version of all.  
+  Many years ago Kuragane created the original BvO map, but then he abandoned it and Unryze continued development and we got BvO Another 1.1a that is considered to be the most balanced and bugfree version of all.  
   Now Unryze also seem to lose interest to this map so I decided to continue.
 
 # Contribution
