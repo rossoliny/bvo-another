@@ -1,7 +1,7 @@
 # Welcome
 ###### This is a dev page of Bleach vs One Piece Another map for Warcraft 3
 
-# Contact
+# Contacts
 * *[VK](https://vk.com/rossoliny)*
 
 # Releases
