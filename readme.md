@@ -18,8 +18,8 @@ If you want to report some bugs, glitches, abuses or share some ideas about new 
 Please don't forget to add an appropriate tag if you create a new issue.
 
 # Contacts
-You can directly contact me if you want:
-* *[VK](https://vk.com/rossoliny)*
+You can directly contact me in Discord if you want:
+* *Rossoliny#0686*
 
 # Releases
 #### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231)*
