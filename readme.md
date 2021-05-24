@@ -10,6 +10,7 @@
 If you want to report some bugs, glitches, abuses please add new issue [here](https://github.com/rossoliny/bvo-another/issues)
 
 # Contacts
+You can directly contact me here:
 * *[VK](https://vk.com/rossoliny)*
 
 # Releases
