@@ -17972,7 +17972,7 @@ function Vov takes nothing returns nothing
             set dg[0]=null
             set Ah=Ah+1
         endloop
-        call TransmissionFromUnitWithNameBJ(bj_FORCE_ALL_PLAYERS,L4,"Unryze",ar,"Get the latest version from |c001ce6b9vk.com/acfwc3|r.",0,2.,true)
+        call TransmissionFromUnitWithNameBJ(bj_FORCE_ALL_PLAYERS,L4,"Rossoliny",ar,"Get the latest version from |c001ce6b9github.com/rossoliny/bvo-another/releases|r.",0,2.,true)
         call ResetUnitAnimation(L4)
     endif
     call TriggerSleepAction(.05)
