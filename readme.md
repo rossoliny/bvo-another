@@ -24,3 +24,4 @@ You can directly contact me in Discord if you want:
 # Releases
 #### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231)*
 #### *[All releases](https://github.com/rossoliny/bvo-another/releases)*
+##### It is recomended to put map into Map/Download. If game does not see the map it means that the name of the file if too long and you need to rename it to something shorter.
