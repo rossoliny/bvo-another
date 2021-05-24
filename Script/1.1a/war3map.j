@@ -67151,7 +67151,7 @@ function Rrx takes nothing returns nothing
     call TriggerAddAction(zE,function Rox)
 endfunction
 
-function Rix takes nothing returns boolean
+function Ace_Hotarubi_Condition takes nothing returns boolean
     return(GetSpellAbilityId()=='A033')
 endfunction
 
@@ -67403,7 +67403,7 @@ function Irx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function Iix takes nothing returns nothing
+function Ace_Hotarubi_Action takes nothing returns nothing
     set A[74]=GetTriggerUnit()
     set B[37]=GetUnitLoc(A[74])
     if(((GetUnitAbilityLevelSwapped('A033',A[74])==5)))then
@@ -67590,10 +67590,10 @@ function Iix takes nothing returns nothing
     set Rj=0
 endfunction
 
-function Iax takes nothing returns nothing
+function Init_Ace_Hidaruma_Trig takes nothing returns nothing
     set AE=CreateTrigger()
-    call TriggerAddCondition(AE,Condition(function Rix))
-    call TriggerAddAction(AE,function Iix)
+    call TriggerAddCondition(AE,Condition(function Ace_Hotarubi_Condition))
+    call TriggerAddAction(AE,function Ace_Hotarubi_Action)
 endfunction
 
 function Inx takes nothing returns boolean
@@ -67692,7 +67692,7 @@ function Ikx takes nothing returns boolean
     return(Tj==4)
 endfunction
 
-function IKx takes nothing returns nothing
+function Ace_Move_Hidaruma_Spark takes nothing returns nothing
     if(((Tj==1)))then
         set Nj[6]=GetUnitLoc(Sj[1])
         call SetUnitPositionLoc(Sj[1],Nj[6])
@@ -67858,11 +67858,11 @@ function IKx takes nothing returns nothing
     endif
 endfunction
 
-function Ilx takes nothing returns nothing
+function Init_Ace_Move_Hidaruma_Spark_Trig takes nothing returns nothing
     set aE=CreateTrigger()
     call DisableTrigger(aE)
     call TriggerRegisterTimerEventPeriodic(aE,.03)
-    call TriggerAddAction(aE,function IKx)
+    call TriggerAddAction(aE,function Ace_Move_Hidaruma_Spark)
 endfunction
 
 function ILx takes nothing returns boolean
@@ -80300,8 +80300,8 @@ function Q3x takes nothing returns nothing
     call OBx()
     call OWx()
     call Rrx()
-    call Iax()
-    call Ilx()
+    call Init_Ace_Hidaruma_Trig()
+    call Init_Ace_Move_Hidaruma_Spark_Trig()
     call I1x()
     call I4x()
     call Avx()
