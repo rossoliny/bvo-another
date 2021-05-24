@@ -19,7 +19,7 @@ Please don't forget to add an appropriate tag if you create a new issue.
 
 # Contacts
 You can directly contact me in Discord if you want:
-* *Rossoliny#0686*
+* *[Rossoliny](https://discord.com/users/0686)*
 
 # Releases
 #### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231)*
