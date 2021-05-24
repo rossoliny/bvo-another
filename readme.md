@@ -1,7 +1,7 @@
 # Welcome
   This is a *__new__* dev page of Bleach vs One Piece Another.
   
-  Hello, my name is Rossoliny.
+  Hello, my name is *[Rossoliny](https://github.com/rossoliny)*.
   Many years ago Kuragane created the original BvO map, but then he abandoned it and Unryze continued development and we got BvO Another 1.1a
   Now Unryze also seem to lose iterest to this map so I decided to continue.
 
