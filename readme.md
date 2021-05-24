@@ -12,13 +12,14 @@ The original BvO from Kurogane was protected in many ways so it is not possible 
 
 Or you can contribute to this project to help me with development.
 
-# Bug Reports
+# Bugs and Features
 
-If you want to report some bugs, glitches, abuses or share some ideas about new features and enhancements please create new issue *[here](https://github.com/rossoliny/bvo-another/issues)*
+If you want to report some bugs, glitches, abuses or share some ideas about new features and enhancements please create new issue __*[here](https://github.com/rossoliny/bvo-another/issues)*__.  
+Please don't forget to add an appropriate tag if you create a new issue.
 
 # Contacts
-You can directly contact me if you want:
-* *[VK](https://vk.com/rossoliny)*
+You can directly contact me in Discord if you want:
+* *[Rossoliny#0686](https://discord.com/users/0686)*
 
 # Releases
 #### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231)*
