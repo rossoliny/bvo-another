@@ -6,7 +6,9 @@
   Now Unryze also seem to lose interest to this map so I decided to continue.
 
 # Contribution
-BvO is now open source so you can freely download this repository and do anything you want with the map.  
+Rossoliny's BvO is open source.  
+The original BvO from Kurogane was protected in many ways so it is not possible for this map to be completely open souece. However I myself will not try to add any kind of protection to this map and all changes that *__I make__* will be open source. So, you can freely download this repository and change the map.  
+
 Or you can contribute to this project to help me with development.
 
 # Bug Reports
