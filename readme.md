@@ -1,6 +1,6 @@
 # Welcome  
   
-  Hello, my name is *[Rossoliny](https://github.com/rossoliny)* and this is a *__NEW__* dev page of Bleach vs One Piece Another.
+  Hello, my name is *[Rossoliny](https://github.com/rossoliny)* and this is a *__NEW__* open source dev page of Bleach vs One Piece Another.
   
   Many years ago Kuragane created the original BvO map, but then he abandoned it and Unryze continued development and we got BvO Another 1.1a that is considered to most balanced and bugfree version of all.  
   Now Unryze also seem to lose interest to this map so I decided to continue.
@@ -12,6 +12,10 @@ If you want to report some bugs, glitches, abuses or share some ideas about new 
 # Contacts
 You can directly contact me if you want:
 * *[VK](https://vk.com/rossoliny)*
+
+# Contribution
+BvO is now open source so you can freely download this repository and to anything you want with this map.  
+Or you can contribute to this project to help me with development.
 
 # Releases
 ### *[Get latest release and read changelog](https://github.com/rossoliny/bvo-another/releases)*
