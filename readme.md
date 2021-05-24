@@ -3,7 +3,7 @@
 
 # Bug Reports
 
-If you want to report some bugs, glitches, abuses please do it [here](https://github.com/rossoliny/bvo-another/issues)
+If you want to report some bugs, glitches, abuses please add new issue [here](https://github.com/rossoliny/bvo-another/issues)
 
 # Contacts
 * *[VK](https://vk.com/rossoliny)*
