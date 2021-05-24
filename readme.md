@@ -8,7 +8,7 @@
 # Contribution
 Rossoliny's BvO is open source.  
 
-The original BvO from Kurogane was protected in many ways so it is not possible for this map to be completely open souece. However, I myself will not try to add any kinds of protection to this map and all changes that *__I make__* will be open source. So, you can freely download this repository and explore the sources.  
+The original BvO from Kurogane was protected in many ways so it is not possible for this map to be completely open source. However, I myself will not try to add any kinds of protection to this map and all changes that *__I make__* will be open source. So, you can freely download this repository and explore the sources.  
 
 Or you can contribute to this project to help me with development.
 
