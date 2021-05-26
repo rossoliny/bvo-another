@@ -1,5 +1,4 @@
-
-
+__[Вернуться на главную страницу](https://github.com/rossoliny/bvo-another)__
 ###### Язык
 | _[Русский](https://github.com/rossoliny/bvo-another/blob/master/readme.RU.md)_ | _[Английский](https://github.com/rossoliny/bvo-another/blob/master/readme.md)_|
 |-|-|
