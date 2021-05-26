@@ -1,7 +1,7 @@
 
 
 ###### Language
-| _[Russian](https://github.com/rossoliny/bvo-another/blob/master/readme.RU.md)_ | _[English](https://github.com/rossoliny/bvo-another/blob/master/readme.EN.md)_|
+| _[Russian](https://github.com/rossoliny/bvo-another/blob/master/readme.RU.md)_ | _[English](https://github.com/rossoliny/bvo-another/blob/master/readme.md)_|
 |-|-|
 ----
 
@@ -13,6 +13,7 @@
   Unfortunately version 1.1b is probably lost and Unryze seems to lose interest to this map and is not likely to finish 1.1c so I decided to continue development.
 
 # Contribution
+
 Rossoliny's BvO is open source.  
 
 The original BvO from Kurogane was protected in many ways so it is not possible for this map to be completely open source. However, I myself will not try to add any kinds of protection to this map and all changes that *__I make__* will be open source. So, you can freely download this repository and explore the sources.  
