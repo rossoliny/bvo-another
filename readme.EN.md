@@ -1,4 +1,11 @@
-# Welcome  
+
+
+###### Language
+| _[Russian](https://github.com/rossoliny/bvo-another/blob/master/readme.RU.md)_ | _[English](https://github.com/rossoliny/bvo-another/blob/master/readme.EN.md)_|
+|-|-|
+----
+
+# Welcome 
   
   Hello, my name is *[Rossoliny](https://github.com/rossoliny)* and this is a *__NEW__* dev page of ***__Bleach vs One Piece Another__*** map.
   
@@ -26,5 +33,5 @@ You can directly contact me in Discord if you want:
 #### *[All releases](https://github.com/rossoliny/bvo-another/releases)*
 
 #### Game does not see the map?
-* *It is recomended to put map file into "Map/Download".*
-* *If game does not see the map it means that the name of the file if too long and you need to rename it to something shorter.*
+* *It is recommended to put map file into "Map/Download".*
+* *If game does not see the map it means that the name of the file is too long and you need to rename it to something shorter.*
