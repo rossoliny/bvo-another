@@ -44,3 +44,10 @@ ________
 Zangetsu
 
 	Added sound effects for T and R.
+
+------------
+ITEM CHANGES
+------------
+
+Medal Exchange now sells medals.
+Added new item Demonic Boots to Recipe Shop 3.
