@@ -1,0 +1,690 @@
+[Recb]
+Art=ReplaceableTextures\CommandButtons\BTNCorrosiveBreath.blp
+Buttonpos=,2
+Hotkey=B
+Name=Corrosive Breath
+Tip=Research Corrosive |cffffcc00B|rreath
+Ubertip=Gives Chimaeras the ability to hurl corrosive bile onto enemy buildings.
+
+[Redc]
+Art=ReplaceableTextures\CommandButtons\BTNDOCAdeptTraining.blp,ReplaceableTextures\CommandButtons\BTNDOCMasterTraining.blp
+Buttonpos=1,2
+Hotkey=L
+Name=Druid of the Claw Adept Training,Druid of the Claw Master Training
+Requires1=etoe
+Requirescount=2
+Tip=Druid of the C|cffffcc00l|raw Adept Training,Druid of the C|cffffcc00l|raw Master Training
+Ubertip="Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, attack damage and gives them the ability Rejuvenation.","Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, attack damage and gives them the ability Bear Form."
+
+[Redt]
+Art=ReplaceableTextures\CommandButtons\BTNDOTAdeptTraining.blp,ReplaceableTextures\CommandButtons\BTNDOTMasterTraining.blp
+Buttonpos=1,2
+Hotkey=A
+Name=Druid of the Talon Adept Training,Druid of the Talon Master Training
+Requires1=etoe
+Requirescount=2
+Tip=Druid of the T|cffffcc00a|rlon Adept Training,Druid of the T|cffffcc00a|rlon Master Training
+Ubertip="Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, and gives them the ability Storm Crow Form.","Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cyclone."
+
+[Reeb]
+Art=ReplaceableTextures\CommandButtons\BTNEnchantedBears.blp
+Buttonpos=1,1
+Hotkey=M
+Name=Mark of the Claw
+Requires=Redc
+Requiresamount=2
+Tip=Research |cffffcc00M|rark of the Claw
+Ubertip=Allows Druids of the Claw to cast Roar while in Bear Form.
+
+[Reec]
+Art=ReplaceableTextures\CommandButtons\BTNEnchantedCrows.blp
+Buttonpos=1,1
+Hotkey=M
+Name=Mark of the Talon
+Requires=Redt
+Requiresamount=2
+Tip=Research |cffffcc00M|rark of the Talon
+Ubertip=Allows Druids of the Talon to cast Faerie Fire while in Storm Crow Form.
+
+[Rehs]
+Art=ReplaceableTextures\CommandButtons\BTNHardenedSkin.blp
+Buttonpos=2,1
+Hotkey=H
+Name=Hardened Skin
+Requires=etoe,eden
+Tip=Research |cffffcc00H|rardened Skin
+Ubertip=Gives Mountain Giants increased resistance to attack damage.
+
+[Reht]
+Art=ReplaceableTextures\CommandButtons\BTNTameHippogriff.blp
+Buttonpos=,2
+Hotkey=I
+Name=Hippogryph Taming
+Tip=Research H|cffffcc00i|rppogryph Taming
+Ubertip=Trains Hippogryphs to allow Archers to mount them. This allows them to attack both air and ground units.
+
+[Reib]
+Art=ReplaceableTextures\CommandButtons\BTNImprovedBows.blp
+Buttonpos=,1
+Hotkey=I
+Name=Improved Bows
+Requires=etoa
+Tip=Research |cffffcc00I|rmproved Bows
+Ubertip=Increases the Archer's and Hippogryph Rider's attack range.
+
+[Rema]
+Art=ReplaceableTextures\CommandButtons\BTNMoonArmor.blp,ReplaceableTextures\CommandButtons\BTNImprovedMoonArmor.blp,ReplaceableTextures\CommandButtons\BTNAdvancedMoonArmor.blp
+Buttonpos=,1
+Hotkey=A
+Name=Moon Armor,Improved Moon Armor,Advanced Moon Armor
+Requires1=etoa
+Requires2=etoe
+Requirescount=3
+Tip=Upgrade to Moon |cffffcc00A|rrmor,Upgrade to Improved Moon |cffffcc00A|rrmor,Upgrade to Advanced Moon |cffffcc00A|rrmor
+Ubertip="Increases the armor of Archers, Huntresses, and Hippogryph Riders.","Further increases the armor of Archers, Huntresses, and Hippogryph Riders."
+
+[Remg]
+Art=ReplaceableTextures\CommandButtons\BTNUpgradeMoonGlaive.blp
+Buttonpos=1,2
+Hotkey=G
+Name=Upgrade Moon Glaive
+Requires=edob,etoe
+Tip=Upgrade Moon |cffffcc00G|rlaive
+Ubertip=Gives the Huntress the ability to strike additional units with her bouncing glaive attacks.
+
+[Remk]
+Art=ReplaceableTextures\CommandButtons\BTNMarksmanship.blp
+Buttonpos=,2
+Hotkey=M
+Name=Marksmanship
+Requires=edob,etoe
+Tip=Research |cffffcc00M|rarksmanship
+Ubertip=Increases damage of Archers and Hippogryph Riders by 3.
+
+[Renb]
+Art=ReplaceableTextures\CommandButtons\BTNNaturesBlessing.blp
+Buttonpos=2
+Hotkey=N
+Name=Nature's Blessing
+Requires=etoa
+Tip=Research |cffffcc00N|rature's Blessing
+Ubertip=Upgrades all Ancients' and Treants' movement speed and armor.
+
+[Repb]
+Art=ReplaceableTextures\CommandButtons\BTNVorpalBlades.blp
+Buttonpos=2,2
+Hotkey=P
+Name=Vorpal Blades
+Requires=etoa,edob
+Tip=Research Vor|cffffcc00p|ral Blades
+Ubertip=Permits the glaives launched by the Glaive Thrower to strike through initial ground targets and damage those behind. Also allows them to attack trees.
+
+[Repm]
+Art=ReplaceableTextures\CommandButtons\BTNPackBeast.blp
+Buttonpos=3
+Hotkey=B
+Name=Backpack
+Requires=eden
+Tip=Research |cffffcc00B|rackpack
+Ubertip=Gives specific Night Elf ground units the ability to carry items.
+
+[Rerh]
+Art=ReplaceableTextures\CommandButtons\BTNReinforcedHides.blp,ReplaceableTextures\CommandButtons\BTNImprovedReinforcedHides.blp,ReplaceableTextures\CommandButtons\BTNAdvancedReinforcedHides.blp
+Buttonpos=1,1
+Hotkey=R
+Name=Reinforced Hides,Improved Reinforced Hides,Advanced Reinforced Hides
+Requires1=etoa
+Requires2=etoe
+Requirescount=3
+Tip=Upgrade to |cffffcc00R|reinforced Hides,Upgrade to Improved |cffffcc00R|reinforced Hides,Upgrade to Advanced |cffffcc00R|reinforced Hides
+Ubertip="Increases the armor of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.","Further increases the armor of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras."
+
+[Rers]
+Art=ReplaceableTextures\CommandButtons\BTNResistantSkin.blp
+Buttonpos=2,2
+Hotkey=T
+Name=Resistant Skin
+Requires=etoe,eden
+Tip=Research Resis|cffffcc00t|rant Skin
+Ubertip=Gives Mountain Giants increased resistance to spell damage.
+
+[Resc]
+Art=ReplaceableTextures\CommandButtons\BTNSentinel.blp
+Buttonpos=1,1
+Hotkey=S
+Name=Sentinel
+Requires=edob,etoa
+Tip=Research |cffffcc00S|rentinel
+Ubertip=Gives the Huntress the ability to send her owl companion to a nearby tree and provide vision. |nCan see invisible units.
+
+[Resi]
+Art=ReplaceableTextures\CommandButtons\BTNDryadDispelMagic.blp
+Buttonpos=,2
+Hotkey=S
+Name=Abolish Magic
+Tip=Research Aboli|cffffcc00s|rh Magic
+Ubertip="Gives the Dryad the ability to dispel positive buffs from enemy units, and negative buffs from friendly units. |nDamages summoned units."
+
+[Resm]
+Art=ReplaceableTextures\CommandButtons\BTNStrengthOfTheMoon.blp,ReplaceableTextures\CommandButtons\BTNImprovedStrengthOfTheMoon.blp,ReplaceableTextures\CommandButtons\BTNAdvancedStrengthOfTheMoon.blp
+Hotkey=M
+Name=Strength of the Moon,Improved Strength of the Moon,Advanced Strength of the Moon
+Requires1=etoa
+Requires2=etoe
+Requirescount=3
+Tip=Upgrade to Strength of the |cffffcc00M|roon,Upgrade to Improved Strength of the |cffffcc00M|roon,Upgrade to Advanced Strength of the |cffffcc00M|roon
+Ubertip="Increases the damage of Archers, Huntresses, Glaive Throwers, and Hippogryph Riders.","Further increases the damage of Archers, Huntresses, Glaive Throwers, and Hippogryph Riders."
+
+[Resw]
+Art=ReplaceableTextures\CommandButtons\BTNStrengthOfTheWild.blp,ReplaceableTextures\CommandButtons\BTNImprovedStrengthOfTheWild.blp,ReplaceableTextures\CommandButtons\BTNAdvancedStrengthOfTheWild.blp
+Buttonpos=1
+Hotkey=W
+Name=Strength of the Wild,Improved Strength of the Wild,Advanced Strength of the Wild
+Requires1=etoa
+Requires2=etoe
+Requirescount=3
+Tip=Upgrade to Strength of the |cffffcc00W|rild,Upgrade to Improved Strength of the |cffffcc00W|rild,Upgrade to Advanced Strength of the |cffffcc00W|rild
+Ubertip="Increases the damage of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.","Further increases the damage of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras."
+
+[Reuv]
+Art=ReplaceableTextures\CommandButtons\BTNUltravision.blp
+Buttonpos=2
+Hotkey=U
+Name=Ultravision
+Tip=Upgrade to |cffffcc00U|rltravision
+Ubertip=Gives Night Elves the ability to see as far at night as they do during the day.
+
+[Rews]
+Art=ReplaceableTextures\CommandButtons\BTNWellSpring.blp
+Buttonpos=3
+Hotkey=E
+Name=Well Spring
+Requires=etoe
+Tip=Research W|cffffcc00e|rll Spring
+Ubertip="Increases the amount of mana that can be stored in Moon Wells by 200, and their rate of mana regeneration by 83%."
+
+[Rgfo]
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+Name=Glyph of Fortification
+
+[Rguv]
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+Name=Glyph of Ultravision
+
+[Rhac]
+Art=ReplaceableTextures\CommandButtons\BTNStoneArchitecture.blp,ReplaceableTextures\CommandButtons\BTNArcaniteArchitecture.blp,ReplaceableTextures\CommandButtons\BTNImbuedMasonry.blp
+Buttonpos=1
+Hotkey=M
+Name=Improved Masonry,Advanced Masonry,Imbued Masonry
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Tip=Upgrade to Improved |cffffcc00M|rasonry,Upgrade to Advanced |cffffcc00M|rasonry,Upgrade to Imbued |cffffcc00M|rasonry
+Ubertip=Increases the armor and hit points of Human buildings.,Further increases the armor and hit points of Human buildings.
+
+[Rhan]
+Art=ReplaceableTextures\CommandButtons\BTNAnimalWarTraining.blp
+Buttonpos=2,2
+Hotkey=A
+Name=Animal War Training
+Requires=hlum,hcas,hbla
+Tip=Research |cffffcc00A|rnimal War Training
+Ubertip="Increases the maximum hit points of Knights, Dragonhawk Riders, and Gryphon Riders by 150."
+
+[Rhar]
+Art=ReplaceableTextures\CommandButtons\BTNHumanArmorUpOne.blp,ReplaceableTextures\CommandButtons\BTNHumanArmorUpTwo.blp,ReplaceableTextures\CommandButtons\BTNHumanArmorUpThree.blp
+Buttonpos=,1
+Hotkey=P
+Name=Iron Plating,Steel Plating,Mithril Plating
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Tip=Upgrade to Iron |cffffcc00P|rlating,Upgrade to Steel |cffffcc00P|rlating,Upgrade to Mithril |cffffcc00P|rlating
+Ubertip="Increases the armor of Militia, Footmen, Spell Breakers, Knights, Flying Machines and Siege Engines.","Further increases the armor of Militia, Footmen, Spell Breakers, Knights, Flying Machines and Siege Engines."
+
+[Rhcd]
+Art=ReplaceableTextures\CommandButtons\BTNCloudOfFog.blp
+Buttonpos=1,2
+Hotkey=C
+Name=Cloud
+Requires=hvlt
+Tip=Research |cffffcc00C|rloud
+Ubertip="Provides Dragonhawk Riders with the Cloud ability, which stops ranged buildings from attacking."
+
+[Rhde]
+Art=ReplaceableTextures\CommandButtons\BTNDefend.blp
+Buttonpos=,2
+Hotkey=D
+Name=Defend
+Tip=Research |cffffcc00D|refend
+Ubertip="Allows Footmen to use the Defend ability, which increases their defensive capabilities against Piercing attacks."
+
+[Rhhb]
+Art=ReplaceableTextures\CommandButtons\BTNStormHammer.blp
+Buttonpos=,2
+Hotkey=H
+Name=Storm Hammers
+Tip=Research Storm |cffffcc00H|rammers
+Ubertip=Causes a Gryphon Rider's attacks to damage multiple units.
+
+[Rhla]
+Art=ReplaceableTextures\CommandButtons\BTNLeatherUpgradeOne.blp,ReplaceableTextures\CommandButtons\BTNLeatherUpgradeTwo.blp,ReplaceableTextures\CommandButtons\BTNLeatherUpgradeThree.blp
+Buttonpos=1,1
+Hotkey=A
+Name=Studded Leather Armor,Reinforced Leather Armor,Dragonhide Armor
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Tip=Upgrade to Studded Leather |cffffcc00A|rrmor,Upgrade to Reinforced Leather |cffffcc00A|rrmor,Upgrade to Dragonhide |cffffcc00A|rrmor
+Ubertip="Increases the armor of Riflemen, Mortar Teams, Dragonhawk Riders and Gryphon Riders.","Further increases the armor of Riflemen, Mortar Teams, Dragonhawk Riders and Gryphon Riders."
+
+[Rhlh]
+Art=ReplaceableTextures\CommandButtons\BTNHumanLumberUpgrade1.blp,ReplaceableTextures\CommandButtons\BTNHumanLumberUpgrade2.blp
+Hotkey=L
+Name=Improved Lumber Harvesting,Advanced Lumber Harvesting
+Requires=hkee
+Requires1=hcas
+Requirescount=2
+Tip=Improved |cffffcc00L|rumber Harvesting,Advanced |cffffcc00L|rumber Harvesting
+Ubertip=Increases the amount of lumber that Peasants can carry by 5.,Further increases the amount of lumber that Peasants can carry by 5.
+
+[Rhme]
+Art=ReplaceableTextures\CommandButtons\BTNSteelMelee.blp,ReplaceableTextures\CommandButtons\BTNThoriumMelee.blp,ReplaceableTextures\CommandButtons\BTNArcaniteMelee.blp
+Hotkey=S
+Name=Iron Forged Swords,Steel Forged Swords,Mithril Forged Swords
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Tip=Upgrade to Iron Forged |cffffcc00S|rwords,Upgrade to Steel Forged |cffffcc00S|rwords,Upgrade to Mithril Forged |cffffcc00S|rwords
+Ubertip="Increases the attack damage of Militia, Footmen, Spell Breakers, Dragonhawk Riders, Gryphon Riders and Knights.","Further increases the attack damage of Militia, Footmen, Spell Breakers, Dragonhawk Riders, Gryphon Riders and Knights."
+
+[Rhpm]
+Art=ReplaceableTextures\CommandButtons\BTNPackBeast.blp
+Buttonpos=3
+Hotkey=B
+Name=Backpack
+Requires=hvlt
+Tip=Research |cffffcc00B|rackpack
+Ubertip=Gives specific Human ground units the ability to carry items.
+
+[Rhra]
+Art=ReplaceableTextures\CommandButtons\BTNHumanMissileUpOne.blp,ReplaceableTextures\CommandButtons\BTNHumanMissileUpTwo.blp,ReplaceableTextures\CommandButtons\BTNHumanMissileUpThree.blp
+Buttonpos=1
+Hotkey=G
+Name=Black Gunpowder,Refined Gunpowder,Imbued Gunpowder
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Tip=Upgrade to Black |cffffcc00G|runpowder,Upgrade to Refined |cffffcc00G|runpowder,Upgrade to Imbued |cffffcc00G|runpowder
+Ubertip="Increases the ranged attack damage of Riflemen, Mortar Teams, Siege Engines and Flying Machines.","Further increases the ranged attack damage of Riflemen, Mortar Teams, Siege Engines and Flying Machines."
+
+[Rhri]
+Art=ReplaceableTextures\CommandButtons\BTNDwarvenLongRifle.blp
+Buttonpos=1,2
+Hotkey=L
+Name=Long Rifles
+Requires=harm
+Tip=Upgrade to |cffffcc00L|rong Rifles
+Ubertip=Increases the range of Riflemen attacks.
+
+[Rnsi]
+Art=ReplaceableTextures\CommandButtons\BTNDryadDispelMagic.blp
+Buttonpos=1,2
+Hotkey=B
+Name=Abolish Magic
+Tip=Research A|cffffcc00b|rolish Magic
+Ubertip="Gives the Couatl the ability to dispel positive buffs from enemy units, and negative buffs from friendly units. |nDamages summoned units."
+
+[Rnsw]
+Art=ReplaceableTextures\CommandButtons\BTNSirenAdept.blp,ReplaceableTextures\CommandButtons\BTNSirenMaster.blp
+Buttonpos=,2
+Hotkey=N
+Name=Naga Siren Adept Training,Naga Siren Master Training
+Tip=Research |cffffcc00N|raga Siren Adept Training,Research |cffffcc00N|raga Siren Master Training
+Ubertip="Increases Naga Sirens' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Frost Armor.","Increases Naga Sirens' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cyclone."
+
+[Roar]
+Art=ReplaceableTextures\CommandButtons\BTNSteelArmor.blp,ReplaceableTextures\CommandButtons\BTNThoriumArmor.blp,ReplaceableTextures\CommandButtons\BTNArcaniteArmor.blp
+Buttonpos=,1
+Hotkey=A
+Name=Steel Armor,Thorium Armor,Arcanite Armor
+Requires1=ostr
+Requires2=ofrt
+Requirescount=3
+Tip=Upgrade to Steel Unit |cffffcc00A|rrmor,Upgrade to Thorium Unit |cffffcc00A|rrmor,Upgrade to Arcanite Unit |cffffcc00A|rrmor
+Ubertip="Increases the armor of Grunts, Raiders, Troll Batriders, Tauren, Headhunters, Wind Riders and Demolishers.","Further increases the armor of Grunts, Raiders, Troll Batriders, Tauren, Headhunters, Wind Riders and Demolishers."
+
+[Robf]
+Art=ReplaceableTextures\CommandButtons\BTNFireRocks.blp
+Buttonpos=2,2
+Hotkey=N
+Name=Burning Oil
+Requires=ofrt
+Tip=Bur|cffffcc00n|ring Oil
+Ubertip="Upgrades Demolishers to fire rocks smothered in burning oil, which causes the ground to burn."
+
+[Robk]
+Art=ReplaceableTextures\CommandButtons\BTNHeadHunterBerserker.blp
+Buttonpos=1,2
+Hotkey=E
+Name=Berserker Upgrade
+Requires=ofrt,ofor
+Tip=B|cffffcc00e|rrserker Upgrade
+Ubertip="Transforms Headhunters into Troll Berserkers, giving them increased hit points and the Berserk ability."
+
+[Robs]
+Art=ReplaceableTextures\CommandButtons\BTNBerserk.blp
+Buttonpos=,2
+Hotkey=B
+Name=Berserker Strength
+Requires=ostr
+Tip=Research |cffffcc00B|rerserker Strength
+Ubertip="Improves the fighting capabilities of Grunts with a 100 hit point increase, and 3 bonus attack damage."
+
+[Roen]
+Art=ReplaceableTextures\CommandButtons\BTNEnsnare.blp
+Buttonpos=,2
+Hotkey=N
+Name=Ensnare
+Tip=Research E|cffffcc00n|rsnare
+Ubertip=Enables Raiders to use the Ensnare ability. Ensnare causes a target enemy unit to be bound to the ground so that it cannot move. Air units that are ensnared can be attacked as though they were land units.
+
+[Rolf]
+Art=ReplaceableTextures\CommandButtons\BTNLiquidFire.blp
+Buttonpos=2,2
+Hotkey=L
+Name=Liquid Fire
+Requires=ofrt,ovln
+Tip=Research |cffffcc00L|riquid Fire
+Ubertip="Gives Troll Batriders the Liquid Fire attack, which deals damage over time to enemy buildings, stops them from being repaired, and reduces the attack rate of enemy buildings."
+
+[Rome]
+Art=ReplaceableTextures\CommandButtons\BTNOrcMeleeUpOne.blp,ReplaceableTextures\CommandButtons\BTNOrcMeleeUpTwo.blp,ReplaceableTextures\CommandButtons\BTNOrcMeleeUpThree.blp
+Hotkey=M
+Name=Steel Melee Weapons,Thorium Melee Weapons,Arcanite Melee Weapons
+Requires1=ostr
+Requires2=ofrt
+Requirescount=3
+Tip=Upgrade to Steel |cffffcc00M|relee Weapons,Upgrade to Thorium |cffffcc00M|relee Weapons,Upgrade to Arcanite |cffffcc00M|relee Weapons
+Ubertip="Increases the melee attack damage of Grunts, Raiders and Tauren.","Further increases the melee attack damage of Grunts, Raiders and Tauren."
+
+[Ropg]
+Art=ReplaceableTextures\CommandButtons\BTNPillage.blp
+Buttonpos=2
+Hotkey=G
+Name=Pillage
+Tip=Pilla|cffffcc00g|re
+Ubertip="Causes Peons', Grunts', and Raiders' attacks to gain resources when hitting enemy buildings."
+
+[Ropm]
+Art=ReplaceableTextures\CommandButtons\BTNPackBeast.blp
+Buttonpos=3
+Hotkey=B
+Name=Backpack
+Requires=ovln
+Tip=Research |cffffcc00B|rackpack
+Ubertip=Gives specific Orc ground units the ability to carry items.
+
+[Rora]
+Art=ReplaceableTextures\CommandButtons\BTNSteelRanged.blp,ReplaceableTextures\CommandButtons\BTNThoriumRanged.blp,ReplaceableTextures\CommandButtons\BTNArcaniteRanged.blp
+Buttonpos=1
+Hotkey=R
+Name=Steel Ranged Weapons,Thorium Ranged Weapons,Arcanite Ranged Weapons
+Requires1=ostr
+Requires2=ofrt
+Requirescount=3
+Tip=Upgrade to Steel |cffffcc00R|ranged Weapons,Upgrade to Thorium |cffffcc00R|ranged Weapons,Upgrade to Arcanite |cffffcc00R|ranged Weapons
+Ubertip="Increases the ranged attack damage of Headhunters, Wind Riders, Troll Batriders and Demolishers.","Further increases the ranged attack damage of Headhunters, Wind Riders, Troll Batriders and Demolishers."
+
+[Rorb]
+Art=ReplaceableTextures\CommandButtons\BTNReinforcedBurrows.blp
+Buttonpos=2,1
+Hotkey=D
+Name=Reinforced Defenses
+Requires=ofrt
+Tip=Reinforced |cffffcc00D|refenses
+Ubertip=Upgrades Burrows and Watch Towers so that they have Fortified armor.
+
+[Rosp]
+Art=ReplaceableTextures\CommandButtons\BTNSpikedBarricades.blp,ReplaceableTextures\CommandButtons\BTNImprovedSpikedBarricades.blp,ReplaceableTextures\CommandButtons\BTNAdvancedSpikedBarricades.blp
+Buttonpos=2
+Hotkey=S
+Name=Spiked Barricades,Improved Spiked Barricades,Advanced Spiked Barricades
+Requires1=ostr
+Requires2=ofrt
+Requirescount=3
+Tip=Upgrade to |cffffcc00S|rpiked Barricades,Upgrade to Improved |cffffcc00S|rpiked Barricades,Upgrade to Advanced |cffffcc00S|rpiked Barricades
+Ubertip=Surrounds Orc buildings with spikes that damage enemy melee attackers. Deals 4 damage per attack.,Increases the amount of damage inflicted on melee attackers by 6.,Further increases the amount of damage inflicted on melee attackers by 6.
+
+[Rost]
+Art=ReplaceableTextures\CommandButtons\BTNShamanAdept.blp,ReplaceableTextures\CommandButtons\BTNShamanMaster.blp
+Buttonpos=,2
+Hotkey=M
+Name=Shaman Adept Training,Shaman Master Training
+Requires1=ofrt
+Requirescount=2
+Tip=Sha|cffffcc00m|ran Adept Training,Sha|cffffcc00m|ran Master Training
+Ubertip="Increases Shaman mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Lightning Shield.","Increases Shaman mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Bloodlust."
+
+[Rotr]
+Art=ReplaceableTextures\CommandButtons\BTNRegenerate.blp
+Buttonpos=1,1
+Hotkey=R
+Name=Troll Regeneration
+Requires=ostr,ofor
+Tip=Research Troll |cffffcc00R|regeneration
+Ubertip="Increases the hit point regeneration rate of Headhunters, Witch Doctors and Troll Batriders."
+
+[Rovs]
+Art=ReplaceableTextures\CommandButtons\BTNEnvenomedSpear.blp
+Buttonpos=2,1
+Hotkey=E
+Name=Envenomed Spears
+Requires=ofrt
+Tip=Research |cffffcc00E|rnvenomed Spears
+Ubertip=Adds an additional poison effect to Wind Riders' attacks. A unit poisoned by Envenomed Spears takes damage over time.
+
+[Rowd]
+Art=ReplaceableTextures\CommandButtons\BTNWitchDoctorAdept.blp,ReplaceableTextures\CommandButtons\BTNWitchDoctorMaster.blp
+Buttonpos=1,2
+Hotkey=D
+Name=Witch Doctor Adept Training,Witch Doctor Master Training
+Requires1=ofrt
+Requirescount=2
+Tip=Witch |cffffcc00D|roctor Adept Training,Witch |cffffcc00D|roctor Master Training
+Ubertip="Increases Witch Doctors' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Stasis Trap.","Increases Witch Doctors' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Healing Ward."
+
+[Rows]
+Art=ReplaceableTextures\CommandButtons\BTNSmash.blp
+Buttonpos=,2
+Hotkey=P
+Name=Pulverize
+Tip=Research |cffffcc00P|rulverize
+Ubertip=Gives Tauren the Pulverize ability. Pulverize gives Tauren a chance of dealing area effect damage on their attacks.
+
+[Rowt]
+Art=ReplaceableTextures\CommandButtons\BTNSpiritWalkerAdeptTraining.blp,ReplaceableTextures\CommandButtons\BTNSpiritWalkerMasterTraining.blp
+Buttonpos=2,2
+Hotkey=R
+Name=Spirit Walker Adept Training,Spirit Walker Master Training
+Requires1=ofrt
+Requirescount=2
+Tip=Spi|cffffcc00r|rit Walker Adept Training,Spi|cffffcc00r|rit Walker Master Training
+Ubertip="Increases Spirit Walkers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Disenchant.","Increases Spirit Walkers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Ancestral Spirit."
+
+[Ruac]
+Art=ReplaceableTextures\CommandButtons\BTNCannibalize.blp
+Buttonpos=,1
+Hotkey=C
+Name=Cannibalize
+Tip=Research |cffffcc00C|rannibalize
+Ubertip=Enables Ghouls and Abominations to use the Cannibalize ability. Cannibalize consumes a nearby corpse to restore health.
+
+[Ruar]
+Art=ReplaceableTextures\CommandButtons\BTNUnholyArmor.blp,ReplaceableTextures\CommandButtons\BTNImprovedUnholyArmor.blp,ReplaceableTextures\CommandButtons\BTNAdvancedUnholyArmor.blp
+Buttonpos=,1
+Hotkey=U
+Name=Unholy Armor,Improved Unholy Armor,Advanced Unholy Armor
+Requires1=unp1
+Requires2=unp2
+Requirescount=3
+Tip=Upgrade to |cffffcc00U|rnholy Armor,Upgrade to Improved |cffffcc00U|rnholy Armor,Upgrade to Advanced |cffffcc00U|rnholy Armor
+Ubertip="Increases the armor of Ghouls, Abominations, Skeleton Warriors, and Skeletal Mages.","Further increases the armor of Ghouls, Abominations, Skeleton Warriors, and Skeletal Mages."
+
+[Ruba]
+Art=ReplaceableTextures\CommandButtons\BTNBansheeAdept.blp,ReplaceableTextures\CommandButtons\BTNBansheeMaster.blp
+Buttonpos=1,2
+Hotkey=A
+Name=Banshee Adept Training,Banshee Master Training
+Requires1=unp2
+Requirescount=2
+Tip=B|cffffcc00a|rnshee Adept Training,B|cffffcc00a|rnshee Master Training
+Ubertip="Increases Banshees' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Anti-magic Shell.","Increases Banshees' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Possession."
+
+[Rubu]
+Art=ReplaceableTextures\CommandButtons\BTNCryptFiendBurrow.blp
+Buttonpos=1,1
+Hotkey=B
+Name=Burrow
+Requires=unp1,ugrv
+Tip=Research |cffffcc00B|rurrow
+Ubertip="Crypt Fiends gain the ability to burrow. Burrowed Crypt Fiends are invisible and gain increased hit point regeneration, but cannot attack."
+
+[Rucr]
+Art=ReplaceableTextures\CommandButtons\BTNCreatureCarapace.blp,ReplaceableTextures\CommandButtons\BTNImprovedCreatureCarapace.blp,ReplaceableTextures\CommandButtons\BTNAdvancedCreatureCarapace.blp
+Buttonpos=1,1
+Hotkey=C
+Name=Creature Carapace,Improved Creature Carapace,Advanced Creature Carapace
+Requires1=unp1
+Requires2=unp2
+Requirescount=3
+Tip=Upgrade to Creature |cffffcc00C|rarapace,Upgrade to Improved Creature |cffffcc00C|rarapace,Upgrade to Advanced Creature |cffffcc00C|rarapace
+Ubertip="Increases the armor of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.","Further increases the armor of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.","Further increases the armor of the Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms."
+
+[Ruex]
+Art=ReplaceableTextures\CommandButtons\BTNExhumeCorpses.blp
+Buttonpos=,2
+Hotkey=E
+Name=Exhume Corpses
+Requires=unp2
+Tip=Research |cffffcc00E|rxhume Corpses
+Ubertip=Gives Meat Wagons the ability to generate corpses.
+
+[Rufb]
+Art=ReplaceableTextures\CommandButtons\BTNFreezingBreath.blp
+Buttonpos=,2
+Hotkey=B
+Name=Freezing Breath
+Tip=Research Freezing |cffffcc00B|rreath
+Ubertip="Enables Frost Wyrms to use the Freezing Breath ability. When cast on a building, temporarily stops production."
+
+[Rugf]
+Art=ReplaceableTextures\CommandButtons\BTNGhoulFrenzy.blp
+Buttonpos=,2
+Hotkey=Z
+Name=Ghoul Frenzy
+Requires=ugrv,unp2
+Tip=Research Ghoul Fren|cffffcc00z|ry
+Ubertip="Increases the attack rate of Ghouls by 25%, and increases their movement speed."
+
+[Rume]
+Art=ReplaceableTextures\CommandButtons\BTNUnholyStrength.blp,ReplaceableTextures\CommandButtons\BTNImprovedUnholyStrength.blp,ReplaceableTextures\CommandButtons\BTNAdvancedUnholyStrength.blp
+Hotkey=S
+Name=Unholy Strength,Improved Unholy Strength,Advanced Unholy Strength
+Requires1=unp1
+Requires2=unp2
+Requirescount=3
+Tip=Upgrade to Unholy |cffffcc00S|rtrength,Upgrade to Improved Unholy |cffffcc00S|rtrength,Upgrade to Advanced Unholy |cffffcc00S|rtrength
+Ubertip="Increases the attack damage of Ghouls, Meat Wagons, Abominations, Skeleton Warriors, and Skeletal Mages.","Further increases the attack damage of Ghouls, Meat Wagons, Abominations, Skeleton Warriors, and Skeletal Mages."
+
+[Rune]
+Art=ReplaceableTextures\CommandButtons\BTNNecromancerAdept.blp,ReplaceableTextures\CommandButtons\BTNNecromancerMaster.blp
+Buttonpos=,2
+Hotkey=E
+Name=Necromancer Adept Training,Necromancer Master Training
+Requires1=unp2
+Requirescount=2
+Tip=N|cffffcc00e|rcromancer Adept Training,N|cffffcc00e|rcromancer Master Training
+Ubertip="Increases Necromancers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Unholy Frenzy.","Increases Necromancers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cripple."
+
+[Rupc]
+Art=ReplaceableTextures\CommandButtons\BTNPlagueCloud.blp
+Buttonpos=1,2
+Hotkey=D
+Name=Disease Cloud
+Requires=unp2
+Tip=Research |cffffcc00D|risease Cloud
+Ubertip=Gives Abominations a Disease Cloud aura that deals 1 damage per second for 120 seconds to nearby enemy units. Meat Wagons will cause Disease Clouds wherever they attack that deal 1 damage per second for 120 seconds to nearby enemy units. |nUndead are immune to Disease Cloud.
+
+[Rupm]
+Art=ReplaceableTextures\CommandButtons\BTNPackBeast.blp
+Buttonpos=3
+Hotkey=B
+Name=Backpack
+Requires=utom
+Tip=Research |cffffcc00B|rackpack
+Ubertip=Gives specific Undead ground units the ability to carry items.
+
+[Rura]
+Art=ReplaceableTextures\CommandButtons\BTNCreatureAttack.blp,ReplaceableTextures\CommandButtons\BTNImprovedCreatureAttack.blp,ReplaceableTextures\CommandButtons\BTNAdvancedCreatureAttack.blp
+Buttonpos=1
+Hotkey=A
+Name=Creature Attack,Improved Creature Attack,Advanced Creature Attack
+Requires1=unp1
+Requires2=unp2
+Requirescount=3
+Tip=Upgrade to Creature |cffffcc00A|rttack,Upgrade to Improved Creature |cffffcc00A|rttack,Upgrade to Advanced Creature |cffffcc00A|rttack
+Ubertip="Increases the attack damage of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.","Further increases the attack damage of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms."
+
+[Rusf]
+Art=ReplaceableTextures\CommandButtons\BTNStoneForm.blp
+Buttonpos=2,2
+Hotkey=S
+Name=Stone Form
+Requires=ugrv,unp2
+Tip=Research |cffffcc00S|rtone Form
+Ubertip="Enables the ability for Gargoyles to assume Stone Form. Stone Form transforms the Gargoyle into a statue with high armor, spell immunity, and regeneration. The Gargoyle cannot attack in this form."
+
+[Rusl]
+Art=ReplaceableTextures\CommandButtons\BTNSkeletalLongevity.blp
+Buttonpos=2,2
+Hotkey=S
+Name=Skeletal Longevity
+Tip=Research |cffffcc00S|rkeletal Longevity
+Ubertip=Increases the duration of raised Skeleton Warriors and Skeletal Mages by 15 seconds.
+
+[Rusm]
+Art=ReplaceableTextures\CommandButtons\BTNSkeletonMage.blp
+Buttonpos=2,1
+Hotkey=M
+Name=Skeletal Mastery
+Requires=unp2
+Tip=Research Skeletal |cffffcc00M|rastery
+Ubertip=Causes one of the two skeletons created by Raise Dead to be a Skeletal Mage.
+
+[Rusp]
+Art=ReplaceableTextures\CommandButtons\BTNDestroyer.blp
+Buttonpos=2,2
+Hotkey=T
+Name=Destroyer Form
+Requires=unp2,utom
+Tip=Research Des|cffffcc00t|rroyer Form
+Ubertip="Allows the Obsidian Statue to transform into a Destroyer, a large flying unit that must devour magic to sustain its mana. The Destroyer has Spell Immunity, Devour Magic, Absorb Mana, and Orb of Annihilation. |n|n|cffffcc00Attacks land and air units.|r"
+
+[Ruwb]
+Art=ReplaceableTextures\CommandButtons\BTNWeb.blp
+Buttonpos=1,2
+Hotkey=W
+Name=Web
+Requires=ugrv,unp1
+Tip=Research |cffffcc00W|reb
+Ubertip="Enables Crypt Fiends to use the Web ability. Web binds a target enemy air unit in webbing, forcing it to the ground. Webbed units can be hit as though they were land units."
+
+[Rwdm]
+Art=ReplaceableTextures\CommandButtons\BTNDrum.blp
+Buttonpos=1,2
+Hotkey=D
+Name=War Drums Damage Increase
+Requires=ofrt,ofor
+Tip=Upgrade War |cffffcc00D|rrums
+Ubertip=Increases the damage bonus that the War Drums aura on the Kodo Beast gives. War Drums increases the damage of friendly units around Kodo Beasts.

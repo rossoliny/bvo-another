@@ -17,6 +17,7 @@ globals
 
     integer Hex_Mana_Cost = 600
 
+    trigger trig_ShowMyInfo=null
     trigger Yo=null
     trigger Zo=null
     unit FG=null
@@ -7199,10 +7200,19 @@ function s1 takes nothing returns nothing
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
+function trig_ShowMyInfo_Action takes nothing returns nothing
+	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Want to help in development? Contact me in Discord: Rossoliny#0686")
+	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Хочешь помочь в разработке? Пиши мне в Discord: Rossoliny#0686")
+endfunction
+
 function t1 takes nothing returns nothing
     set Bs=CreateTrigger()
+    set trig_ShowMyInfo=CreateTrigger()
     call TriggerRegisterTimerEventSingle(Bs,60.)
     call TriggerAddAction(Bs,function s1)
+
+    call TriggerRegisterTimerEventSingle(trig_ShowMyInfo,50.)
+    call TriggerAddAction(trig_ShowMyInfo,function trig_ShowMyInfo_Action)
 endfunction
 
 function u1 takes nothing returns boolean
