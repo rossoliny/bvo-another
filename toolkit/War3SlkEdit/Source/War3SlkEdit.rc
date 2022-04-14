@@ -1,0 +1,372 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Swedish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_SVE)
+#ifdef _WIN32
+LANGUAGE LANG_SWEDISH, SUBLANG_DEFAULT
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+UnitDialog DIALOG DISCARDABLE  0, 0, 387, 266
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Unit"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,255,55,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,265,85,50,14
+    EDITTEXT        IDC_EDIT1,90,5,110,15,ES_AUTOHSCROLL
+    LTEXT           "If you make changes in the units, you need to include UnitData.txt",
+                    IDC_STATIC,125,230,225,20
+    LTEXT           "ID:",IDC_STATIC,5,5,60,10
+    LTEXT           "AS YOU CAN SEE THIS IS NOT!!!! FINISHED!",IDC_STATIC,45,
+                    120,160,20
+END
+
+MainDialog DIALOG DISCARDABLE  0, 0, 181, 286
+STYLE DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU | WS_THICKFRAME
+CAPTION "War3SlkEdit v1.05"
+MENU MainMenu
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         GroupList,5,5,170,275,LBS_NOINTEGRALHEIGHT | 
+                    LBS_DISABLENOSCROLL | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+END
+
+ModeDialog DIALOG DISCARDABLE  0, 0, 197, 76
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Select edit mode"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Edit single TXT file",ModeTxt,"Button",
+                    BS_AUTORADIOBUTTON,10,10,120,10
+    CONTROL         "Edit single SLK file",ModeSlk,"Button",
+                    BS_AUTORADIOBUTTON,10,20,115,10
+    CONTROL         "Edit Units",ModeUnit,"Button",BS_AUTORADIOBUTTON,10,30,
+                    115,10
+    CONTROL         "Edit Spells",ModeSpell,"Button",BS_AUTORADIOBUTTON,10,
+                    40,115,10
+    CONTROL         "Edit Upgrades",ModeUpgrade,"Button",BS_AUTORADIOBUTTON,
+                    10,50,115,10
+    CONTROL         "Edit blah",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,60,
+                    115,10
+    PUSHBUTTON      "OK",ModeOk,135,5,50,15
+    DEFPUSHBUTTON   "Cancel",ModeCancel,135,25,50,15
+END
+
+PickIconDialog DIALOG DISCARDABLE  0, 0, 402, 217
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Select an icon"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         PickIconList,5,5,335,205,LBS_NOINTEGRALHEIGHT | 
+                    LBS_DISABLENOSCROLL | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    DEFPUSHBUTTON   "OK",PickIconOk,345,5,50,15
+    PUSHBUTTON      "Cancel",PickIconCancel,345,25,50,15
+END
+
+PickModelDialog DIALOG DISCARDABLE  0, 0, 402, 217
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Select a model"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         PickModelList,5,5,335,205,LBS_NOINTEGRALHEIGHT | 
+                    LBS_DISABLENOSCROLL | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    DEFPUSHBUTTON   "OK",PickModelOk,345,5,50,15
+    PUSHBUTTON      "Cancel",PickModelCancel,345,25,50,15
+END
+
+PickTargetDialog DIALOG DISCARDABLE  0, 0, 232, 166
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "Select the target types"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Ground",PickTargetGround,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,5,70,10
+    CONTROL         "Air",PickTargetAir,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,15,70,10
+    CONTROL         "Terrain",PickTargetTerrain,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,25,70,10
+    CONTROL         "Structure",PickTargetStructure,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,35,70,10
+    CONTROL         "Organic",PickTargetOrganic,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,45,70,10
+    CONTROL         "Mechanical",PickTargetMechanical,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,55,70,10
+    CONTROL         "Undead",PickTargetUndead,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,65,70,10
+    CONTROL         "Dead",PickTargetDead,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,75,70,10
+    CONTROL         "Alive",PickTargetAlive,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,85,70,10
+    CONTROL         "Hero",PickTargetHero,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,95,70,10
+    CONTROL         "NonHero",PickTargetNonhero,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,105,70,10
+    CONTROL         "Sapper",PickTargetSapper,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,115,70,10
+    CONTROL         "NonSapper",PickTargetNonsapper,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,125,70,10
+    CONTROL         "Self",PickTargetSelf,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,135,70,10
+    CONTROL         "NotSelf",PickTargetNotself,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,145,70,10
+    CONTROL         "Player",PickTargetPlayer,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,5,70,10
+    CONTROL         "Enemy",PickTargetEnemy,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,15,70,10
+    CONTROL         "Allied",PickTargetAllied,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,25,70,10
+    CONTROL         "Neutral",PickTargetNeutral,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,35,70,10
+    CONTROL         "Friend",PickTargetFriend,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,45,70,10
+    CONTROL         "Item",PickTargetItem,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,55,70,10
+    CONTROL         "Tree",PickTargetTree,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,65,70,10
+    CONTROL         "Ward",PickTargetWard,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,75,70,10
+    CONTROL         "Debris",PickTargetDebris,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,85,70,10
+    CONTROL         "Wall",PickTargetWall,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,95,70,10
+    CONTROL         "Ancient",PickTargetAncient,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,105,70,10
+    CONTROL         "NonAncient",PickTargetNonancient,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,90,115,70,10
+    CONTROL         "Vulnerable",PickTargetVuln,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,125,70,10
+    CONTROL         "Invulnerable",PickTargetInvu,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,135,70,10
+    CONTROL         "None",PickTargetNone,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,90,145,70,10
+    DEFPUSHBUTTON   "OK",PickTargetOk,170,5,50,15
+    PUSHBUTTON      "Cancel",PickTargetCancel,170,25,50,15
+END
+
+EditDialog DIALOGEX 0, 0, 272, 106
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Enter a value for this field"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        EditText,10,10,250,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "Model",EditModel,20,50,50,15
+    PUSHBUTTON      "Icon",EditIcon,20,70,50,15
+    PUSHBUTTON      "Target",EditTarget,80,50,50,15
+    DEFPUSHBUTTON   "OK",EditOk,210,40,50,15
+    PUSHBUTTON      "Cancel",EditCancel,210,60,50,15
+    GROUPBOX        "Preset",IDC_STATIC,10,35,190,60
+END
+
+NameDialog DIALOGEX 0, 0, 222, 46
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Enter an ID"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",NameOk,165,5,50,14
+    PUSHBUTTON      "Cancel",NameCancel,165,25,50,14
+    EDITTEXT        NameEdit,5,5,150,15,ES_AUTOHSCROLL
+END
+
+SortDialog DIALOG DISCARDABLE  0, 0, 167, 46
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Sorting..."
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Sorting the list...\n(This may take a while if the list is large)",
+                    IDC_STATIC,10,10,145,20
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    UnitDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 380
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 259
+    END
+
+    MainDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 174
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 279
+    END
+
+    ModeDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 69
+    END
+
+    PickIconDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 395
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    PickModelDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 395
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    PickTargetDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 159
+    END
+
+    EditDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 99
+    END
+
+    NameDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 215
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+
+    SortDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 160
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+MainMenu MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",                        FileNew, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      FileClose
+        MENUITEM "&Open",                       FileOpen
+        MENUITEM "&Save",                       FileSave
+        MENUITEM "Save &As",                    FileSaveAs
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       FileExit
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&New group",                  EditNew
+        MENUITEM "&Copy group",                 EditCopy
+        MENUITEM "&Remove group",               EditRemove
+        MENUITEM SEPARATOR
+        MENUITEM "&Sort groups by name",        EditSort
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About",                      HelpAbout
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+ProgramIcon             ICON    DISCARDABLE     "ProgramIcon.ico"
+#endif    // Swedish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

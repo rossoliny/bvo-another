@@ -1,0 +1,55 @@
+[FrameDef]
+KEY_QUESTS=INFO (|Cfffed312F9|R)
+QUESTDESCRIPTION=Description
+QUESTSOPTIONAL= 
+QUESTS=INFO
+QUESTSMAIN= 
+LUMBER=Medal
+COLON_LUMBER=Medal:
+RESOURCES_COLUMN1=Medals Received
+RESOURCE_UBERTIP_LUMBER=Medal is received from hero kills.
+RESOURCE_UBERTIP_GOLD=Gold is received from unit kills.
+COLON_FOOD=Food:
+UPKEEP_NONE=|Cff00ff00BvO Another v1.1a
+RESOURCE_UBERTIP_UPKEEP=Found a bug?|nWrite to me in Garena: |c001ce6b9Unryze|r|nVisit the website: |cffBA75FFhttps://vk.com/acfwc3|r
+COLON_GOLD_INCOME_RATE=|c00101c29
+RESOURCE_UBERTIP_UPKEEP_INFO= 
+UPPER_BUTTON_QUEST_TIP=INFO (|Cfffed312F9|R)
+QUESTSTATUSLABEL= 
+QUESTNOTDISCOVERED= 
+UPPER_BUTTON_QUEST_UBER=Display the map informations.
+BONUS_MANAREGEN=  
+RESOURCES_COLUMN3=--
+RESOURCES_COLUMN4=--
+HEROES_COLUMN3=--
+UNIT_COLUMN1=Creeps Killed
+SCORESCREEN_TAB1=Creeps
+UNIT_COLUMN0=--
+UNIT_COLUMN2=--
+UNIT_COLUMN3=--
+UNIT_COLUMN4=--
+RESOURCES_COLUMN0=Gold Received
+OVERVIEW_COLUMN0=Unit & Creep Score
+OVERVIEW_COLUMN2=Gold & Medal Score
+RESOURCES_COLUMN2=--
+SCORESCREEN_TAB3=Gold/Medal
+CHEATENABLED=Virus Detected!
+CHEATDISABLED=Virus Cleaned!
+REVIVE_AT_ALTAR=Your hero is dead at the moment.
+
+[Errors]
+Herodeath= , , , 
+Nolumber=Not enough medal.
+Lumberfromally=Received %d medal from %s.
+Cooldown=Skill is not ready yet.
+Notpowerup=Courier unable to pick/use this item.
+Upkeeplevel= 
+
+[CustomSkin]
+CommandButtonCooldown=Interface\CoolDown UI.mdx
+LumberIcon=ReplaceableTextures\CommandButtons\BTNMedalionOfCourage.blp
+NoLumberSound=ErrorMessage
+ToolTipLumberIcon=ReplaceableTextures\CommandButtons\BTNMedalionOfCourage.blp
+AllyHeroDiesSound=AcolyteMining
+HeroDiesSound=AcolyteMining
+
