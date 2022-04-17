@@ -1,0 +1,4 @@
+** 1.1 **
+- Fixed some minor bugs
+- Fixed ability data fields for levels 4 and above
+- Added an option to replace GetObjectName('asdf') lines with object names

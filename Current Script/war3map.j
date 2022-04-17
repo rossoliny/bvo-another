@@ -1286,7 +1286,7 @@ globals
     trigger ox=null
     trigger px=null
     trigger qx=null
-    trigger rx=null
+    trigger trig_BuyMaximillian=null
     trigger sx=null
     trigger tx=null
     trigger ux=null
@@ -1570,6 +1570,8 @@ globals
     trigger JB=null
     trigger KB=null
     trigger gg_trg_DemonicBoot=null
+    trigger gg_trg_Moon_Armor=null
+    trigger gg_trg_Demonic_Armor=null
     trigger Renji_Trig_0=null
     trigger Renji_Trig_1=null
     trigger NB=null
@@ -5692,6 +5694,7 @@ function cH takes nothing returns nothing
     call Preload("ReplaceableTextures\\CommandButtons\\BTNlucci.blp")
     call Preload("ReplaceableTextures\\CommandButtons\\BTNluffy.blp")
     call Preload("ReplaceableTextures\\CommandButtons\\BTNmaximillian.blp")
+    call Preload("ReplaceableTextures\\CommandButtons\\BTNDemonA.blp")
     call Preload("ReplaceableTextures\\CommandButtons\\BTNmihawk.blp")
     call Preload("ReplaceableTextures\\CommandButtons\\BTNmjollnir.blp")
     call Preload("ReplaceableTextures\\CommandButtons\\BTNmkb.blp")
@@ -5742,6 +5745,7 @@ function cH takes nothing returns nothing
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNlucci.blp")
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNluffy.blp")
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNmaximillian.blp")
+    call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNDemonA.blp")
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNmihawk.blp")
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNmjollnir.blp")
     call Preload("ReplaceableTextures\\CommandButtonsDisabled\\DISBTNmkb.blp")
@@ -28673,14 +28677,14 @@ function lEv takes nothing returns nothing
 endfunction
 
 function Trig_DemonicBoot_Conditions takes nothing returns boolean
-    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),$49303043)==true) then
+    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),'I00C')==true) then
         return false
     endif
         return true
 endfunction
 
 function Trig_DemonicBoot_Func001C takes nothing returns boolean
-    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),$49303543)==true) then
+    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),'I05C')==true) then
         return false
     endif
         return true
@@ -31973,7 +31977,7 @@ function sFv takes nothing returns nothing
     call TriggerAddAction(qx,function sfv)
 endfunction
 
-function sgv takes nothing returns boolean
+function trig_BuyMaximillian_Condition takes nothing returns boolean
     return(MG(GetBuyingUnit(),UNIT_TYPE_HERO))and(GetItemTypeId(GetSoldItem())=='I03Q')
 endfunction
 
@@ -31985,7 +31989,7 @@ function shv takes nothing returns boolean
     return(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I000'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I015'))))
 endfunction
 
-function sHv takes nothing returns nothing
+function trig_BuyMaximillian_Action takes nothing returns nothing
     if(((((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I000'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I015'))))))then
         call RemoveItem(GetItemOfTypeFromUnitBJ(GetBuyingUnit(),'I000'))
         call RemoveItem(GetItemOfTypeFromUnitBJ(GetBuyingUnit(),'I015'))
@@ -31999,11 +32003,80 @@ function sHv takes nothing returns nothing
     endif
 endfunction
 
-function sjv takes nothing returns nothing
-    set rx=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(rx,EVENT_PLAYER_UNIT_SELL_ITEM)
-    call TriggerAddCondition(rx,Condition(function sgv))
-    call TriggerAddAction(rx,function sHv)
+function trig_BuyMaximillian_Init takes nothing returns nothing
+    set trig_BuyMaximillian=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(trig_BuyMaximillian,EVENT_PLAYER_UNIT_SELL_ITEM)
+    call TriggerAddCondition(trig_BuyMaximillian,Condition(function trig_BuyMaximillian_Condition))
+    call TriggerAddAction(trig_BuyMaximillian,function trig_BuyMaximillian_Action)
+endfunction
+
+function Trig_Demonic_Armor_Conditions takes nothing returns boolean
+    return UnitHasItemOfTypeBJ(GetTriggerUnit(),'I080')or UnitHasItemOfTypeBJ(GetTriggerUnit(),'I083')
+endfunction
+
+function Trig_Demonic_Armor_Func001C takes nothing returns boolean
+    return UnitHasItemOfTypeBJ(GetTriggerUnit(),'I086') and UnitHasItemOfTypeBJ(GetTriggerUnit(),'I04M')
+endfunction
+
+function Trig_Demonic_Armor_Actions takes nothing returns nothing
+    if(Trig_Demonic_Armor_Func001C())then
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I086'))
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I04M'))
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I083'))
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I080'))
+        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl")
+        call DestroyEffect(bj_lastCreatedEffect)
+        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl")
+        call DestroyEffect(bj_lastCreatedEffect)
+        call UnitAddItemByIdSwapped('I084',GetTriggerUnit())
+    elseif UnitHasItemOfTypeBJ(GetTriggerUnit(),'I080') and not UnitHasItemOfTypeBJ(GetTriggerUnit(),'I083') then
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I080'))
+        call UnitAddItemByIdSwapped('I083',GetTriggerUnit())
+    endif
+endfunction
+
+function InitTrig_Demonic_Armor takes nothing returns nothing
+    set gg_trg_Demonic_Armor=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_Demonic_Armor,EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    call TriggerAddCondition(gg_trg_Demonic_Armor,Condition(function Trig_Demonic_Armor_Conditions))
+    call TriggerAddAction(gg_trg_Demonic_Armor,function Trig_Demonic_Armor_Actions)
+endfunction
+
+function Trig_Moon_Armor_Conditions takes nothing returns boolean
+    if(not(UnitHasItemOfTypeBJ(GetTriggerUnit(),'I017')==true))then
+        return false
+    endif
+    if(not(UnitHasItemOfTypeBJ(GetTriggerUnit(),'I04M')==true))then
+        return false
+    endif
+    return true
+endfunction
+
+function Trig_Moon_Armor_Func001C takes nothing returns boolean
+    if(not(UnitHasItemOfTypeBJ(GetTriggerUnit(),'I015')==true))then
+        return false
+    endif
+    return true
+endfunction
+
+function Trig_Moon_Armor_Actions takes nothing returns nothing
+    if(Trig_Moon_Armor_Func001C())then
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I017'))
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I04M'))
+        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I015'))
+        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl")
+        call DestroyEffectBJ(GetLastCreatedEffectBJ())
+        call UnitAddItemByIdSwapped('I086',GetTriggerUnit())
+    else
+        call DoNothing()
+    endif
+endfunction
+
+function InitTrig_Moon_Armor takes nothing returns nothing
+    set gg_trg_Moon_Armor=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(gg_trg_Moon_Armor,EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    call TriggerAddCondition(gg_trg_Moon_Armor,Condition(function Trig_Moon_Armor_Conditions))
+    call TriggerAddAction(gg_trg_Moon_Armor,function Trig_Moon_Armor_Actions)
 endfunction
 
 function sJv takes nothing returns boolean
@@ -38799,7 +38872,6 @@ function Ichigo_Bankai_Action takes nothing returns nothing
             call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
             call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
-            call BJDebugMsg("Take back 50 STR and AGI From Ichigo. (FIX)")
             call ModifyHeroStat(0,Xg,1,50)
             call ModifyHeroStat(1,Xg,1,50)
         endif
@@ -71463,7 +71535,7 @@ function Dnx takes nothing returns boolean
 endfunction
 
 function Remove_Enum_Unit takes nothing returns nothing
-    call BJDebugMsg("Mihawk: removing enum unit " + GetUnitName(GetEnumUnit()))
+//Nami Bug    call BJDebugMsg("Mihawk: removing enum unit " + GetUnitName(GetEnumUnit()))
     call RemoveUnit(GetEnumUnit())
 endfunction
 
@@ -79813,7 +79885,7 @@ function Q3x takes nothing returns nothing
     call sAv()
     call sCv()
     call sFv()
-    call sjv()
+    call trig_BuyMaximillian_Init()
     call sLv()
     call sPv()
     call sSv()
@@ -79881,6 +79953,8 @@ function Q3x takes nothing returns nothing
     call WKv()
     call WMv()
     call InitTrig_DemonicBoot()
+    call InitTrig_Moon_Armor()
+    call InitTrig_Demonic_Armor()
     call Trig_Dont_Buy_Kumas_Unique_Book()
     call Trig_Buy_Kumas_Unique_Book()
     call WZv()

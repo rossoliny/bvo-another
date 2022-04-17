@@ -596,6 +596,24 @@ Buffubertip=Unit is unable to cast spells while this buff persists.
 TargetArt=Abilities\Spells\Other\Silence\SilenceTarget.mdl
 Targetattach=overhead
 
+[B061]
+Buffart=ReplaceableTextures\CommandButtons\BTNDemonA.blp
+Bufftip=Demonic Aura
+Buffubertip=This unit is under the effects of Demonic Aura: +35% attack speed.
+Spelldetail=2
+
+[B062]
+Buffart=ReplaceableTextures\CommandButtons\BTNDemonA.blp
+Bufftip=Demonic Aura
+Buffubertip=This unit is under the effects of Demonic Aura: +5 armor.
+Spelldetail=2
+
+[B063]
+Buffart=ReplaceableTextures\CommandButtons\BTNDemonA.blp
+Bufftip=Demonic Aura
+Buffubertip=This unit is under the effects of Demonic Aura: -10 armor.
+Spelldetail=2
+
 [BCtc]
 Buffart=ReplaceableTextures\CommandButtons\BTNGolemThunderclap.blp
 Bufftip=Slam

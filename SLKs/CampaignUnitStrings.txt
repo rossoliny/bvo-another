@@ -2724,7 +2724,7 @@ LoopingSoundFadeIn=512
 LoopingSoundFadeOut=512
 Missilespeed=1500,1500
 Name=Recipe Shop 3
-Sellitems=I02N,I02O,I03O,I04T,I048,I01M,I04G,I03N,I05C
+Sellitems=I02N,I02O,I03O,I04T,I048,I01M,I04G,I03N,I05C,I085
 Specialart=Objects\Spawnmodels\Human\HCancelDeath\HCancelDeath.mdl
 Tip=Build |cffffcc00W|rorkshop
 Ubertip="Produces Siege Engines, Flying Machines, and Mortar Teams. |nAlso contains the Flare, Fragmentation Shards, Barrage, Flying Machine Bombs, and Flak Cannons upgrades."
@@ -3237,7 +3237,7 @@ Art=ReplaceableTextures\CommandButtons\BTNBlacksmith.blp
 Description=Sells various magic items.
 Missilespeed=1500,1500
 Name=Recipe Shop 5
-Sellitems=I03Q,I03R,I04A,I03L,I044,I04U
+Sellitems=I03Q,I03R,I04A,I03L,I044,I04U,I080
 Tip=Build Goblin Merchant
 Ubertip=,
 

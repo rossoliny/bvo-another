@@ -2512,3 +2512,39 @@ Description=Conjures a Sentry Ward.
 Name=Sentry Wards
 Tip=Purchase Sentry Wards
 Ubertip=Drops a Sentry Ward to spy upon an area for 300 seconds. |nContains 3 charges.
+
+[I080]
+Art=ReplaceableTextures\CommandButtons\BTNDemonA.blp
+Buttonpos=,1
+Name=Demonic Armor - 9000
+Tip=Demonic Armor - 9000
+Ubertip=|cffffcc00Gives:|r|n+15 Armor|n+35% attack speed|n+Demonic Aura|n|cffffcc00Requires:|r|nMoon Armor|nChainmail
+
+[I083]
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+Description=|cffffcc00Gives:|r|n+15 Armor|n+35% attack speed|n+Demonic Aura|n|cffffcc00Requires:|r|nMoon Armor|nChainmail
+Buttonpos=,1
+Name=Demonic Armor (recipe)
+Tip=Demonic Armor
+Ubertip=|cffffcc00Gives:|r|n+15 Armor|n+35% attack speed|n+Demonic Aura|n|cffffcc00Requires:|r|nMoon Armor|nChainmail
+
+[I084]
+Art=ReplaceableTextures\CommandButtons\BTNDemonA.blp
+Description="A magical armor with the emblem of an unfamiliar Paladin order on it.. Gives +15 armor, +35% attack speed and demonic aura."
+Name=Demonic Armor
+Tip=Purchase Demonic Armor
+Ubertip="A magical armor with the emblem of an unfamiliar Paladin order on it.. Gives +15 armor, +35% attack speed and demonic aura."
+
+[I085]
+Art=ReplaceableTextures\CommandButtons\BTNImprovedMoonArmor.blp
+Buttonpos=,2
+Name=Moon Armor (shop)
+Tip=Moon Armor
+Ubertip=|cffffcc00Gives:|r|n+15 Armor|n+35% attack speed|n|cffffcc00Requires:|r|nEro Statue|nChainmail|nHaki Stone
+
+[I086]
+Art=ReplaceableTextures\CommandButtons\BTNImprovedMoonArmor.blp
+Description="A magical armor. Gives +15 armor, +35% attack speed."
+Name=Moon Armor
+Tip=Purchase Moon Armor
+Ubertip="A magical armor. Gives +15 armor, +35% attack speed."
