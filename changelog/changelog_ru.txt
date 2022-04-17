@@ -51,3 +51,6 @@ Zangetsu
 
 Медали теперь можно купить на базе у Medal Exchange
 Добавился новый предмет Demonic Boots, можно купить в Recipe Shop 3
+Добавился новый предмет Demonic Armor, можно купить в Recipe Shop 5
+Добавился новый предмет Moon Armor, можно купить в Recipe Shop 3
+

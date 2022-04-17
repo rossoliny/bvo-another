@@ -51,3 +51,6 @@ ITEM CHANGES
 
 Medal Exchange now sells medals.
 Added new item Demonic Boots to Recipe Shop 3.
+Added new item Demonic Armor to Recipe Shop 5.
+Added new item Moon Armor to Recipe Shop 3.
+
