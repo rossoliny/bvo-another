@@ -71600,7 +71600,7 @@ function Mihawk_T takes nothing returns nothing
         set dg[60]=GetUnitLoc(A[(107+i)])
         call AddSpecialEffectLocBJ(dg[60],"Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-        call BJDebugMsg("Mihawk: removing unit " + GetUnitName(A[107+i]))
+// Nami Bug        call BJDebugMsg("Mihawk: removing unit " + GetUnitName(A[107+i]))
         call RemoveUnit(A[(107+i)])
         set A[(107+i)]=null
         call RemoveLocation(dg[60])
