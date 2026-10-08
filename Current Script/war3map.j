@@ -16843,24 +16843,9 @@ function iVv takes nothing returns nothing
     call MultiboardSetItemValueBJ(X,2,9,("|c0020c000"+(I2S(j)+"|r")))
     call ForForce(t6(Condition(function r0v)),function r3v)
     call ForForce(t6(Condition(function r4v)),function r7v)
-    if N4 then
-        call MultiboardSetItemValueBJ(X,1,1,"|c00fffc01Team "+I2S(M4)+" Wins!|r")
-    else
-        call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
-    endif
+    call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
     call ForForce(e,function ixv)
     call ForForce(f,function inv)
-endfunction
-
-// Restore the interface after the cinematic and show the frozen match results.
-function Scoreboard_ShowResults takes nothing returns nothing
-    call CinematicModeBJ(false,bj_FORCE_ALL_PLAYERS)
-    call PauseAllUnitsBJ(true)
-    call MultiboardSetItemValueBJ(X,1,1,"|c00fffc01Team "+I2S(M4)+" Wins!|r")
-    call MultiboardDisplay(X,true)
-    call MultiboardMinimize(X,false)
-    call ClearTextMessagesBJ(bj_FORCE_ALL_PLAYERS)
-    call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,20.,"Match results. The victory/defeat dialog will appear in 20 seconds.")
 endfunction
 
 function iEv takes nothing returns nothing
@@ -18057,8 +18042,6 @@ function Vov takes nothing returns nothing
         call RemoveUnit(L4)
     endif
     call TriggerSleepAction(1.5)
-    call Scoreboard_ShowResults()
-    call TriggerSleepAction(20.)
     if(((M4==1)))then
         call ForForce(e,function Vvv)
         call ForForce(f,function Vev)
