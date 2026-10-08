@@ -6,3 +6,5 @@ toolkit/W3x2Lni v2.7.2/w3x2lni_enUS_v2.7.2/log
 toolkit/W3x2Lni v2.7.2/log/
 toolkit/W3x2Lni v2.7.2/log/*
 *.log
+/build/
+/.serena/

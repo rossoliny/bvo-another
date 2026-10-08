@@ -1,4 +1,5 @@
 globals
+    boolean TestCommands_NoCooldown = false
     sound Sound_Effect_Ichigo_R_1 = null
     sound Sound_Effect_Ichigo_T_1 = null
     sound Sound_Effect_Ichigo_T_2 = null
@@ -35302,7 +35303,7 @@ endfunction
 
 function Is_Unit_Vastolorde takes unit who returns boolean
     local integer UnitID = GetUnitTypeId(who)
-    return (UnitID == 'H01F' or UnitID == 'H01G' or UnitID == 'H01H' or UnitID == 'H01I' or UnitID == 'H01J')
+    return (UnitID == 'H01F' or UnitID == 'H02A' or UnitID == 'H02B' or UnitID == 'H02C' or UnitID == 'H02D')
 endfunction
 
 function Unit_Not_Allowed_To_Buy_Kumas_Unique_Book takes nothing returns boolean
@@ -39241,13 +39242,13 @@ function Ichigo_Hollow_Learned_Action takes nothing returns nothing
     if(abilityLevel == 1) then
         set unitID = 'H01F'
     elseif(abilityLevel == 2) then
-        set unitID = 'H01G'
+        set unitID = 'H02A'
     elseif(abilityLevel == 3) then
-        set unitID = 'H01H'
+        set unitID = 'H02B'
     elseif(abilityLevel == 4) then
-        set unitID = 'H01I'
+        set unitID = 'H02C'
     elseif(abilityLevel == 5) then
-        set unitID = 'H01J'
+        set unitID = 'H02D'
     endif
 
     call CreateNUnitsAtLoc(1,unitID,Player(15),Sd,bj_UNIT_FACING)
@@ -39292,7 +39293,7 @@ endfunction
 
 function Ichigo_Trig_0_Action takes nothing returns nothing
     set G[0]=k6(GetOwningPlayer(dh),'orai')
-    if(GetUnitStateSwap(UNIT_STATE_LIFE,dh)<=(.6*GetUnitStateSwap(UNIT_STATE_MAX_LIFE,dh)))then
+    if(GetUnitStateSwap(UNIT_STATE_LIFE,dh)<=(.4*GetUnitStateSwap(UNIT_STATE_MAX_LIFE,dh)))then
         if(IsUnitGroupEmptyBJ(G[0]))and(RectContainsUnit(zn,dh)==false)then
             set r9[1876]=GetRectCenter(to)
             call CreateNUnitsAtLoc(1,'orai',GetOwningPlayer(dh),r9[1876],bj_UNIT_FACING)
@@ -39669,7 +39670,7 @@ function nhe takes nothing returns boolean
 endfunction
 
 function Get_HollowForm_Stat_Bonus takes integer abilityLevel returns integer
-    return (20 * abilityLevel)
+    return (10 * (abilityLevel - 1))
 endfunction
 
 function Get_Random_Sound_Ichigo_T takes nothing returns sound
@@ -39742,8 +39743,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     call PauseUnit(Ck,false)
     call SetUnitInvulnerable(Ck,false)
     call UnitRemoveBuffsBJ(1,Ck)
-    //call SetWidgetLife(Ck,I2R(Ek[6]))
-    call SetUnitLifePercentBJ(Ck,40)
+    call SetWidgetLife(Ck,I2R(Ek[6]))
     call SetUnitManaBJ(Ck,0)
     call UnitRemoveAbility(Ck,'Agho')
     set Cj[70]=1
@@ -40305,9 +40305,9 @@ function Ichigo_Die_Action takes nothing returns nothing
         if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
             call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
         else
-            set currItem = UnitItemInSlotBJ(Xg,Cj[70])
-            call UnitRemoveItem(Xg, currItem)
-            call UnitAddItem(Ck, currItem)
+            set currItem = UnitItemInSlotBJ(Ck,Cj[70])
+            call UnitRemoveItem(Ck, currItem)
+            call UnitAddItem(Xg, currItem)
         endif
         set Cj[70]=Cj[70]+1
     endloop
@@ -80798,6 +80798,102 @@ function Q6x takes nothing returns nothing
     call SetStartLocPrio(11,5,10,MAP_LOC_PRIO_HIGH)
 endfunction
 
+// General test commands ported from Original Scripts/1.1c/War3map.j.
+// Available only when exactly one human plays, and only to Player(0).
+function TestCommands_Selected takes nothing returns unit
+    local group testSelected = CreateGroup()
+    local unit testResult
+    call GroupEnumUnitsSelected(testSelected, Player(0), null)
+    set testResult = FirstOfGroup(testSelected)
+    call DestroyGroup(testSelected)
+    set testSelected = null
+    return testResult
+endfunction
+
+function TestCommands_C2Id takes string testInput returns integer
+    local integer testPos = 0
+    local string testChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    loop
+        exitwhen testPos >= 62 or SubString(testChars, testPos, testPos + 1) == testInput
+        set testPos = testPos + 1
+    endloop
+    if testPos < 10 then
+        return testPos + 48
+    elseif testPos < 36 then
+        return testPos + 55
+    elseif testPos < 62 then
+        return testPos + 61
+    endif
+    return 0
+endfunction
+
+function TestCommands_S2Id takes string testInput returns integer
+    return ((TestCommands_C2Id(SubString(testInput,0,1))*256+TestCommands_C2Id(SubString(testInput,1,2)))*256+TestCommands_C2Id(SubString(testInput,2,3)))*256+TestCommands_C2Id(SubString(testInput,3,4))
+endfunction
+
+function TestCommands_Message takes string testText returns nothing
+    call DisplayTimedTextToPlayer(Player(0), 0, 0, 60, "[Test commands] " + testText)
+endfunction
+
+function TestCommands_Cooldown takes nothing returns nothing
+    local unit testCaster = GetTriggerUnit()
+    if TestCommands_NoCooldown then
+        call TriggerSleepAction(.01)
+        call UnitResetCooldown(testCaster)
+    endif
+    set testCaster = null
+endfunction
+
+function TestCommands_Commands takes nothing returns nothing
+    local string testText = GetEventPlayerChatString()
+    local unit testSelected = TestCommands_Selected()
+    local integer testValue
+    if SubString(testText,0,7) == "-level " and IsUnitType(testSelected,UNIT_TYPE_HERO) then
+        set testValue = S2I(SubString(testText,7,StringLength(testText)))
+        if testValue >= 1 and testValue <= 99 then
+            if testValue > GetHeroLevel(testSelected) then
+                call SetHeroLevel(testSelected,testValue,false)
+            else
+                call UnitStripHeroLevel(testSelected,GetHeroLevel(testSelected)-testValue)
+            endif
+            call TestCommands_Message("level="+I2S(GetHeroLevel(testSelected)))
+        endif
+    elseif SubString(testText,0,12) == "-createitem " and StringLength(testText) == 16 and testSelected != null then
+        set testValue = TestCommands_S2Id(SubString(testText,12,16))
+        call CreateItem(testValue,GetUnitX(testSelected),GetUnitY(testSelected))
+        call TestCommands_Message("created item "+SubString(testText,12,16))
+    elseif testText == "-nc" then
+        set TestCommands_NoCooldown = not TestCommands_NoCooldown
+        call TestCommands_Message("cooldown reset toggled")
+    endif
+    set testSelected = null
+endfunction
+
+function TestCommands_Init takes nothing returns nothing
+    local integer testPlayerIndex = 0
+    local integer testHumans = 0
+    local trigger testChat
+    local trigger testSpells
+    loop
+        exitwhen testPlayerIndex >= 12
+        if GetPlayerController(Player(testPlayerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(testPlayerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            set testHumans = testHumans + 1
+        endif
+        set testPlayerIndex = testPlayerIndex + 1
+    endloop
+    if testHumans == 1 and GetPlayerController(Player(0)) == MAP_CONTROL_USER then
+        set testChat = CreateTrigger()
+        call TriggerRegisterPlayerChatEvent(testChat,Player(0),"-",false)
+        call TriggerAddAction(testChat,function TestCommands_Commands)
+        set testSpells = CreateTrigger()
+        call TriggerRegisterPlayerUnitEvent(testSpells,Player(0),EVENT_PLAYER_UNIT_SPELL_EFFECT,null)
+        call TriggerAddAction(testSpells,function TestCommands_Cooldown)
+        call TestCommands_Message("single-player commands: -level N, -createitem XXXX, -nc")
+    endif
+    set testChat = null
+    set testSpells = null
+endfunction
+
 function main takes nothing returns nothing
     call SetCameraBounds(-7808.0+GetCameraMargin(CAMERA_MARGIN_LEFT),-7040.0+GetCameraMargin(CAMERA_MARGIN_BOTTOM),8192.0-GetCameraMargin(CAMERA_MARGIN_RIGHT),7424.0-GetCameraMargin(CAMERA_MARGIN_TOP),-7808.0+GetCameraMargin(CAMERA_MARGIN_LEFT),7424.0-GetCameraMargin(CAMERA_MARGIN_TOP),8192.0-GetCameraMargin(CAMERA_MARGIN_RIGHT),-7040.0+GetCameraMargin(CAMERA_MARGIN_BOTTOM))
     call SetDayNightModels("Environment\\DNC\\DNCLordaeron\\DNCLordaeronTerrain\\DNCLordaeronTerrain.mdl","Environment\\DNC\\DNCLordaeron\\DNCLordaeronUnit\\DNCLordaeronUnit.mdl")
@@ -80813,6 +80909,7 @@ function main takes nothing returns nothing
     call I6()
     call Q3x()
     call Q4x()
+    call TestCommands_Init()
 endfunction
 
 function config takes nothing returns nothing
