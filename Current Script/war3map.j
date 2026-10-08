@@ -1,5 +1,8 @@
 globals
-    boolean TestCommands_NoCooldown = false
+    boolean array TestCommands_Access
+    boolean array TestCommands_NoCooldown
+    boolean TestCommands_SinglePlayer = false
+    unit array Mihawk_T_Copies
     sound Sound_Effect_Ichigo_R_1 = null
     sound Sound_Effect_Ichigo_T_1 = null
     sound Sound_Effect_Ichigo_T_2 = null
@@ -71580,12 +71583,12 @@ function Mihawk_T takes nothing returns nothing
         exitwhen i>5
         set H[68]=(H[68]+72.)
         call CreateNUnitsAtLoc(1,'h00G',GetOwningPlayer(A[107]),B[67],H[68])
-        set A[107+i]=bj_lastCreatedUnit
-        call AddSpecialEffectTargetUnitBJ("hand right",A[107+i],"Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl")
-        call SetUnitPathing(A[107+i],false)
-        call SetUnitTimeScalePercent(A[107+i],50.)
-        call SetUnitAnimation(A[107+i],"spell")
-        call SetUnitVertexColorBJ(A[107+i],100,100,100,50.)
+        set Mihawk_T_Copies[i]=bj_lastCreatedUnit
+        call AddSpecialEffectTargetUnitBJ("hand right",Mihawk_T_Copies[i],"Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile_mini.mdl")
+        call SetUnitPathing(Mihawk_T_Copies[i],false)
+        call SetUnitTimeScalePercent(Mihawk_T_Copies[i],50.)
+        call SetUnitAnimation(Mihawk_T_Copies[i],"spell")
+        call SetUnitVertexColorBJ(Mihawk_T_Copies[i],100,100,100,50.)
         set i=i+1
     endloop
     call TriggerSleepAction(.01)
@@ -71597,12 +71600,12 @@ function Mihawk_T takes nothing returns nothing
     set i=1
     loop
         exitwhen i>5
-        set dg[60]=GetUnitLoc(A[(107+i)])
+        set dg[60]=GetUnitLoc(Mihawk_T_Copies[i])
         call AddSpecialEffectLocBJ(dg[60],"Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-// Nami Bug        call BJDebugMsg("Mihawk: removing unit " + GetUnitName(A[107+i]))
-        call RemoveUnit(A[(107+i)])
-        set A[(107+i)]=null
+// Nami Bug        call BJDebugMsg("Mihawk: removing unit " + GetUnitName(Mihawk_T_Copies[i]))
+        call RemoveUnit(Mihawk_T_Copies[i])
+        set Mihawk_T_Copies[i]=null
         call RemoveLocation(dg[60])
         set dg[60]=null
         set i=i+1
@@ -71720,8 +71723,8 @@ function Dbx takes nothing returns nothing
     loop
         exitwhen b[40]>5
         set H[69]=(H[69]+72.)
-        set dg[60]=PG(GetUnitLoc(A[(107+b[40])]),30.,H[69])
-        call SetUnitPositionLoc(A[(107+b[40])],dg[60])
+        set dg[60]=PG(GetUnitLoc(Mihawk_T_Copies[b[40]]),30.,H[69])
+        call SetUnitPositionLoc(Mihawk_T_Copies[b[40]],dg[60])
         call AddSpecialEffectLocBJ(dg[60],"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
         call RemoveLocation(dg[60])
@@ -80799,11 +80802,15 @@ function Q6x takes nothing returns nothing
 endfunction
 
 // General test commands ported from Original Scripts/1.1c/War3map.j.
-// Available only when exactly one human plays, and only to Player(0).
-function TestCommands_Selected takes nothing returns unit
-    local group testSelected = CreateGroup()
+// Single-player access is automatic; multiplayer access is personal.
+function TestCommands_Selected takes player testPlayer returns unit
+    local group testSelected
     local unit testResult
-    call GroupEnumUnitsSelected(testSelected, Player(0), null)
+    if not TestCommands_SinglePlayer then
+        return m[1+GetPlayerId(testPlayer)]
+    endif
+    set testSelected = CreateGroup()
+    call GroupEnumUnitsSelected(testSelected, testPlayer, null)
     set testResult = FirstOfGroup(testSelected)
     call DestroyGroup(testSelected)
     set testSelected = null
@@ -80831,49 +80838,99 @@ function TestCommands_S2Id takes string testInput returns integer
     return ((TestCommands_C2Id(SubString(testInput,0,1))*256+TestCommands_C2Id(SubString(testInput,1,2)))*256+TestCommands_C2Id(SubString(testInput,2,3)))*256+TestCommands_C2Id(SubString(testInput,3,4))
 endfunction
 
-function TestCommands_Message takes string testText returns nothing
-    call DisplayTimedTextToPlayer(Player(0), 0, 0, 60, "[Test commands] " + testText)
+function TestCommands_Message takes player testPlayer, string testCommand, string testResult returns nothing
+    call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS, 10., "|cffff6600[ЧИТЫ]|r " + GetPlayerName(testPlayer) + ": " + testCommand + " — " + testResult)
 endfunction
 
 function TestCommands_Cooldown takes nothing returns nothing
     local unit testCaster = GetTriggerUnit()
-    if TestCommands_NoCooldown then
+    local integer testPlayerIndex = GetPlayerId(GetOwningPlayer(testCaster))
+    if TestCommands_Access[testPlayerIndex] and TestCommands_NoCooldown[testPlayerIndex] and testCaster == m[testPlayerIndex+1] and IsUnitType(testCaster,UNIT_TYPE_HERO) then
         call TriggerSleepAction(.01)
-        call UnitResetCooldown(testCaster)
+        if TestCommands_Access[testPlayerIndex] and TestCommands_NoCooldown[testPlayerIndex] and testCaster == m[testPlayerIndex+1] and GetPlayerId(GetOwningPlayer(testCaster)) == testPlayerIndex then
+            call UnitResetCooldown(testCaster)
+        endif
     endif
     set testCaster = null
 endfunction
 
 function TestCommands_Commands takes nothing returns nothing
+    local player testPlayer = GetTriggerPlayer()
+    local integer testPlayerIndex = GetPlayerId(testPlayer)
     local string testText = GetEventPlayerChatString()
-    local unit testSelected = TestCommands_Selected()
+    local boolean testIsLevel = testText == "-level" or SubString(testText,0,7) == "-level "
+    local boolean testIsItem = testText == "-createitem" or SubString(testText,0,12) == "-createitem "
+    local boolean testIsCooldown = testText == "-nc" or SubString(testText,0,4) == "-nc "
+    local unit testSelected = null
+    local item testItem = null
     local integer testValue
-    if SubString(testText,0,7) == "-level " and IsUnitType(testSelected,UNIT_TYPE_HERO) then
-        set testValue = S2I(SubString(testText,7,StringLength(testText)))
-        if testValue >= 1 and testValue <= 99 then
-            if testValue > GetHeroLevel(testSelected) then
-                call SetHeroLevel(testSelected,testValue,false)
+    if testText == "-cheats" or SubString(testText,0,8) == "-cheats " then
+        if testText == "-cheats bvo-rossoliny" then
+            if TestCommands_Access[testPlayerIndex] then
+                call TestCommands_Message(testPlayer,"-cheats","доступ уже активирован")
             else
-                call UnitStripHeroLevel(testSelected,GetHeroLevel(testSelected)-testValue)
+                set TestCommands_Access[testPlayerIndex] = true
+                call TestCommands_Message(testPlayer,"-cheats","персональный доступ активирован")
             endif
-            call TestCommands_Message("level="+I2S(GetHeroLevel(testSelected)))
+        else
+            call TestCommands_Message(testPlayer,"-cheats","отказ: неверный код активации")
         endif
-    elseif SubString(testText,0,12) == "-createitem " and StringLength(testText) == 16 and testSelected != null then
-        set testValue = TestCommands_S2Id(SubString(testText,12,16))
-        call CreateItem(testValue,GetUnitX(testSelected),GetUnitY(testSelected))
-        call TestCommands_Message("created item "+SubString(testText,12,16))
-    elseif testText == "-nc" then
-        set TestCommands_NoCooldown = not TestCommands_NoCooldown
-        call TestCommands_Message("cooldown reset toggled")
+    elseif testIsLevel or testIsItem or testIsCooldown then
+        if not TestCommands_Access[testPlayerIndex] then
+            call TestCommands_Message(testPlayer,testText,"отказ: доступ к читам не активирован")
+        elseif testIsLevel then
+            set testSelected = TestCommands_Selected(testPlayer)
+            set testValue = S2I(SubString(testText,7,StringLength(testText)))
+            if not IsUnitType(testSelected,UNIT_TYPE_HERO) then
+                call TestCommands_Message(testPlayer,testText,"ошибка: герой не найден")
+            elseif testValue < 1 or testValue > 99 then
+                call TestCommands_Message(testPlayer,testText,"ошибка: укажи уровень от 1 до 99")
+            else
+                if testValue > GetHeroLevel(testSelected) then
+                    call SetHeroLevel(testSelected,testValue,false)
+                else
+                    call UnitStripHeroLevel(testSelected,GetHeroLevel(testSelected)-testValue)
+                endif
+                call TestCommands_Message(testPlayer,testText,"уровень героя: "+I2S(GetHeroLevel(testSelected)))
+            endif
+        elseif testIsItem then
+            set testSelected = TestCommands_Selected(testPlayer)
+            if StringLength(testText) != 16 then
+                call TestCommands_Message(testPlayer,testText,"ошибка: укажи четырёхсимвольный код предмета")
+            elseif testSelected == null then
+                call TestCommands_Message(testPlayer,testText,"ошибка: юнит не найден")
+            else
+                set testValue = TestCommands_S2Id(SubString(testText,12,16))
+                set testItem = CreateItem(testValue,GetUnitX(testSelected),GetUnitY(testSelected))
+                if testItem == null then
+                    call TestCommands_Message(testPlayer,testText,"ошибка: неизвестный код предмета")
+                else
+                    call TestCommands_Message(testPlayer,testText,"создан предмет: "+GetItemName(testItem))
+                endif
+            endif
+        elseif testText != "-nc" then
+            call TestCommands_Message(testPlayer,testText,"ошибка: используй -nc без параметров")
+        elseif not IsUnitType(m[testPlayerIndex+1],UNIT_TYPE_HERO) then
+            call TestCommands_Message(testPlayer,testText,"ошибка: собственный герой не найден")
+        else
+            set TestCommands_NoCooldown[testPlayerIndex] = not TestCommands_NoCooldown[testPlayerIndex]
+            if TestCommands_NoCooldown[testPlayerIndex] then
+                call TestCommands_Message(testPlayer,testText,"отключение перезарядок включено для своего героя")
+            else
+                call TestCommands_Message(testPlayer,testText,"отключение перезарядок выключено")
+            endif
+        endif
     endif
+    set testItem = null
     set testSelected = null
+    set testPlayer = null
 endfunction
 
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
     local integer testHumans = 0
-    local trigger testChat
-    local trigger testSpells
+    local trigger testChat = CreateTrigger()
+    local trigger testSpells = CreateTrigger()
     loop
         exitwhen testPlayerIndex >= 12
         if GetPlayerController(Player(testPlayerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(testPlayerIndex)) == PLAYER_SLOT_STATE_PLAYING then
@@ -80881,15 +80938,22 @@ function TestCommands_Init takes nothing returns nothing
         endif
         set testPlayerIndex = testPlayerIndex + 1
     endloop
-    if testHumans == 1 and GetPlayerController(Player(0)) == MAP_CONTROL_USER then
-        set testChat = CreateTrigger()
-        call TriggerRegisterPlayerChatEvent(testChat,Player(0),"-",false)
-        call TriggerAddAction(testChat,function TestCommands_Commands)
-        set testSpells = CreateTrigger()
-        call TriggerRegisterPlayerUnitEvent(testSpells,Player(0),EVENT_PLAYER_UNIT_SPELL_EFFECT,null)
-        call TriggerAddAction(testSpells,function TestCommands_Cooldown)
-        call TestCommands_Message("single-player commands: -level N, -createitem XXXX, -nc")
-    endif
+    set TestCommands_SinglePlayer = testHumans == 1
+    set testPlayerIndex = 0
+    loop
+        exitwhen testPlayerIndex >= 12
+        if GetPlayerController(Player(testPlayerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(testPlayerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            set TestCommands_Access[testPlayerIndex] = TestCommands_SinglePlayer
+            call TriggerRegisterPlayerChatEvent(testChat,Player(testPlayerIndex),"-",false)
+            call TriggerRegisterPlayerUnitEvent(testSpells,Player(testPlayerIndex),EVENT_PLAYER_UNIT_SPELL_EFFECT,null)
+            if TestCommands_SinglePlayer then
+                call DisplayTimedTextToPlayer(Player(testPlayerIndex),0,0,10.,"Single-player commands: -level N, -createitem XXXX, -nc")
+            endif
+        endif
+        set testPlayerIndex = testPlayerIndex + 1
+    endloop
+    call TriggerAddAction(testChat,function TestCommands_Commands)
+    call TriggerAddAction(testSpells,function TestCommands_Cooldown)
     set testChat = null
     set testSpells = null
 endfunction

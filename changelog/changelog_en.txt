@@ -8,6 +8,7 @@ Fixed: Now it is not possible to put/drop Kuma's Unique Book into Zaraki.
 Fixed: Ability sound effects are now multi channel so no longer one sound effect interrupts others.
 Fixed: Ichigo's True Hollow Form no longer resreshes item cooldowns.
 Fixed: Ichigo's items no longer disappear when he dies in Hollow Form.
+Fixed: Nami and her cloud are no longer removed when W is used during Mihawk's T.
 
 ------------
 HERO CHANGES
@@ -54,4 +55,13 @@ Medal Exchange now sells medals.
 Added new item Demonic Boots to Recipe Shop 3.
 Added new item Demonic Armor to Recipe Shop 5.
 Added new item Moon Armor to Recipe Shop 3.
+
+-------------
+TEST COMMANDS
+-------------
+
+Added personal activation of existing cheats in PvP. Only the activating player receives access; single-player access remains automatic.
+In PvP, -level N and -createitem XXXX use the command author's hero; single-player commands continue to use the selected unit.
+The -nc command resets cooldowns only for the enabling player's own hero.
+Every cheat use displays a map system notification to all players for 10 seconds: a colored [ЧИТЫ] prefix, player name, command, parameters and result. Activation is also announced, with the activation code hidden from the notification.
 
