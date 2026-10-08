@@ -1,7 +1,8 @@
 globals
     boolean array TestCommands_Access
     boolean array TestCommands_NoCooldown
-    boolean TestCommands_SinglePlayer = false
+    boolean array TestCommands_InfiniteMana
+    integer array Scoreboard_Deaths
     unit array Mihawk_T_Copies
     sound Sound_Effect_Ichigo_R_1 = null
     sound Sound_Effect_Ichigo_T_1 = null
@@ -16617,16 +16618,39 @@ function rUv takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
+// Count the registered main hero only. Hollow death is credited when Xg dies.
+function Scoreboard_Death takes nothing returns nothing
+    local unit dyingHero = GetTriggerUnit()
+    local integer playerIndex = GetPlayerId(GetOwningPlayer(dyingHero)) + 1
+    local integer boardRow = 0
+    if not N4 and playerIndex >= 1 and playerIndex <= 12 and dyingHero == m[playerIndex] and dyingHero != Ck and IsUnitType(dyingHero,UNIT_TYPE_HERO) and not IsUnitIllusion(dyingHero) then
+        if IsPlayerInForce(GetOwningPlayer(dyingHero),e) then
+            set boardRow = playerIndex + 2
+        elseif IsPlayerInForce(GetOwningPlayer(dyingHero),f) then
+            set boardRow = playerIndex + 3
+        endif
+        if boardRow != 0 then
+            set Scoreboard_Deaths[playerIndex] = Scoreboard_Deaths[playerIndex] + 1
+            if X != null then
+                call MultiboardSetItemValueBJ(X,3,boardRow,I2S(Scoreboard_Deaths[playerIndex]))
+            endif
+        endif
+    endif
+    set dyingHero = null
+endfunction
+
 function rwv takes nothing returns nothing
     if(((IsPlayerInForce(GetEnumPlayer(),e))))then
         call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"0")
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"0")
         call MultiboardSetItemStyleBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),true,true)
         call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"UI\\Console\\Human\\human-transport-slot.blp")
     else
         if(((IsPlayerInForce(GetEnumPlayer(),f))))then
             call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
             call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"0")
+            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"0")
             call MultiboardSetItemStyleBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),true,true)
             call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"UI\\Console\\Human\\human-transport-slot.blp")
         endif
@@ -16649,10 +16673,12 @@ function rzv takes nothing returns nothing
     if(((IsPlayerInForce(GetEnumPlayer(),e))))then
         call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"---")
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
     else
         if(((IsPlayerInForce(GetEnumPlayer(),f))))then
             call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"---")
             call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
+            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
         endif
     endif
 endfunction
@@ -16663,11 +16689,12 @@ function rZv takes nothing returns nothing
     loop
         exitwhen bj_forLoopAIndex>bj_forLoopAIndexEnd
         set d[bj_forLoopAIndex]=0
+        set Scoreboard_Deaths[bj_forLoopAIndex]=0
         set bj_forLoopAIndex=bj_forLoopAIndex+1
     endloop
     set N[799]=8
     call TriggerSleepAction(.01)
-    call CreateMultiboardBJ(2,15,("BvO Another v1.1a"))
+    call CreateMultiboardBJ(3,15,("BvO Another v1.1a"))
     set X=bj_lastCreatedMultiboard
     set bj_forLoopAIndex=1
     set bj_forLoopAIndexEnd=15
@@ -16675,11 +16702,15 @@ function rZv takes nothing returns nothing
         exitwhen bj_forLoopAIndex>bj_forLoopAIndexEnd
         call MultiboardSetItemWidthBJ(X,1,bj_forLoopAIndex,13.)
         call MultiboardSetItemWidthBJ(X,2,bj_forLoopAIndex,2.5)
+        call MultiboardSetItemWidthBJ(X,3,bj_forLoopAIndex,2.5)
         call MultiboardSetItemStyleBJ(X,1,bj_forLoopAIndex,true,false)
         call MultiboardSetItemStyleBJ(X,2,bj_forLoopAIndex,true,false)
+        call MultiboardSetItemStyleBJ(X,3,bj_forLoopAIndex,true,false)
         set bj_forLoopAIndex=bj_forLoopAIndex+1
     endloop
     call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
+    call MultiboardSetItemValueBJ(X,2,1,"|c00fffc01K|r")
+    call MultiboardSetItemValueBJ(X,3,1,"|c00fffc01D|r")
     call MultiboardSetItemValueBJ(X,1,2,"|c00ff0000TEAM 1|r")
     call MultiboardSetItemValueBJ(X,2,2,("|c00ff0000"+(I2S(h)+"|r")))
     call MultiboardSetItemValueBJ(X,1,9,"|c0020c000TEAM 2|r")
@@ -16693,6 +16724,10 @@ function rZv takes nothing returns nothing
 endfunction
 
 function r_v takes nothing returns nothing
+    local trigger deathTrigger = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
+    call TriggerAddAction(deathTrigger,function Scoreboard_Death)
+    set deathTrigger = null
     set bt=CreateTrigger()
     call TriggerAddAction(bt,function rZv)
 endfunction
@@ -16713,11 +16748,13 @@ function r3v takes nothing returns nothing
     if(((IsPlayerInForce(GetEnumPlayer(),e))))then
         call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),I2S(d[(1+GetPlayerId(GetEnumPlayer()))]))
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))]))
         call TriggerExecute(ct)
     else
         if(((IsPlayerInForce(GetEnumPlayer(),f))))then
             call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
             call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),I2S(d[(1+GetPlayerId(GetEnumPlayer()))]))
+            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))]))
             call TriggerExecute(ct)
         endif
     endif
@@ -16738,9 +16775,11 @@ endfunction
 function r7v takes nothing returns nothing
     if(((IsPlayerInForce(GetEnumPlayer(),e))))then
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
     else
         if(((IsPlayerInForce(GetEnumPlayer(),f))))then
             call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
+            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
         endif
     endif
 endfunction
@@ -16765,6 +16804,7 @@ function ixv takes nothing returns nothing
     if(((GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)))then
         call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(GetPlayerName(GetEnumPlayer())+"|r")))
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
         if((GetBooleanAnd(((m[(1+GetPlayerId(GetEnumPlayer()))]!=null)),((IsUnitPaused(m[(1+GetPlayerId(GetEnumPlayer()))])==false)))))then
             call PauseUnit(m[(1+GetPlayerId(GetEnumPlayer()))],true)
         endif
@@ -16791,6 +16831,7 @@ function inv takes nothing returns nothing
     if(((GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)))then
         call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(GetPlayerName(GetEnumPlayer())+"|r")))
         call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
+        call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
         if((GetBooleanAnd(((m[(1+GetPlayerId(GetEnumPlayer()))]!=null)),((IsUnitPaused(m[(1+GetPlayerId(GetEnumPlayer()))])==false)))))then
             call PauseUnit(m[(1+GetPlayerId(GetEnumPlayer()))],true)
         endif
@@ -16802,9 +16843,24 @@ function iVv takes nothing returns nothing
     call MultiboardSetItemValueBJ(X,2,9,("|c0020c000"+(I2S(j)+"|r")))
     call ForForce(t6(Condition(function r0v)),function r3v)
     call ForForce(t6(Condition(function r4v)),function r7v)
-    call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
+    if N4 then
+        call MultiboardSetItemValueBJ(X,1,1,"|c00fffc01Team "+I2S(M4)+" Wins!|r")
+    else
+        call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
+    endif
     call ForForce(e,function ixv)
     call ForForce(f,function inv)
+endfunction
+
+// Restore the interface after the cinematic and show the frozen match results.
+function Scoreboard_ShowResults takes nothing returns nothing
+    call CinematicModeBJ(false,bj_FORCE_ALL_PLAYERS)
+    call PauseAllUnitsBJ(true)
+    call MultiboardSetItemValueBJ(X,1,1,"|c00fffc01Team "+I2S(M4)+" Wins!|r")
+    call MultiboardDisplay(X,true)
+    call MultiboardMinimize(X,false)
+    call ClearTextMessagesBJ(bj_FORCE_ALL_PLAYERS)
+    call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,20.,"Match results. The victory/defeat dialog will appear in 20 seconds.")
 endfunction
 
 function iEv takes nothing returns nothing
@@ -18001,6 +18057,8 @@ function Vov takes nothing returns nothing
         call RemoveUnit(L4)
     endif
     call TriggerSleepAction(1.5)
+    call Scoreboard_ShowResults()
+    call TriggerSleepAction(20.)
     if(((M4==1)))then
         call ForForce(e,function Vvv)
         call ForForce(f,function Vev)
@@ -79561,6 +79619,7 @@ function Q1x takes nothing returns nothing
     if(Q_x())then
         call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(GetPlayerName(GetTriggerPlayer())+"|r")))
         call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
+        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
         if(QKx())then
             call AddSpecialEffectLocBJ(GetUnitLoc(m[(1+GetPlayerId(GetTriggerPlayer()))]),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
@@ -79587,6 +79646,7 @@ function Q1x takes nothing returns nothing
         if(QZx())then
             call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(GetPlayerName(GetTriggerPlayer())+"|r")))
             call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
+            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
             if(QTx())then
                 call AddSpecialEffectLocBJ(GetUnitLoc(m[(1+GetPlayerId(GetTriggerPlayer()))]),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
                 call DestroyEffect(bj_lastCreatedEffect)
@@ -80802,18 +80862,13 @@ function Q6x takes nothing returns nothing
 endfunction
 
 // General test commands ported from Original Scripts/1.1c/War3map.j.
-// Single-player access is automatic; multiplayer access is personal.
+// Resource and mana commands ported from Original Scripts/13.0/war3map.j.
+// Personal activation is required in every game mode.
 function TestCommands_Selected takes player testPlayer returns unit
-    local group testSelected
-    local unit testResult
-    if not TestCommands_SinglePlayer then
-        return m[1+GetPlayerId(testPlayer)]
+    local unit testResult = m[1+GetPlayerId(testPlayer)]
+    if GetOwningPlayer(testResult) != testPlayer then
+        set testResult = null
     endif
-    set testSelected = CreateGroup()
-    call GroupEnumUnitsSelected(testSelected, testPlayer, null)
-    set testResult = FirstOfGroup(testSelected)
-    call DestroyGroup(testSelected)
-    set testSelected = null
     return testResult
 endfunction
 
@@ -80842,13 +80897,36 @@ function TestCommands_Message takes player testPlayer, string testCommand, strin
     call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS, 10., "|cffff6600[ЧИТЫ]|r " + GetPlayerName(testPlayer) + ": " + testCommand + " — " + testResult)
 endfunction
 
+// Mana refresh uses the current main hero so transformations keep personal access.
+function TestCommands_RefillMana takes integer testPlayerIndex returns nothing
+    local unit testHero = m[testPlayerIndex+1]
+    if TestCommands_Access[testPlayerIndex] and TestCommands_InfiniteMana[testPlayerIndex] and IsUnitType(testHero,UNIT_TYPE_HERO) and GetOwningPlayer(testHero) == Player(testPlayerIndex) and IsUnitAliveBJ(testHero) then
+        call SetUnitState(testHero,UNIT_STATE_MANA,GetUnitState(testHero,UNIT_STATE_MAX_MANA))
+    endif
+    set testHero = null
+endfunction
+
+function TestCommands_Mana takes nothing returns nothing
+    local integer testPlayerIndex = 0
+    loop
+        exitwhen testPlayerIndex >= 12
+        if TestCommands_InfiniteMana[testPlayerIndex] then
+            call TestCommands_RefillMana(testPlayerIndex)
+        endif
+        set testPlayerIndex = testPlayerIndex + 1
+    endloop
+endfunction
+
 function TestCommands_Cooldown takes nothing returns nothing
     local unit testCaster = GetTriggerUnit()
     local integer testPlayerIndex = GetPlayerId(GetOwningPlayer(testCaster))
-    if TestCommands_Access[testPlayerIndex] and TestCommands_NoCooldown[testPlayerIndex] and testCaster == m[testPlayerIndex+1] and IsUnitType(testCaster,UNIT_TYPE_HERO) then
+    if TestCommands_Access[testPlayerIndex] and (TestCommands_NoCooldown[testPlayerIndex] or TestCommands_InfiniteMana[testPlayerIndex]) and testCaster == m[testPlayerIndex+1] and IsUnitType(testCaster,UNIT_TYPE_HERO) then
         call TriggerSleepAction(.01)
-        if TestCommands_Access[testPlayerIndex] and TestCommands_NoCooldown[testPlayerIndex] and testCaster == m[testPlayerIndex+1] and GetPlayerId(GetOwningPlayer(testCaster)) == testPlayerIndex then
-            call UnitResetCooldown(testCaster)
+        if TestCommands_Access[testPlayerIndex] and testCaster == m[testPlayerIndex+1] and GetPlayerId(GetOwningPlayer(testCaster)) == testPlayerIndex then
+            if TestCommands_NoCooldown[testPlayerIndex] then
+                call UnitResetCooldown(testCaster)
+            endif
+            call TestCommands_RefillMana(testPlayerIndex)
         endif
     endif
     set testCaster = null
@@ -80861,6 +80939,12 @@ function TestCommands_Commands takes nothing returns nothing
     local boolean testIsLevel = testText == "-level" or SubString(testText,0,7) == "-level "
     local boolean testIsItem = testText == "-createitem" or SubString(testText,0,12) == "-createitem "
     local boolean testIsCooldown = testText == "-nc" or SubString(testText,0,4) == "-nc "
+    local boolean testIsGold = testText == "-gold" or SubString(testText,0,6) == "-gold "
+    local boolean testIsLumber = testText == "-lumber" or SubString(testText,0,8) == "-lumber "
+    local boolean testIsMana = testText == "-mana" or SubString(testText,0,6) == "-mana " or testText == "-nomana" or SubString(testText,0,8) == "-nomana "
+    local string testAmount
+    local playerstate testResource
+    local string testResourceName
     local unit testSelected = null
     local item testItem = null
     local integer testValue
@@ -80875,9 +80959,39 @@ function TestCommands_Commands takes nothing returns nothing
         else
             call TestCommands_Message(testPlayer,"-cheats","отказ: неверный код активации")
         endif
-    elseif testIsLevel or testIsItem or testIsCooldown then
+    elseif testIsLevel or testIsItem or testIsCooldown or testIsGold or testIsLumber or testIsMana then
         if not TestCommands_Access[testPlayerIndex] then
             call TestCommands_Message(testPlayer,testText,"отказ: доступ к читам не активирован")
+        elseif testIsGold or testIsLumber then
+            if testIsGold then
+                set testAmount = SubString(testText,6,StringLength(testText))
+                set testResource = PLAYER_STATE_RESOURCE_GOLD
+                set testResourceName = "золото"
+            else
+                set testAmount = SubString(testText,8,StringLength(testText))
+                set testResource = PLAYER_STATE_RESOURCE_LUMBER
+                set testResourceName = "медали"
+            endif
+            set testValue = S2I(testAmount)
+            if testValue < 1 or testValue > 100000000 or I2S(testValue) != testAmount then
+                call TestCommands_Message(testPlayer,testText,"ошибка: укажи целое количество от 1 до 100000000")
+            elseif GetPlayerState(testPlayer,testResource) > 2147483647-testValue then
+                call TestCommands_Message(testPlayer,testText,"ошибка: превышен предел количества валюты")
+            else
+                call AdjustPlayerStateBJ(testValue,testPlayer,testResource)
+                call TestCommands_Message(testPlayer,testText,testResourceName+": добавлено "+I2S(testValue)+", всего "+I2S(GetPlayerState(testPlayer,testResource)))
+            endif
+        elseif testIsMana then
+            if testText == "-mana" then
+                set TestCommands_InfiniteMana[testPlayerIndex] = true
+                call TestCommands_RefillMana(testPlayerIndex)
+                call TestCommands_Message(testPlayer,testText,"бесконечная мана включена для своего героя")
+            elseif testText == "-nomana" then
+                set TestCommands_InfiniteMana[testPlayerIndex] = false
+                call TestCommands_Message(testPlayer,testText,"бесконечная мана выключена")
+            else
+                call TestCommands_Message(testPlayer,testText,"ошибка: используй -mana или -nomana без параметров")
+            endif
         elseif testIsLevel then
             set testSelected = TestCommands_Selected(testPlayer)
             set testValue = S2I(SubString(testText,7,StringLength(testText)))
@@ -80910,7 +81024,7 @@ function TestCommands_Commands takes nothing returns nothing
             endif
         elseif testText != "-nc" then
             call TestCommands_Message(testPlayer,testText,"ошибка: используй -nc без параметров")
-        elseif not IsUnitType(m[testPlayerIndex+1],UNIT_TYPE_HERO) then
+        elseif not IsUnitType(TestCommands_Selected(testPlayer),UNIT_TYPE_HERO) then
             call TestCommands_Message(testPlayer,testText,"ошибка: собственный герой не найден")
         else
             set TestCommands_NoCooldown[testPlayerIndex] = not TestCommands_NoCooldown[testPlayerIndex]
@@ -80921,6 +81035,7 @@ function TestCommands_Commands takes nothing returns nothing
             endif
         endif
     endif
+    set testResource = null
     set testItem = null
     set testSelected = null
     set testPlayer = null
@@ -80928,34 +81043,27 @@ endfunction
 
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
-    local integer testHumans = 0
     local trigger testChat = CreateTrigger()
     local trigger testSpells = CreateTrigger()
+    local trigger testMana = CreateTrigger()
     loop
         exitwhen testPlayerIndex >= 12
+        set TestCommands_Access[testPlayerIndex] = false
+        set TestCommands_NoCooldown[testPlayerIndex] = false
+        set TestCommands_InfiniteMana[testPlayerIndex] = false
         if GetPlayerController(Player(testPlayerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(testPlayerIndex)) == PLAYER_SLOT_STATE_PLAYING then
-            set testHumans = testHumans + 1
-        endif
-        set testPlayerIndex = testPlayerIndex + 1
-    endloop
-    set TestCommands_SinglePlayer = testHumans == 1
-    set testPlayerIndex = 0
-    loop
-        exitwhen testPlayerIndex >= 12
-        if GetPlayerController(Player(testPlayerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(testPlayerIndex)) == PLAYER_SLOT_STATE_PLAYING then
-            set TestCommands_Access[testPlayerIndex] = TestCommands_SinglePlayer
             call TriggerRegisterPlayerChatEvent(testChat,Player(testPlayerIndex),"-",false)
             call TriggerRegisterPlayerUnitEvent(testSpells,Player(testPlayerIndex),EVENT_PLAYER_UNIT_SPELL_EFFECT,null)
-            if TestCommands_SinglePlayer then
-                call DisplayTimedTextToPlayer(Player(testPlayerIndex),0,0,10.,"Single-player commands: -level N, -createitem XXXX, -nc")
-            endif
         endif
         set testPlayerIndex = testPlayerIndex + 1
     endloop
     call TriggerAddAction(testChat,function TestCommands_Commands)
     call TriggerAddAction(testSpells,function TestCommands_Cooldown)
+    call TriggerRegisterTimerEventPeriodic(testMana,.1)
+    call TriggerAddAction(testMana,function TestCommands_Mana)
     set testChat = null
     set testSpells = null
+    set testMana = null
 endfunction
 
 function main takes nothing returns nothing

@@ -56,12 +56,23 @@ Added new item Demonic Boots to Recipe Shop 3.
 Added new item Demonic Armor to Recipe Shop 5.
 Added new item Moon Armor to Recipe Shop 3.
 
+----------
+SCOREBOARD
+----------
+
+Added a death counter to the player scoreboard. Kill and death columns are labeled K and D.
+Only real hero deaths count, including Ichigo's Hollow Form death once. Illusion and dummy unit deaths are excluded.
+Statistics stop changing when the winner is determined; deaths during the ending cinematic do not affect match results.
+After the cinematic, the final K/D table is shown inside the map for 20 seconds before the victory or defeat dialog.
+
 -------------
 TEST COMMANDS
 -------------
 
-Added personal activation of existing cheats in PvP. Only the activating player receives access; single-player access remains automatic.
-In PvP, -level N and -createitem XXXX use the command author's hero; single-player commands continue to use the selected unit.
+All cheats require personal activation, including single-player games. Only the activating player receives access.
+The -level N and -createitem XXXX commands use only the command author's own hero.
+Added -gold N and -lumber N to add the specified amount of gold or medals only to the player who entered the command.
+Added -mana and -nomana to enable or disable infinite mana only for the player's own hero; the setting persists through transformations.
 The -nc command resets cooldowns only for the enabling player's own hero.
 Every cheat use displays a map system notification to all players for 10 seconds: a colored [ЧИТЫ] prefix, player name, command, parameters and result. Activation is also announced, with the activation code hidden from the notification.
 
