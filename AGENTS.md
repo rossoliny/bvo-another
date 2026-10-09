@@ -10,3 +10,9 @@
 - When writing new code, use clear, descriptive, human-readable names for variables, functions, parameters, and other identifiers.
 - When editing existing code with unclear names, rename the identifiers in the code being edited to make their purpose understandable, and update every affected reference.
 - Do not rename identifiers when only reading, studying, or analyzing code.
+
+## Code explanations
+
+- When explaining code or giving code examples, write a clear, descriptive code identifier in parentheses immediately after each original variable name, for example `Gj (mamaraganDamage)`.
+- At first mention, briefly explain what the variable stores or represents and how it is used. Keep this explanation outside the parentheses.
+- Put the descriptive identifier directly in parentheses, without introductory phrases such as "I would name it".
