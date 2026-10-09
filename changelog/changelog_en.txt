@@ -16,8 +16,12 @@ HERO CHANGES
 
 _____
 Renji
-	[E] 
-		Now does not disarm Renji for two seconds after hitting target and allows Renji to attack right after spell hits the target.
+	[E]
+		Changes relative to the original Unryze 1.1a:
+		E restrictions on attacks and abilities end 1 second after casting, regardless of a hit or flight cancellation. In the original, recovery occurred 2 seconds after E ended.
+		Maximum projectile lifetime increased from 10 to 20 seconds.
+		Instead of constant pursuit speed, projectiles gain 5% of their initial speed every second: +50% after 10 seconds, +100% after 20 seconds.
+		Each E flight stores its own target and projectiles. An old flight does not affect subsequent E, Q or R casts; an unreachable target ends the flight at the time limit, and dead or missing targets/projectiles trigger cleanup.
 
 _______________
 Kurosaki Ichigo

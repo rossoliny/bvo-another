@@ -665,7 +665,7 @@ globals
     group wk=null
     integer array xk
     group array yk
-    boolean zk=false
+    boolean RenjiDisarmed=false
     unit Ak=null
     group ak=null
     boolean Bk=false
@@ -1568,7 +1568,7 @@ globals
     trigger DB=null
     trigger EB=null
     trigger FB=null
-    trigger GB=null
+    trigger RenjiDisarmedAttackTrigger=null
     trigger HB=null
     trigger IB=null
     trigger lB=null
@@ -1577,8 +1577,25 @@ globals
     trigger gg_trg_DemonicBoot=null
     trigger gg_trg_Moon_Armor=null
     trigger gg_trg_Demonic_Armor=null
-    trigger Renji_Trig_0=null
-    trigger Renji_Trig_1=null
+    constant real RENJI_E_RECOVERY_DELAY=1.0
+    constant real RENJI_E_PROJECTILE_LIFETIME=20.0
+    constant real RENJI_E_UPDATE_PERIOD=0.015
+    constant integer RENJI_E_SPREAD_TICKS=40 // Initial spread lasts 0.6 seconds.
+    constant real RENJI_E_BASE_STEP=25.0
+    constant real RENJI_E_SPEED_GAIN=0.05
+    constant integer RENJI_E_PROJECTILE_COUNT=8
+    constant integer RENJI_E_CASTER_KEY=0
+    constant integer RENJI_E_TARGET_KEY=1
+    constant integer RENJI_E_DAMAGE_KEY=2
+    constant integer RENJI_E_TICKS_KEY=3
+    constant integer RENJI_E_FLIGHT_INDEX_KEY=4
+    constant integer RENJI_E_RECOVERY_TIMER_KEY=5
+    constant integer RENJI_E_PROJECTILE_KEY_BASE=10
+    hashtable RenjiEState=null
+    group RenjiERecoveringCasters=null
+    timer array RenjiEActiveFlights
+    integer RenjiEFlightCount=0
+    trigger RenjiETrigger=null
     trigger NB=null
     trigger OB=null
     trigger PB=null
@@ -3206,7 +3223,7 @@ function I6 takes nothing returns nothing
         set yk[i]=CreateGroup()
         set i=i+1
     endloop
-    set zk=false
+    set RenjiDisarmed=false
     set ak=CreateGroup()
     set Bk=false
     set bk=CreateGroup()
@@ -39397,9 +39414,19 @@ function aXe takes nothing returns boolean
     return(Xg==a[16])
 endfunction
 
-function aOe takes nothing returns boolean
-    return(Xg==sk[11])
+function RenjiERetargetFlights takes unit previousTarget, unit replacementTarget returns nothing
+    local integer flightIndex=1
+    local integer flightKey
+    loop
+        exitwhen flightIndex>RenjiEFlightCount
+        set flightKey=GetHandleId(RenjiEActiveFlights[flightIndex])
+        if LoadUnitHandle(RenjiEState,flightKey,RENJI_E_TARGET_KEY)==previousTarget then
+            call SaveUnitHandle(RenjiEState,flightKey,RENJI_E_TARGET_KEY,replacementTarget)
+        endif
+        set flightIndex=flightIndex+1
+    endloop
 endfunction
+
 
 function aRe takes nothing returns boolean
     return(Xg==sk[21])
@@ -39577,9 +39604,6 @@ function a2e takes nothing returns boolean
     return(Ck==a[16])
 endfunction
 
-function a3e takes nothing returns boolean
-    return(Ck==sk[11])
-endfunction
 
 function a4e takes nothing returns boolean
     return(Ck==sk[21])
@@ -39823,9 +39847,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     if(((Xg==a[16])))then
         set a[16]=Ck
     endif
-    if(((Xg==sk[11])))then
-        set sk[11]=Ck
-    endif
+    call RenjiERetargetFlights(Xg,Ck)
     if(((Xg==sk[21])))then
         set sk[21]=Ck
     endif
@@ -40026,9 +40048,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         if(((Ck==a[16])))then
             set a[16]=Xg
         endif
-        if(((Ck==sk[11])))then
-            set sk[11]=Xg
-        endif
+        call RenjiERetargetFlights(Ck,Xg)
         if(((Ck==sk[21])))then
             set sk[21]=Xg
         endif
@@ -40203,9 +40223,6 @@ function nse takes nothing returns boolean
     return(Ck==a[16])
 endfunction
 
-function nSe takes nothing returns boolean
-    return(Ck==sk[11])
-endfunction
 
 function nte takes nothing returns boolean
     return(Ck==sk[21])
@@ -40416,9 +40433,7 @@ function Ichigo_Die_Action takes nothing returns nothing
     if(((Ck==a[16])))then
         set a[16]=Xg
     endif
-    if(((Ck==sk[11])))then
-        set sk[11]=Xg
-    endif
+    call RenjiERetargetFlights(Ck,Xg)
     if(((Ck==sk[21])))then
         set sk[21]=Xg
     endif
@@ -45035,14 +45050,13 @@ function Bze takes nothing returns nothing
     if(((Ak==null)))then
         call DestroyTrigger(EB)
         call DestroyTrigger(FB)
-        call DestroyTrigger(GB)
+        call DestroyTrigger(RenjiDisarmedAttackTrigger)
         call DestroyTrigger(HB)
         call DestroyTrigger(IB)
         call DestroyTrigger(lB)
         call DestroyTrigger(JB)
         call DestroyTrigger(KB)
-        call DestroyTrigger(Renji_Trig_0)
-        call DestroyTrigger(Renji_Trig_1)
+        call DestroyTrigger(RenjiETrigger)
         call DestroyTrigger(NB)
         call DestroyTrigger(OB)
         call DestroyTrigger(PB)
@@ -45056,7 +45070,7 @@ function Bze takes nothing returns nothing
         call TriggerRegisterUnitEvent(HB,Ak,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(lB,Ak,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(JB,Ak,EVENT_UNIT_SPELL_FINISH)
-        call TriggerRegisterUnitEvent(Renji_Trig_0,Ak,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(RenjiETrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(NB,Ak,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(QB,Ak,EVENT_UNIT_SPELL_CAST)
         call TriggerRegisterUnitEvent(RB,Ak,EVENT_UNIT_SPELL_EFFECT)
@@ -45133,7 +45147,7 @@ function B9e takes nothing returns nothing
             set Cj[59]=Cj[59]+1
         endloop
         call UnitAddAbility(sk[12],'A0BM')
-        set zk=false
+        set RenjiDisarmed=false
         set uk[12]=GetRectCenter(to)
         call CreateNUnitsAtLoc(1,'edoc',GetOwningPlayer(sk[12]),uk[12],bj_UNIT_FACING)
         call RemoveLocation(uk[12])
@@ -45152,23 +45166,19 @@ function cve takes nothing returns nothing
     call TriggerAddAction(FB,function B9e)
 endfunction
 
-function cee takes nothing returns boolean
-    return(GetUnitTypeId(GetAttacker())=='H01Q')and(zk)
+function RenjiDisarmedAttackCondition takes nothing returns boolean
+    return(GetUnitTypeId(GetAttacker())=='H01Q')and(RenjiDisarmed or IsUnitInGroup(GetAttacker(),RenjiERecoveringCasters))
 endfunction
 
-function cxe takes nothing returns boolean
-    return(((GetUnitTypeId(GetAttacker())=='H01Q')and(zk)))
-endfunction
-
-function coe takes nothing returns nothing
+function StopRenjiDisarmedAttack takes nothing returns nothing
     call IssueImmediateOrderById(GetAttacker(),851972)
 endfunction
 
-function cre takes nothing returns nothing
-    set GB=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(GB,EVENT_PLAYER_UNIT_ATTACKED)
-    call TriggerAddCondition(GB,Condition(function cxe))
-    call TriggerAddAction(GB,function coe)
+function InitRenjiDisarmedAttackTrigger takes nothing returns nothing
+    set RenjiDisarmedAttackTrigger=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(RenjiDisarmedAttackTrigger,EVENT_PLAYER_UNIT_ATTACKED)
+    call TriggerAddCondition(RenjiDisarmedAttackTrigger,Condition(function RenjiDisarmedAttackCondition))
+    call TriggerAddAction(RenjiDisarmedAttackTrigger,function StopRenjiDisarmedAttack)
 endfunction
 
 function cie takes nothing returns boolean
@@ -45621,192 +45631,262 @@ function Cie takes nothing returns nothing
 endfunction
 
 
-function Renji_Trig_0_Condition takes nothing returns boolean
-    return(GetSpellAbilityId()=='A0BN')
+function RenjiECastCondition takes nothing returns boolean
+    return GetSpellAbilityId()=='A0BN'
 endfunction
 
+function RenjiETextHiddenForPlayer takes nothing returns boolean
+    return R[1+GetPlayerId(GetFilterPlayer())]
+endfunction
 
-function Cne takes nothing returns nothing
+function RenjiEKillAbilityRequirement takes nothing returns nothing
     call KillUnit(GetEnumUnit())
 endfunction
 
-
-function CVe takes nothing returns boolean
-    return(GetRandomInt(1,100)<=50)
-endfunction
-
-
-function CEe takes nothing returns boolean
-    return(R[(1+GetPlayerId(GetFilterPlayer()))])
-endfunction
-
-
-function Renji_Trig_0_Action takes nothing returns nothing
-    set sk[10]=GetTriggerUnit()
-    set sk[11]=GetSpellTargetUnit()
-    set uk[10]=GetUnitLoc(sk[10])
-    set xk[10]=0
-    set vk[10]=(((5.+I2R(GetUnitAbilityLevelSwapped('A0BN',sk[10])))*I2R(GetHeroStatBJ(0,sk[10],true)))+((18.+(2.*I2R(GetUnitAbilityLevelSwapped('A0BN',sk[10]))))*I2R(GetHeroLevel(sk[10]))))
-    // disarm renji
-    call UnitRemoveAbility(sk[10],'A0BM')
-    set zk=true
-    set yk[10]=k6(GetOwningPlayer(sk[10]),'edoc')
-    call ForGroupBJ(yk[10],function Cne)
-    call DestroyGroup(yk[10])
-    set yk[10]=null
-    set Cj[55]=1
+function RenjiEEnsureAbilityRequirement takes unit caster returns nothing
+    local group requirements=k6(GetOwningPlayer(caster),'edoc')
+    local unit requirement
+    local boolean requirementExists=false
     loop
-        exitwhen Cj[55]>8
-        if(((GetRandomInt(1,100)<=50)))then
-            call CreateNUnitsAtLoc(1,'h01S',GetOwningPlayer(sk[10]),uk[10],(I2R(Cj[55])*45.))
-            set tk[(18+Cj[55])]=bj_lastCreatedUnit
-        else
-            call CreateNUnitsAtLoc(1,'h01T',GetOwningPlayer(sk[10]),uk[10],(I2R(Cj[55])*45.))
-            set tk[(18+Cj[55])]=bj_lastCreatedUnit
+        set requirement=FirstOfGroup(requirements)
+        exitwhen requirement==null
+        call GroupRemoveUnit(requirements,requirement)
+        if IsUnitAliveBJ(requirement) then
+            set requirementExists=true
         endif
-        call SetUnitFlyHeight(tk[(18+Cj[55])],GetRandomReal(100.,600.),500.)
-        call UnitApplyTimedLifeBJ(10.,'BTLF',tk[(18+Cj[55])])
-        set Cj[55]=Cj[55]+1
     endloop
-    call RemoveLocation(uk[10])
-    set uk[10]=null
-    call CreateTextTagUnitBJ("Higa Zekko",sk[10],0,10.,100,100.,100.,0)
-    call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
-    call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.)
-    call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function CEe)))
-    call EnableTrigger(Renji_Trig_1)
-    set Km[18]=GetUnitLoc(sk[10])
-    call PlaySoundAtPointBJ(tq,100,Km[18],0)
-    call RemoveLocation(Km[18])
-    set Km[18]=null
-    call TriggerSleepAction(.6)
-    set Cj[55]=1
+    call DestroyGroup(requirements)
+    if not requirementExists then
+        set requirement=CreateUnit(GetOwningPlayer(caster),'edoc',GetRectCenterX(to),GetRectCenterY(to),bj_UNIT_FACING)
+    endif
+    set requirement=null
+    set requirements=null
+endfunction
+
+function RenjiERecoverCaster takes nothing returns nothing
+    local timer recoveryTimer=GetExpiredTimer()
+    local integer recoveryKey=GetHandleId(recoveryTimer)
+    local unit caster=LoadUnitHandle(RenjiEState,recoveryKey,RENJI_E_CASTER_KEY)
+    local integer casterKey=GetHandleId(caster)
+    if caster!=null and LoadTimerHandle(RenjiEState,casterKey,RENJI_E_RECOVERY_TIMER_KEY)==recoveryTimer then
+        call RemoveSavedHandle(RenjiEState,casterKey,RENJI_E_RECOVERY_TIMER_KEY)
+        call GroupRemoveUnit(RenjiERecoveringCasters,caster)
+        // Only E's restrictions end here; an active Bankai keeps its own disarm.
+        if GetUnitTypeId(caster)!=0 and not RenjiDisarmed then
+            call UnitAddAbility(caster,'A0BM')
+            call RenjiEEnsureAbilityRequirement(caster)
+        endif
+    endif
+    call FlushChildHashtable(RenjiEState,recoveryKey)
+    call PauseTimer(recoveryTimer)
+    call DestroyTimer(recoveryTimer)
+    set caster=null
+    set recoveryTimer=null
+endfunction
+
+function RenjiEFinishFlight takes timer flightTimer returns nothing
+    local integer flightKey=GetHandleId(flightTimer)
+    local integer flightIndex=LoadInteger(RenjiEState,flightKey,RENJI_E_FLIGHT_INDEX_KEY)
+    local integer projectileIndex=1
+    local timer lastFlight
+    local unit projectile
+    call PauseTimer(flightTimer)
+    if flightIndex>0 then
+        set lastFlight=RenjiEActiveFlights[RenjiEFlightCount]
+        set RenjiEActiveFlights[flightIndex]=lastFlight
+        call SaveInteger(RenjiEState,GetHandleId(lastFlight),RENJI_E_FLIGHT_INDEX_KEY,flightIndex)
+        set RenjiEActiveFlights[RenjiEFlightCount]=null
+        set RenjiEFlightCount=RenjiEFlightCount-1
+    endif
     loop
-        exitwhen Cj[55]>8
-        call SetUnitFlyHeight(tk[(18+Cj[55])],.0,1200.)
-        set Cj[55]=Cj[55]+1
+        exitwhen projectileIndex>RENJI_E_PROJECTILE_COUNT
+        set projectile=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+projectileIndex)
+        if projectile!=null then
+            call RemoveUnit(projectile)
+        endif
+        set projectileIndex=projectileIndex+1
     endloop
-    set xk[10]=1
+    // Flight cleanup never restores a caster or changes a later Q/E/R cast.
+    call FlushChildHashtable(RenjiEState,flightKey)
+    call DestroyTimer(flightTimer)
+    set lastFlight=null
+    set projectile=null
+endfunction
+
+function RenjiEFinishHitAnimation takes nothing returns nothing
+    local timer flightTimer=GetExpiredTimer()
+    call RenjiEFinishFlight(flightTimer)
+    set flightTimer=null
+endfunction
+
+function RenjiEUpdateFlight takes nothing returns nothing
+    local timer flightTimer=GetExpiredTimer()
+    local integer flightKey=GetHandleId(flightTimer)
+    local unit caster=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_CASTER_KEY)
+    local unit target=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_TARGET_KEY)
+    local integer flightTicks=LoadInteger(RenjiEState,flightKey,RENJI_E_TICKS_KEY)+1
+    local real flightAge=I2R(flightTicks)*RENJI_E_UPDATE_PERIOD
+    local integer projectileIndex=1
+    local integer completedSeconds=R2I(flightAge+0.0001)
+    local real step=RENJI_E_BASE_STEP*(1.0+RENJI_E_SPEED_GAIN*I2R(completedSeconds))
+    local real angle
+    local real destinationX
+    local real destinationY
+    local real targetX
+    local real targetY
+    local real distanceX
+    local real distanceY
+    local unit projectile
+    local unit hitProjectile
+    local unit stunCaster
+    local location impactLocation
+    local boolean flightInvalid=flightAge>=RENJI_E_PROJECTILE_LIFETIME or GetUnitTypeId(caster)==0 or GetUnitTypeId(target)==0 or not IsUnitAliveBJ(caster) or not IsUnitAliveBJ(target) or IsUnitHidden(target)
+    call SaveInteger(RenjiEState,flightKey,RENJI_E_TICKS_KEY,flightTicks)
     loop
-        exitwhen(not IsTriggerEnabled(Renji_Trig_1))
-        call TriggerSleepAction(RMaxBJ(bj_WAIT_FOR_COND_MIN_INTERVAL,.1))
+        exitwhen projectileIndex>RENJI_E_PROJECTILE_COUNT or flightInvalid
+        set projectile=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+projectileIndex)
+        if GetUnitTypeId(projectile)==0 or not IsUnitAliveBJ(projectile) then
+            set flightInvalid=true
+        endif
+        set projectileIndex=projectileIndex+1
     endloop
-    set xk[10]=0
-    set vk[10]=.0
-    set sk[11]=null
-    // undo disarm in case E did not hit the target if it died or escaped spell somehow
-    call TriggerSleepAction(1)
-    call UnitAddAbility(sk[10],'A0BM')
-    set zk=false
-    set uk[10]=GetRectCenter(to)
-    call CreateNUnitsAtLoc(1,'edoc',GetOwningPlayer(sk[10]),uk[10],bj_UNIT_FACING)
-    call RemoveLocation(uk[10])
-    set uk[10]=null
-    set sk[10]=null
-endfunction
-
-
-function Init_Renji_Trig_0 takes nothing returns nothing
-    set Renji_Trig_0=CreateTrigger()
-    call TriggerAddCondition(Renji_Trig_0,Condition(function Renji_Trig_0_Condition))
-    call TriggerAddAction(Renji_Trig_0,function Renji_Trig_0_Action)
-endfunction
-
-
-function Trig_HZ_move_Func002Func001Func006Func005Func001001 takes nothing returns boolean
-    return(GetUnitStateSwap(UNIT_STATE_LIFE,Uj[1])<=Mj[8])
-endfunction
-
-
-function Renji_Trig_1_Action takes nothing returns nothing
-    if(xk[10]==0)then
-        set Cj[56]=1
+    if flightInvalid then
+        call RenjiEFinishFlight(flightTimer)
+    else
+        set targetX=GetUnitX(target)
+        set targetY=GetUnitY(target)
+        set projectileIndex=1
         loop
-            exitwhen Cj[56]>8
-            set uk[10]=PG(GetUnitLoc(tk[(18+Cj[56])]),20.,GetUnitFacing(tk[(18+Cj[56])]))
-            call SetUnitPositionLoc(tk[(18+Cj[56])],uk[10])
-            call RemoveLocation(uk[10])
-            set uk[10]=null
-            set Cj[56]=Cj[56]+1
-        endloop
-    endif
-    if(xk[10]==1)then
-        if(IsUnitAliveBJ(sk[10]))and(IsUnitAliveBJ(sk[11]))and(IsUnitHidden(sk[11])==false)then
-            set Cj[56]=1
-            loop
-                exitwhen Cj[56]>8
-                set uk[10]=PG(GetUnitLoc(tk[(18+Cj[56])]),25.,AngleBetweenPoints(GetUnitLoc(tk[(18+Cj[56])]),GetUnitLoc(sk[11])))
-                call SetUnitPositionLoc(tk[(18+Cj[56])],uk[10])
-                call RemoveLocation(uk[10])
-                set uk[10]=null
-                set Cj[56]=Cj[56]+1
-            endloop
-            set uk[10]=GetUnitLoc(tk[20])
-            set uk[11]=GetUnitLoc(sk[11])
-            if(DistanceBetweenPoints(uk[11],uk[10])<=120.)then
-                call UnitDamageTargetBJ(sk[10],sk[11],vk[10],ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-                // undo renji disarm
-                call UnitAddAbility(sk[10],'A0BM')
-                set zk = false
-                set uk[10]=GetRectCenter(to)
-                call CreateNUnitsAtLoc(1,'edoc',GetOwningPlayer(sk[10]),uk[10],bj_UNIT_FACING)
-                
-                call AddSpecialEffectLocBJ(uk[11],"NewDirtEXNofire.mdx")
-                call DestroyEffect(bj_lastCreatedEffect)
-                call CreateNUnitsAtLoc(1,'u002',GetOwningPlayer(sk[10]),uk[11],bj_UNIT_FACING)
-                set sk[12]=bj_lastCreatedUnit
-                call UnitAddAbility(sk[12],'A00G')
-                call IssueTargetOrderById(sk[12],852095,sk[11])
-                call UnitApplyTimedLifeBJ(1.,'BTLF',sk[12])
-                set sk[12]=null
-                set sk[11]=null
-                set Cj[57]=1
-                loop
-                    exitwhen Cj[57]>8
-                    call SetUnitFlyHeight(tk[(18+Cj[57])],.0,.0)
-                    call SetUnitPositionLocFacingLocBJ(tk[(18+Cj[57])],uk[11],uk[11])
-                    set Cj[57]=Cj[57]+1
-                endloop
-                call RemoveLocation(uk[10])
-                set uk[10]=null
-                call RemoveLocation(uk[11])
-                set uk[11]=null
-                call DisableTrigger(GetTriggeringTrigger())
-                call TriggerSleepAction(.02)
-                set Cj[57]=1
-                loop
-                    exitwhen Cj[57]>8
-                    call RemoveUnit(tk[(18+Cj[57])])
-                    set tk[(18+Cj[57])]=null
-                    set Cj[57]=Cj[57]+1
-                endloop
+            exitwhen projectileIndex>RENJI_E_PROJECTILE_COUNT
+            set projectile=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+projectileIndex)
+            if flightTicks<RENJI_E_SPREAD_TICKS then
+                set angle=GetUnitFacing(projectile)*bj_DEGTORAD
+                set destinationX=GetUnitX(projectile)+20.0*Cos(angle)
+                set destinationY=GetUnitY(projectile)+20.0*Sin(angle)
             else
-                call RemoveLocation(uk[10])
-                set uk[10]=null
-                call RemoveLocation(uk[11])
-                set uk[11]=null
+                if flightTicks==RENJI_E_SPREAD_TICKS then
+                    call SetUnitFlyHeight(projectile,0.0,1200.0)
+                endif
+                set angle=Atan2(targetY-GetUnitY(projectile),targetX-GetUnitX(projectile))
+                set destinationX=GetUnitX(projectile)+step*Cos(angle)
+                set destinationY=GetUnitY(projectile)+step*Sin(angle)
             endif
-        else
-            set Cj[57]=1
-            loop
-                exitwhen Cj[57]>8
-                call RemoveUnit(tk[(18+Cj[57])])
-                set tk[(18+Cj[57])]=null
-                set Cj[57]=Cj[57]+1
-            endloop
-            call DisableTrigger(GetTriggeringTrigger())
+            call SetUnitPosition(projectile,destinationX,destinationY)
+            set projectileIndex=projectileIndex+1
+        endloop
+        if flightTicks>=RENJI_E_SPREAD_TICKS then
+            set hitProjectile=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+2)
+            set distanceX=targetX-GetUnitX(hitProjectile)
+            set distanceY=targetY-GetUnitY(hitProjectile)
+            if distanceX*distanceX+distanceY*distanceY<=120.0*120.0 then
+                call PauseTimer(flightTimer)
+                set impactLocation=Location(targetX,targetY)
+                call UnitDamageTargetBJ(caster,target,LoadReal(RenjiEState,flightKey,RENJI_E_DAMAGE_KEY),ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
+                // Damage can replace Ichigo's hero unit during a transformation.
+                set target=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_TARGET_KEY)
+                call AddSpecialEffectLocBJ(impactLocation,"NewDirtEXNofire.mdx")
+                call DestroyEffect(bj_lastCreatedEffect)
+                if GetUnitTypeId(target)!=0 and IsUnitAliveBJ(target) then
+                    set stunCaster=CreateUnit(GetOwningPlayer(caster),'u002',targetX,targetY,bj_UNIT_FACING)
+                    call UnitAddAbility(stunCaster,'A00G')
+                    call IssueTargetOrderById(stunCaster,852095,target)
+                    call UnitApplyTimedLifeBJ(1.0,'BTLF',stunCaster)
+                endif
+                set projectileIndex=1
+                loop
+                    exitwhen projectileIndex>RENJI_E_PROJECTILE_COUNT
+                    set projectile=LoadUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+projectileIndex)
+                    call SetUnitFlyHeight(projectile,0.0,0.0)
+                    call SetUnitPosition(projectile,targetX,targetY)
+                    set projectileIndex=projectileIndex+1
+                endloop
+                call RemoveLocation(impactLocation)
+                call TimerStart(flightTimer,0.02,false,function RenjiEFinishHitAnimation)
+            endif
         endif
     endif
+    set caster=null
+    set target=null
+    set projectile=null
+    set hitProjectile=null
+    set stunCaster=null
+    set impactLocation=null
+    set flightTimer=null
 endfunction
 
-
-function Init_Renji_Trig_1 takes nothing returns nothing
-    set Renji_Trig_1=CreateTrigger()
-    call DisableTrigger(Renji_Trig_1)
-    call TriggerRegisterTimerEventPeriodic(Renji_Trig_1,.015)
-    call TriggerAddAction(Renji_Trig_1,function Renji_Trig_1_Action)
+function RenjiECast takes nothing returns nothing
+    local unit caster=GetTriggerUnit()
+    local unit target=GetSpellTargetUnit()
+    local timer flightTimer=CreateTimer()
+    local timer recoveryTimer=CreateTimer()
+    local integer flightKey=GetHandleId(flightTimer)
+    local integer casterKey=GetHandleId(caster)
+    local timer previousRecovery=LoadTimerHandle(RenjiEState,casterKey,RENJI_E_RECOVERY_TIMER_KEY)
+    local integer projectileIndex=1
+    local integer abilityLevel=GetUnitAbilityLevel(caster,'A0BN')
+    local real damage=(5.0+I2R(abilityLevel))*I2R(GetHeroStatBJ(0,caster,true))+(18.0+2.0*I2R(abilityLevel))*I2R(GetHeroLevel(caster))
+    local unit projectile
+    local group requirements=k6(GetOwningPlayer(caster),'edoc')
+    local location casterLocation=GetUnitLoc(caster)
+    local force hiddenTextPlayers
+    if previousRecovery!=null then
+        call PauseTimer(previousRecovery)
+        call FlushChildHashtable(RenjiEState,GetHandleId(previousRecovery))
+        call DestroyTimer(previousRecovery)
+    endif
+    call SaveUnitHandle(RenjiEState,GetHandleId(recoveryTimer),RENJI_E_CASTER_KEY,caster)
+    call SaveTimerHandle(RenjiEState,casterKey,RENJI_E_RECOVERY_TIMER_KEY,recoveryTimer)
+    call UnitRemoveAbility(caster,'A0BM')
+    call GroupAddUnit(RenjiERecoveringCasters,caster)
+    call ForGroup(requirements,function RenjiEKillAbilityRequirement)
+    call DestroyGroup(requirements)
+    call TimerStart(recoveryTimer,RENJI_E_RECOVERY_DELAY,false,function RenjiERecoverCaster)
+    call SaveUnitHandle(RenjiEState,flightKey,RENJI_E_CASTER_KEY,caster)
+    call SaveUnitHandle(RenjiEState,flightKey,RENJI_E_TARGET_KEY,target)
+    call SaveReal(RenjiEState,flightKey,RENJI_E_DAMAGE_KEY,damage)
+    call SaveInteger(RenjiEState,flightKey,RENJI_E_TICKS_KEY,0)
+    set RenjiEFlightCount=RenjiEFlightCount+1
+    set RenjiEActiveFlights[RenjiEFlightCount]=flightTimer
+    call SaveInteger(RenjiEState,flightKey,RENJI_E_FLIGHT_INDEX_KEY,RenjiEFlightCount)
+    loop
+        exitwhen projectileIndex>RENJI_E_PROJECTILE_COUNT
+        if GetRandomInt(1,100)<=50 then
+            set projectile=CreateUnit(GetOwningPlayer(caster),'h01S',GetUnitX(caster),GetUnitY(caster),I2R(projectileIndex)*45.0)
+        else
+            set projectile=CreateUnit(GetOwningPlayer(caster),'h01T',GetUnitX(caster),GetUnitY(caster),I2R(projectileIndex)*45.0)
+        endif
+        call SaveUnitHandle(RenjiEState,flightKey,RENJI_E_PROJECTILE_KEY_BASE+projectileIndex,projectile)
+        call SetUnitFlyHeight(projectile,GetRandomReal(100.0,600.0),500.0)
+        call UnitApplyTimedLifeBJ(RENJI_E_PROJECTILE_LIFETIME,'BTLF',projectile)
+        set projectileIndex=projectileIndex+1
+    endloop
+    call CreateTextTagUnitBJ("Higa Zekko",caster,0,10.0,100.0,100.0,100.0,0)
+    call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
+    call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.0)
+    set hiddenTextPlayers=t6(Condition(function RenjiETextHiddenForPlayer))
+    call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,hiddenTextPlayers)
+    call DestroyForce(hiddenTextPlayers)
+    call PlaySoundAtPointBJ(tq,100.0,casterLocation,0)
+    call RemoveLocation(casterLocation)
+    call TimerStart(flightTimer,RENJI_E_UPDATE_PERIOD,true,function RenjiEUpdateFlight)
+    set caster=null
+    set target=null
+    set projectile=null
+    set requirements=null
+    set casterLocation=null
+    set hiddenTextPlayers=null
+    set previousRecovery=null
+    set flightTimer=null
+    set recoveryTimer=null
 endfunction
 
+function InitRenjiETrigger takes nothing returns nothing
+    set RenjiEState=InitHashtable()
+    set RenjiERecoveringCasters=CreateGroup()
+    set RenjiETrigger=CreateTrigger()
+    call TriggerAddCondition(RenjiETrigger,Condition(function RenjiECastCondition))
+    call TriggerAddAction(RenjiETrigger,function RenjiECast)
+endfunction
 
 function Cde takes nothing returns boolean
     return(GetSpellAbilityId()=='A0BP')
@@ -45856,7 +45936,7 @@ function Cke takes nothing returns nothing
     call PauseUnit(sk[12],true)
     call SetUnitAnimation(sk[12],"attack slam")
     call UnitRemoveAbility(sk[12],'A0BM')
-    set zk=true
+    set RenjiDisarmed=true
     set yk[12]=k6(GetOwningPlayer(sk[12]),'edoc')
     call ForGroupBJ(yk[12],function CDe)
     call DestroyGroup(yk[12])
@@ -45941,7 +46021,7 @@ function Cke takes nothing returns nothing
             set Cj[59]=Cj[59]+1
         endloop
         call UnitAddAbility(sk[12],'A0BM')
-        set zk=false
+        set RenjiDisarmed=false
         set uk[12]=GetRectCenter(to)
         call CreateNUnitsAtLoc(1,'edoc',GetOwningPlayer(sk[12]),uk[12],bj_UNIT_FACING)
         call RemoveLocation(uk[12])
@@ -46335,7 +46415,7 @@ function dEe takes nothing returns nothing
         set Cj[59]=Cj[59]+1
     endloop
     call UnitAddAbility(sk[12],'A0BM')
-    set zk=false
+    set RenjiDisarmed=false
     set uk[12]=GetRectCenter(to)
     call CreateNUnitsAtLoc(1,'edoc',GetOwningPlayer(sk[12]),uk[12],bj_UNIT_FACING)
     call RemoveLocation(uk[12])
@@ -78851,11 +78931,11 @@ function Pjx takes nothing returns nothing
     call TriggerRegisterTimerEventPeriodic(MF,2.)
     call TriggerAddAction(MF,function PHx)
 endfunction
-function PJx takes nothing returns boolean
-    return(GetOrderedUnit()==gi)or(GetOrderedUnit()==sk[10])or(GetOrderedUnit()==sk[12])or(GetOrderedUnit()==sk[20])
+function IsOrderedUnitUsingRestrictedAbility takes nothing returns boolean
+    return(GetOrderedUnit()==gi)or(IsUnitInGroup(GetOrderedUnit(),RenjiERecoveringCasters))or(GetOrderedUnit()==sk[12])or(GetOrderedUnit()==sk[20])
 endfunction
 function Pkx takes nothing returns boolean
-    return(GetIssuedOrderId()==851983)and(GetItemType(GetOrderTargetItem())==ITEM_TYPE_ANY)and(PJx())
+    return(GetIssuedOrderId()==851983)and(GetItemType(GetOrderTargetItem())==ITEM_TYPE_ANY)and(IsOrderedUnitUsingRestrictedAbility())
 endfunction
 function PKx takes nothing returns boolean
     return(Pkx())
@@ -78922,11 +79002,11 @@ function Pyx takes nothing returns nothing
     call TriggerAddCondition(QF,Condition(function Pwx))
     call TriggerAddAction(QF,function PWx)
 endfunction
-function PYx takes nothing returns boolean
-    return(MG(GetAttacker(),UNIT_TYPE_HERO))and(RectContainsUnit(zn,GetAttacker())==false)and(IsUnitEnemy(GetTriggerUnit(),GetOwningPlayer(GetAttacker())))and(GetAttacker()!=gi)and(GetAttacker()!=sk[10])and(GetAttacker()!=sk[12])and(GetAttacker()!=sk[20])
+function IsHeroAttackEligibleForItemEffects takes nothing returns boolean
+    return(MG(GetAttacker(),UNIT_TYPE_HERO))and(RectContainsUnit(zn,GetAttacker())==false)and(IsUnitEnemy(GetTriggerUnit(),GetOwningPlayer(GetAttacker())))and(GetAttacker()!=gi)and(IsUnitInGroup(GetAttacker(),RenjiERecoveringCasters)==false)and(GetAttacker()!=sk[12])and(GetAttacker()!=sk[20])
 endfunction
 function Pzx takes nothing returns boolean
-    return(PYx())
+    return(IsHeroAttackEligibleForItemEffects())
 endfunction
 function PZx takes nothing returns boolean
     return(UnitHasItemOfTypeBJ(GetAttacker(),'rwiz'))
@@ -80214,14 +80294,13 @@ function Q3x takes nothing returns nothing
     call BZe()
     call B2e()
     call cve()
-    call cre()
+    call InitRenjiDisarmedAttackTrigger()
     call cEe()
     call che()
     call cJe()
     call c9e()
     call Cie()
-    call Init_Renji_Trig_0()
-    call Init_Renji_Trig_1()
+    call InitRenjiETrigger()
     call CKe()
     call CYe()
     call C1e()
