@@ -1643,6 +1643,11 @@ globals
     integer RenjiTSetupSegmentIndex=0
     integer RenjiTMoveIndex=0
     unit array RenjiRSegments
+    real array RenjiRSpreadStartX
+    real array RenjiRSpreadStartY
+    real array RenjiRSpreadTargetX
+    real array RenjiRSpreadTargetY
+    integer array RenjiRSpreadLateralSlots
     location array RenjiTSegmentDestinations
     location array RenjiTPathPositions
     real array RenjiTPathDirections
@@ -1650,6 +1655,10 @@ globals
     integer array RenjiTSegmentMoving
     constant integer RENJI_R_RETURN_ABILITY_ID='A0R0'
     constant real RENJI_R_RETURN_WINDOW=6.0
+    constant real RENJI_R_ROTATION_STEP=10.0
+    constant integer RENJI_R_ROTATION_STEPS=36
+    constant real RENJI_R_SPREAD_WIDTH=1500.0
+    constant real RENJI_R_SPREAD_LENGTH_MULTIPLIER=1.3
     constant integer RENJI_R_STUN_ABILITY_ID='A0R1'
     constant integer RENJI_R_SLOW_ABILITY_ID='A0R2'
     constant real RENJI_R_KNOCKBACK_PERIOD=0.03
@@ -45361,6 +45370,11 @@ function RenjiRFinish takes unit caster,boolean resetCasterMotion,boolean explod
             call RemoveUnit(RenjiRSegments[segmentIndex])
             set RenjiRSegments[segmentIndex]=null
         endif
+        set RenjiRSpreadStartX[segmentIndex]=0.0
+        set RenjiRSpreadStartY[segmentIndex]=0.0
+        set RenjiRSpreadTargetX[segmentIndex]=0.0
+        set RenjiRSpreadTargetY[segmentIndex]=0.0
+        set RenjiRSpreadLateralSlots[segmentIndex]=0
         set segmentIndex=segmentIndex+1
     endloop
     if explosionTargets!=null then
@@ -46219,6 +46233,82 @@ function RenjiRCanFinishCheck takes nothing returns boolean
     return(((RenjiRCaster!=null)and(RenjiTActive==false)))
 endfunction
 
+function RenjiRPrepareSpread takes nothing returns nothing
+    local integer segmentIndex=1
+    local integer shuffleIndex=19
+    local integer randomIndex=0
+    local integer savedSlot=0
+    local integer lateralSlot=0
+    local real casterX=GetLocationX(RenjiRCastPosition)
+    local real casterY=GetLocationY(RenjiRCastPosition)
+    local real directionRadians=RenjiRCastFacing*bj_DEGTORAD
+    local real forwardX=Cos(directionRadians)
+    local real forwardY=Sin(directionRadians)
+    local real maximumForwardDistance=65.0*19.0*RENJI_R_SPREAD_LENGTH_MULTIPLIER
+    local real lateralSpacing=RENJI_R_SPREAD_WIDTH/18.0
+    local real forwardDistance=0.0
+    local real lateralDistance=0.0
+    local real targetX=0.0
+    local real targetY=0.0
+    local real landingFraction=1.0
+    local real minimumX=RMinBJ(casterX,GetRectMinX(bj_mapInitialPlayableArea)+64.0)
+    local real maximumX=RMaxBJ(casterX,GetRectMaxX(bj_mapInitialPlayableArea)-64.0)
+    local real minimumY=RMinBJ(casterY,GetRectMinY(bj_mapInitialPlayableArea)+64.0)
+    local real maximumY=RMaxBJ(casterY,GetRectMaxY(bj_mapInitialPlayableArea)-64.0)
+    // Shuffle the width slots so increasing segment numbers cannot form a diagonal line.
+    loop
+        exitwhen segmentIndex>19
+        set RenjiRSpreadLateralSlots[segmentIndex]=segmentIndex-1
+        set segmentIndex=segmentIndex+1
+    endloop
+    loop
+        exitwhen shuffleIndex<=1
+        set randomIndex=GetRandomInt(1,shuffleIndex)
+        set savedSlot=RenjiRSpreadLateralSlots[shuffleIndex]
+        set RenjiRSpreadLateralSlots[shuffleIndex]=RenjiRSpreadLateralSlots[randomIndex]
+        set RenjiRSpreadLateralSlots[randomIndex]=savedSlot
+        set shuffleIndex=shuffleIndex-1
+    endloop
+    set segmentIndex=1
+    loop
+        exitwhen segmentIndex>19
+        set lateralSlot=RenjiRSpreadLateralSlots[segmentIndex]
+        set lateralDistance=-RENJI_R_SPREAD_WIDTH/2.0+lateralSpacing*I2R(lateralSlot)
+        if lateralSlot>0 and lateralSlot<18 then
+            set lateralDistance=lateralDistance+GetRandomReal(-lateralSpacing/4.0,lateralSpacing/4.0)
+        endif
+        set forwardDistance=65.0*I2R(segmentIndex)*RENJI_R_SPREAD_LENGTH_MULTIPLIER+GetRandomReal(-32.5,32.5)
+        set forwardDistance=RMaxBJ(65.0*I2R(segmentIndex),RMinBJ(maximumForwardDistance,forwardDistance))
+        if segmentIndex==19 then
+            set forwardDistance=maximumForwardDistance
+        endif
+        // Forward and sideways coordinates are relative to the cast position and facing.
+        set targetX=casterX+forwardDistance*forwardX-lateralDistance*forwardY
+        set targetY=casterY+forwardDistance*forwardY+lateralDistance*forwardX
+        set RenjiRSpreadStartX[segmentIndex]=GetUnitX(RenjiRSegments[segmentIndex])
+        set RenjiRSpreadStartY[segmentIndex]=GetUnitY(RenjiRSegments[segmentIndex])
+        // Clip along the ray from the caster, preserving both the forward and width limits.
+        set landingFraction=1.0
+        if targetX<minimumX then
+            set landingFraction=RMinBJ(landingFraction,(minimumX-casterX)/(targetX-casterX))
+        elseif targetX>maximumX then
+            set landingFraction=RMinBJ(landingFraction,(maximumX-casterX)/(targetX-casterX))
+        endif
+        if targetY<minimumY then
+            set landingFraction=RMinBJ(landingFraction,(minimumY-casterY)/(targetY-casterY))
+        elseif targetY>maximumY then
+            set landingFraction=RMinBJ(landingFraction,(maximumY-casterY)/(targetY-casterY))
+        endif
+        set landingFraction=RMaxBJ(0.0,RMinBJ(1.0,landingFraction))
+        set RenjiRSpreadTargetX[segmentIndex]=casterX+(targetX-casterX)*landingFraction
+        set RenjiRSpreadTargetY[segmentIndex]=casterY+(targetY-casterY)*landingFraction
+        call SetUnitFlyHeight(RenjiRSegments[segmentIndex],GetRandomReal(400.0,800.0),900.0)
+        // The visual rotation is independent of the flight path.
+        call SetUnitFacingTimed(RenjiRSegments[segmentIndex],GetRandomReal(0.0,360.0),GetRandomReal(0.0,4.0))
+        set segmentIndex=segmentIndex+1
+    endloop
+endfunction
+
 function RenjiRCast takes nothing returns nothing
     local unit caster=GetTriggerUnit()
     local timer castTimer=null
@@ -46236,6 +46326,7 @@ function RenjiRCast takes nothing returns nothing
     set RenjiRCastFacing=GetUnitFacing(RenjiRCaster)
     call PauseUnit(RenjiRCaster,true)
     call SetUnitAnimation(RenjiRCaster,"attack slam")
+    call SetUnitTimeScalePercent(RenjiRCaster,50.)
     call UnitRemoveAbility(RenjiRCaster,'A0BM')
     set RenjiDisarmed=true
     set RenjiRRequirements=k6(GetOwningPlayer(RenjiRCaster),'edoc')
@@ -46246,21 +46337,20 @@ function RenjiRCast takes nothing returns nothing
     call PlaySoundAtPointBJ(qp,100,RenjiRSoundPosition,0)
     call RemoveLocation(RenjiRSoundPosition)
     set RenjiRSoundPosition=null
-    call TriggerSleepAction(.06)
-    if RenjiRCaster!=caster or RenjiRAutoFinishTimer!=castTimer then
-        set caster=null
-        set castTimer=null
-        return
-    endif
-    call SetUnitTimeScalePercent(RenjiRCaster,50.)
-    call CreateNUnitsAtLoc(1,'h01V',GetOwningPlayer(RenjiRCaster),RenjiRCastPosition,GetUnitFacing(RenjiRCaster))
+    set RenjiRSegmentPosition=PG(RenjiRCastPosition,65.0*19.0,RenjiRCastFacing)
+    call CreateNUnitsAtLoc(1,'h01V',GetOwningPlayer(RenjiRCaster),RenjiRSegmentPosition,RenjiRCastFacing)
+    call RemoveLocation(RenjiRSegmentPosition)
+    set RenjiRSegmentPosition=null
     set RenjiRSegments[19]=bj_lastCreatedUnit
     call SetUnitFlyHeight(RenjiRSegments[19],60.,.0)
     call UnitApplyTimedLifeBJ(30.,'BTLF',RenjiRSegments[19])
     set RenjiRSpawnIndex=1
     loop
         exitwhen RenjiRSpawnIndex>18
-        call CreateNUnitsAtLoc(1,'h01U',GetOwningPlayer(RenjiRCaster),RenjiRCastPosition,GetUnitFacing(RenjiRCaster))
+        set RenjiRSegmentPosition=PG(RenjiRCastPosition,65.0*I2R(RenjiRSpawnIndex),RenjiRCastFacing)
+        call CreateNUnitsAtLoc(1,'h01U',GetOwningPlayer(RenjiRCaster),RenjiRSegmentPosition,RenjiRCastFacing)
+        call RemoveLocation(RenjiRSegmentPosition)
+        set RenjiRSegmentPosition=null
         set RenjiRSegments[RenjiRSpawnIndex]=bj_lastCreatedUnit
         if(((RenjiRSpawnIndex<=5)))then
             set segmentScale=(20.+(16.*I2R(RenjiRSpawnIndex)))
@@ -46286,6 +46376,8 @@ function RenjiRCast takes nothing returns nothing
         set castTimer=null
         return
     endif
+    // Capture the landing layout before movement resumes or cast coordinates are cleared.
+    call RenjiRPrepareSpread()
     call PauseUnit(RenjiRCaster,false)
     call SetUnitTimeScalePercent(RenjiRCaster,100.)
     call ResetUnitAnimation(RenjiRCaster)
@@ -46304,15 +46396,6 @@ function RenjiRCast takes nothing returns nothing
     call CreateNUnitsAtLoc(1,'oshm',GetOwningPlayer(RenjiRCaster),RenjiRCastPosition,bj_UNIT_FACING)
     call RemoveLocation(RenjiRCastPosition)
     set RenjiRCastPosition=null
-    if(((RenjiRCaster!=null)))then
-        set RenjiRSpreadSegmentIndex=1
-        loop
-            exitwhen RenjiRSpreadSegmentIndex>19
-            call SetUnitFlyHeight(RenjiRSegments[RenjiRSpreadSegmentIndex],GetRandomReal(400.,800.),500.)
-            call SetUnitFacingTimed(RenjiRSegments[RenjiRSpreadSegmentIndex],GetRandomReal(0,360.),GetRandomReal(.0,4.))
-            set RenjiRSpreadSegmentIndex=RenjiRSpreadSegmentIndex+1
-        endloop
-    endif
     call EnableTrigger(RenjiRSpreadTrigger)
     loop
         exitwhen not IsTriggerEnabled(RenjiRSpreadTrigger) or RenjiRAutoFinishTimer!=castTimer
@@ -46378,7 +46461,7 @@ endfunction
 function RenjiRDamageWaveTarget takes nothing returns nothing
     local unit caster=RenjiRCaster
     local unit target=GetEnumUnit()
-    local real knockbackDirection=RenjiRSegmentAngle-90.0
+    local real knockbackDirection=RenjiRSegmentAngle+90.0
     if RenjiRCaster==null then
         set caster=null
         set target=null
@@ -46388,7 +46471,7 @@ function RenjiRDamageWaveTarget takes nothing returns nothing
     // Play before damage: lethal hits must not skip the impact effect or sound.
     call RenjiRPlaySweepHitEffect(target)
     call UnitDamageTargetBJ(caster,target,RenjiRDamage,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-    // The sweep turns clockwise, so its tangent is the segment angle minus 90 degrees.
+    // The 1.1c sweep turns counterclockwise, so its tangent is the segment angle plus 90 degrees.
     call RenjiRStartKnockback(caster,target,knockbackDirection)
     call AddSpecialEffectTargetUnitBJ("chest",target,"Effects\\RenjiRHitImpact.mdx")
     call DestroyEffect(bj_lastCreatedEffect)
@@ -46411,7 +46494,7 @@ function RenjiRWaveReturningCondition takes nothing returns boolean
 endfunction
 
 function RenjiRWaveFinishedCondition takes nothing returns boolean
-    return(RenjiRWaveTicks>=20)
+    return(RenjiRWaveTicks>=RENJI_R_ROTATION_STEPS)
 endfunction
 
 function RenjiRWaveCasterAliveCondition takes nothing returns boolean
@@ -46421,15 +46504,11 @@ endfunction
 function RenjiRUpdateWave takes nothing returns nothing
     local timer castTimer=RenjiRAutoFinishTimer
     if(((IsUnitAliveBJ(RenjiRCaster))))then
-        set RenjiRSegmentAngle=((RenjiRCastFacing+90.)-(18.*I2R(RenjiRWaveTicks)))
+        set RenjiRSegmentAngle=RenjiRCastFacing+RENJI_R_ROTATION_STEP*I2R(RenjiRWaveTicks)
         set RenjiRWaveSegmentIndex=1
         loop
             exitwhen RenjiRWaveSegmentIndex>19
-            if(((RenjiRWaveTicks<=5)))then
-                set RenjiRSegmentPosition=PG(RenjiRCastPosition,((13.*I2R(RenjiRWaveTicks))*I2R(RenjiRWaveSegmentIndex)),RenjiRSegmentAngle)
-            else
-                set RenjiRSegmentPosition=PG(RenjiRCastPosition,(65.*I2R(RenjiRWaveSegmentIndex)),RenjiRSegmentAngle)
-            endif
+            set RenjiRSegmentPosition=PG(RenjiRCastPosition,65.0*I2R(RenjiRWaveSegmentIndex),RenjiRSegmentAngle)
             call SetUnitPositionLoc(RenjiRSegments[RenjiRWaveSegmentIndex],RenjiRSegmentPosition)
             set RenjiRWaveTargets=e6(200.,RenjiRSegmentPosition,Condition(function RenjiRWaveDamageFilter))
             call ForGroupBJ(RenjiRWaveTargets,function RenjiRDamageWaveTarget)
@@ -46447,15 +46526,14 @@ function RenjiRUpdateWave takes nothing returns nothing
             call SetUnitFacingTimed(RenjiRSegments[RenjiRWaveSegmentIndex],(RenjiRSegmentAngle+.0),0)
             set RenjiRWaveSegmentIndex=RenjiRWaveSegmentIndex+1
         endloop
-        if(((RenjiRWaveTicks>=20)))then
+        // Match 1.1c: the hero and all segments finish at the original facing after 360 degrees.
+        call SetUnitFacingTimed(RenjiRCaster,RenjiRSegmentAngle,0.0)
+        if RenjiRWaveTicks>=RENJI_R_ROTATION_STEPS then
             call DisableTrigger(GetTriggeringTrigger())
         else
             set RenjiRWaveTicks=(RenjiRWaveTicks+1)
             if(((RenjiRWaveTicks==10)))then
                 call SetUnitTimeScalePercent(RenjiRCaster,.0)
-            endif
-            if(((RenjiRWaveTicks>=10)))then
-                call SetUnitPositionLocFacingBJ(RenjiRCaster,RenjiRCastPosition,(RenjiRSegmentAngle+45.))
             endif
         endif
     else
@@ -46468,16 +46546,16 @@ function InitRenjiRWaveTrigger takes nothing returns nothing
     set RenjiRKnockbackState=InitHashtable()
     set RenjiRWaveTrigger=CreateTrigger()
     call DisableTrigger(RenjiRWaveTrigger)
-    call TriggerRegisterTimerEventPeriodic(RenjiRWaveTrigger,.06)
+    call TriggerRegisterTimerEventPeriodic(RenjiRWaveTrigger,.03)
     call TriggerAddAction(RenjiRWaveTrigger,function RenjiRUpdateWave)
 endfunction
 
 function RenjiRSpreadLandingCondition takes nothing returns boolean
-    return(RenjiRSpreadTicks==30)
+    return(RenjiRSpreadTicks==25)
 endfunction
 
 function RenjiRSpreadFinishedCondition takes nothing returns boolean
-    return(RenjiRSpreadTicks>=60)
+    return(RenjiRSpreadTicks>=50)
 endfunction
 
 function RenjiRSpreadCasterAliveCondition takes nothing returns boolean
@@ -46485,21 +46563,26 @@ function RenjiRSpreadCasterAliveCondition takes nothing returns boolean
 endfunction
 
 function RenjiRUpdateSpread takes nothing returns nothing
-    if(((IsUnitAliveBJ(RenjiRCaster))))then
-        set RenjiRSpreadTicks=(RenjiRSpreadTicks+1)
+    local real flightProgress=0.0
+    local real segmentX=0.0
+    local real segmentY=0.0
+    if IsUnitAliveBJ(RenjiRCaster) then
+        set RenjiRSpreadTicks=RenjiRSpreadTicks+1
+        set flightProgress=I2R(RenjiRSpreadTicks)/50.0
         set RenjiRSpreadSegmentIndex=1
         loop
             exitwhen RenjiRSpreadSegmentIndex>19
-            set RenjiRSegmentPosition=PG(GetUnitLoc(RenjiRSegments[RenjiRSpreadSegmentIndex]),20.,GetUnitFacing(RenjiRSegments[RenjiRSpreadSegmentIndex]))
-            if(((RenjiRSpreadTicks==30)))then
-                call SetUnitFlyHeight(RenjiRSegments[RenjiRSpreadSegmentIndex],60.,1000.)
+            if GetUnitTypeId(RenjiRSegments[RenjiRSpreadSegmentIndex])!=0 then
+                set segmentX=RenjiRSpreadStartX[RenjiRSpreadSegmentIndex]+(RenjiRSpreadTargetX[RenjiRSpreadSegmentIndex]-RenjiRSpreadStartX[RenjiRSpreadSegmentIndex])*flightProgress
+                set segmentY=RenjiRSpreadStartY[RenjiRSpreadSegmentIndex]+(RenjiRSpreadTargetY[RenjiRSpreadSegmentIndex]-RenjiRSpreadStartY[RenjiRSpreadSegmentIndex])*flightProgress
+                if RenjiRSpreadTicks==25 then
+                    call SetUnitFlyHeight(RenjiRSegments[RenjiRSpreadSegmentIndex],60.0,1800.0)
+                endif
+                call SetUnitPosition(RenjiRSegments[RenjiRSpreadSegmentIndex],segmentX,segmentY)
             endif
-            call SetUnitPositionLocFacingBJ(RenjiRSegments[RenjiRSpreadSegmentIndex],RenjiRSegmentPosition,GetUnitFacing(RenjiRSegments[RenjiRSpreadSegmentIndex]))
-            call RemoveLocation(RenjiRSegmentPosition)
-            set RenjiRSegmentPosition=null
             set RenjiRSpreadSegmentIndex=RenjiRSpreadSegmentIndex+1
         endloop
-        if(((RenjiRSpreadTicks>=60)))then
+        if RenjiRSpreadTicks>=50 then
             call DisableTrigger(GetTriggeringTrigger())
             call RenjiRSetSegmentSlow(true)
         endif
@@ -46511,7 +46594,7 @@ endfunction
 function InitRenjiRSpreadTrigger takes nothing returns nothing
     set RenjiRSpreadTrigger=CreateTrigger()
     call DisableTrigger(RenjiRSpreadTrigger)
-    call TriggerRegisterTimerEventPeriodic(RenjiRSpreadTrigger,.03)
+    call TriggerRegisterTimerEventPeriodic(RenjiRSpreadTrigger,.02)
     call TriggerAddAction(RenjiRSpreadTrigger,function RenjiRUpdateSpread)
 endfunction
 

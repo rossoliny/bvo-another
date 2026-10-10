@@ -38,13 +38,15 @@ Renji
 
 	[R]
 		Changes relative to the original Unryze 1.1a:
+		Rotation follows 1.1c: the fully extended snake starts in front of Renji, turns 360 degrees in 10-degree steps every 0.03 seconds, and finishes at the original facing. The current 19 segments and tapered tail are retained for compatibility with T.
+		Segments then land across a 1500-unit-wide area in front of the cast position, up to 1.3 snake lengths (1605.5 units) forward. Shuffled width slots and depth variation prevent a straight-line layout. Airborne scatter is shortened from the original 1.8 seconds to 1 second; landing points are clipped at the playable map border.
 		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. Bankai Dismissal has a 75-second cooldown, matching the main R, with no initial delay before it becomes available.
 		Manual return does not stop movement or interrupt the hero's current actions.
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
 		Initial sweep hits use the WarStomp effect and sound from Ikkaku's Final Madness, including lethal hits. The shared Stampede hit effect is silent for this sweep; its visuals are preserved.
-		Enemies hit by the initial rotation are now stunned for 1 second and pushed clockwise along the sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
+		Enemies hit by the initial rotation are now stunned for 1 second and pushed along the counterclockwise sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
 		After scattering, segments slow enemy movement by 50% within 200 AoE. Overlapping segment auras do not stack, and the aura is disabled during T.
 		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and the explosion sound from Renji's Higa Zekko once for the whole return.
 
