@@ -16,6 +16,11 @@ HERO CHANGES
 
 _____
 Renji
+	[Q]
+		Changes relative to the original Unryze 1.1a:
+		Maximum weapon length increased from 720 to 800. The hit radius around each segment remains 100; at full extension the outer hit boundary reaches 900 instead of 820, providing a 100-range margin beyond the farthest selected point.
+		The swing direction is fixed toward the selected point when cast. Visual segments and damage checks use the same coordinates. Damage, mana cost and cooldown are preserved.
+
 	[E]
 		Changes relative to the original Unryze 1.1a:
 		E restrictions on attacks and abilities end 1 second after casting, regardless of a hit or flight cancellation. In the original, recovery occurred 2 seconds after E ended.
@@ -29,6 +34,7 @@ Renji
 	[R]
 		Changes relative to the original Unryze 1.1a:
 		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. The return action has a 1-second cooldown, with no initial delay before it becomes available.
+		Manual return does not stop movement or interrupt the hero's current actions.
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
