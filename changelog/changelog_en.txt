@@ -18,7 +18,7 @@ _____
 Renji
 	[General]
 		Changes relative to the original Unryze 1.1a:
-		Spell cast point reduced from 0.4 to 0.2 seconds. Normal abilities begin taking effect sooner.
+		Spell cast point reduced from 0.4 to 0.1 seconds, 25% of the original value. Normal abilities begin taking effect sooner.
 
 	[Q]
 		Changes relative to the original Unryze 1.1a:
@@ -45,8 +45,8 @@ Renji
 
 	[T]
 		Changes relative to the original Unryze 1.1a:
-		Alongside the normal final shot, a second projectile travels from the head back through the snake segments to Renji. The head does not turn for this shot.
-		Each projectile deals full final damage once to each enemy it hits; an enemy on both paths can take damage from both. Segments remain until both projectiles finish. Normal shot damage, mana cost and cooldown are preserved.
+		One final projectile starts at Renji, follows the snake segments from tail to head, then continues forward along the existing mouth-shot trajectory. In the original, the projectile was fired directly from the snake's mouth. The head direction is not changed for the shot.
+		Each enemy hit takes full final damage once during the entire flight. Segments remain until the shot finishes. Speed, hit radius, final damage, mana cost and cooldown are preserved.
 
 _______________
 Kurosaki Ichigo
