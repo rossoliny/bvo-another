@@ -43,11 +43,6 @@ Renji
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
-	[T]
-		Changes relative to the original Unryze 1.1a:
-		One final projectile starts at Renji, follows the snake segments from tail to head, then continues forward along the existing mouth-shot trajectory. In the original, the projectile was fired directly from the snake's mouth. The head direction is not changed for the shot.
-		Each enemy hit takes full final damage once during the entire flight. Segments remain until the shot finishes. Speed, hit radius, final damage, mana cost and cooldown are preserved.
-
 _______________
 Kurosaki Ichigo
 	[T]

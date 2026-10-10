@@ -1619,7 +1619,6 @@ globals
     unit RenjiTCaster=null
     unit RenjiTTarget=null
     unit RenjiTBlastProjectile=null
-    integer RenjiTBlastSegmentIndex=0
     location RenjiRCastPosition=null
     location RenjiRSegmentPosition=null
     location RenjiTCastPosition=null
@@ -46448,35 +46447,17 @@ function RenjiTKillRequirement takes nothing returns nothing
 endfunction
 
 function RenjiTStartBlast takes nothing returns nothing
-    local integer segmentIndex=1
-    local unit waypoint=null
-    local real previousX=GetUnitX(RenjiTCaster)
-    local real previousY=GetUnitY(RenjiTCaster)
-    local real offsetX=0.0
-    local real offsetY=0.0
-    local real pathLength=1000.0
-    local real initialDirection=bj_RADTODEG*Atan2(GetUnitY(RenjiRSegments[1])-previousY,GetUnitX(RenjiRSegments[1])-previousX)
-    // One continuous shot: Renji, tail-to-head body segments, then the original forward line.
-    loop
-        exitwhen segmentIndex>19
-        set waypoint=RenjiRSegments[segmentIndex]
-        set offsetX=GetUnitX(waypoint)-previousX
-        set offsetY=GetUnitY(waypoint)-previousY
-        set pathLength=pathLength+SquareRoot(offsetX*offsetX+offsetY*offsetY)
-        set previousX=GetUnitX(waypoint)
-        set previousY=GetUnitY(waypoint)
-        set segmentIndex=segmentIndex+1
-    endloop
+    local real headX=GetUnitX(RenjiRSegments[19])
+    local real headY=GetUnitY(RenjiRSegments[19])
+    local real directionRadians=RenjiTDirection*bj_DEGTORAD
+    // Original Unryze 1.1a shot: start 100 ahead of the mouth and fly straight toward 1000.
     call GroupClear(RenjiTBlastHitUnits)
-    set RenjiTBlastSegmentIndex=1
-    set RenjiTBlastDestination=Location(previousX+1000.0*Cos(RenjiTDirection*bj_DEGTORAD),previousY+1000.0*Sin(RenjiTDirection*bj_DEGTORAD))
-    set RenjiTBlastProjectile=CreateUnit(GetOwningPlayer(RenjiTCaster),'h01P',GetUnitX(RenjiTCaster),GetUnitY(RenjiTCaster),initialDirection)
+    set RenjiTBlastDestination=Location(headX+1000.0*Cos(directionRadians),headY+1000.0*Sin(directionRadians))
+    set RenjiTBlastProjectile=CreateUnit(GetOwningPlayer(RenjiTCaster),'h01P',headX+100.0*Cos(directionRadians),headY+100.0*Sin(directionRadians),RenjiTDirection)
     call SetUnitScalePercent(RenjiTBlastProjectile,200.,150.,250.)
     call SetUnitFlyHeight(RenjiTBlastProjectile,200.,0.0)
     call SetUnitPathing(RenjiTBlastProjectile,false)
-    // Preserve 50 units per 0.03 seconds and allow enough lifetime for the whole route.
-    call UnitApplyTimedLifeBJ(pathLength/50.0*0.03+1.0,'BTLF',RenjiTBlastProjectile)
-    set waypoint=null
+    call UnitApplyTimedLifeBJ(3.0,'BTLF',RenjiTBlastProjectile)
 endfunction
 
 function RenjiTCast takes nothing returns nothing
@@ -46565,7 +46546,6 @@ function RenjiTCast takes nothing returns nothing
             call KillUnit(RenjiTBlastProjectile)
         endif
         set RenjiTBlastProjectile=null
-        set RenjiTBlastSegmentIndex=0
         call RemoveLocation(RenjiTBlastDestination)
         set RenjiTBlastDestination=null
         call GroupClear(RenjiTBlastHitUnits)
@@ -46864,75 +46844,32 @@ function d0e takes nothing returns boolean
 endfunction
 
 function RenjiTUpdateBlast takes nothing returns nothing
-    local real remainingStep=50.0
-    local real projectileX=GetUnitX(RenjiTBlastProjectile)
-    local real projectileY=GetUnitY(RenjiTBlastProjectile)
-    local real nextX=0.0
-    local real nextY=0.0
-    local real offsetX=0.0
-    local real offsetY=0.0
-    local real distance=0.0
-    local boolean blastFinished=false
-    local unit waypoint=null
-    local location impactPosition=null
+    local location previousPosition=null
+    local location nextPosition=null
     local group hitCandidates=null
     if not IsUnitAliveBJ(RenjiTCaster) or not IsUnitAliveBJ(RenjiTBlastProjectile) then
         call DisableTrigger(GetTriggeringTrigger())
         return
     endif
-    // Consume a single tick's movement budget across short or coincident body segments.
-    loop
-        exitwhen remainingStep<=0.0 or RenjiTBlastSegmentIndex>19
-        set waypoint=RenjiRSegments[RenjiTBlastSegmentIndex]
-        if GetUnitTypeId(waypoint)==0 then
-            call DisableTrigger(GetTriggeringTrigger())
-            set waypoint=null
-            return
-        endif
-        set offsetX=GetUnitX(waypoint)-projectileX
-        set offsetY=GetUnitY(waypoint)-projectileY
-        set distance=SquareRoot(offsetX*offsetX+offsetY*offsetY)
-        if distance>0.0 then
-            call SetUnitFacing(RenjiTBlastProjectile,bj_RADTODEG*Atan2(offsetY,offsetX))
-        endif
-        if distance<=remainingStep then
-            set projectileX=GetUnitX(waypoint)
-            set projectileY=GetUnitY(waypoint)
-            set remainingStep=remainingStep-distance
-            set RenjiTBlastSegmentIndex=RenjiTBlastSegmentIndex+1
-        else
-            set projectileX=projectileX+offsetX/distance*remainingStep
-            set projectileY=projectileY+offsetY/distance*remainingStep
-            set remainingStep=0.0
-        endif
-    endloop
-    if RenjiTBlastSegmentIndex>19 and remainingStep>0.0 then
-        // Continue from the head without replacing or teleporting the projectile.
-        set nextX=projectileX+remainingStep*Cos(RenjiTDirection*bj_DEGTORAD)
-        set nextY=projectileY+remainingStep*Sin(RenjiTDirection*bj_DEGTORAD)
-        set offsetX=GetLocationX(RenjiTBlastDestination)-nextX
-        set offsetY=GetLocationY(RenjiTBlastDestination)-nextY
-        if SquareRoot(offsetX*offsetX+offsetY*offsetY)<=60.0 then
-            set blastFinished=true
-        else
-            set projectileX=nextX
-            set projectileY=nextY
-        endif
-        call SetUnitFacing(RenjiTBlastProjectile,RenjiTDirection)
+    // Preserve the original straight flight, 50 units per tick and 60-unit end threshold.
+    set previousPosition=GetUnitLoc(RenjiTBlastProjectile)
+    set nextPosition=PG(previousPosition,50.,RenjiTDirection)
+    if DistanceBetweenPoints(nextPosition,RenjiTBlastDestination)<=60. then
+        call DisableTrigger(GetTriggeringTrigger())
+    else
+        call SetUnitPositionLocFacingBJ(RenjiTBlastProjectile,nextPosition,RenjiTDirection)
+        set hitCandidates=e6(350.,nextPosition,Condition(function RenjiTBlastDamageFilter))
+        call ForGroupBJ(hitCandidates,function RenjiTDamageBlastUnit)
+        call DestroyGroup(hitCandidates)
+        call UG(350.,nextPosition,function RenjiTDestroyBlastDestructable)
     endif
-    call SetUnitPosition(RenjiTBlastProjectile,projectileX,projectileY)
-    set impactPosition=GetUnitLoc(RenjiTBlastProjectile)
-    // The same hit group covers the entire body path and forward continuation.
-    set hitCandidates=e6(350.,impactPosition,Condition(function RenjiTBlastDamageFilter))
-    call ForGroupBJ(hitCandidates,function RenjiTDamageBlastUnit)
-    call DestroyGroup(hitCandidates)
-    call UG(350.,impactPosition,function RenjiTDestroyBlastDestructable)
-    call RemoveLocation(impactPosition)
-    if blastFinished or not IsUnitAliveBJ(RenjiTCaster) then
+    call RemoveLocation(previousPosition)
+    call RemoveLocation(nextPosition)
+    if not IsUnitAliveBJ(RenjiTCaster) or not IsUnitAliveBJ(RenjiTBlastProjectile) then
         call DisableTrigger(GetTriggeringTrigger())
     endif
-    set waypoint=null
-    set impactPosition=null
+    set previousPosition=null
+    set nextPosition=null
     set hitCandidates=null
 endfunction
 
