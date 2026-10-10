@@ -46104,6 +46104,9 @@ function RenjiRCast takes nothing returns nothing
     call PauseUnit(RenjiRCaster,false)
     call SetUnitTimeScalePercent(RenjiRCaster,100.)
     call ResetUnitAnimation(RenjiRCaster)
+    // Allow returning the segments as soon as movement is restored, even during their flight.
+    set RenjiRReturnAvailable=true
+    call UnitAddAbility(caster,RENJI_R_RETURN_ABILITY_ID)
     set RenjiRDamage=.0
     set RenjiRSegmentAngle=.0
     set RenjiRCastFacing=.0
@@ -46135,9 +46138,7 @@ function RenjiRCast takes nothing returns nothing
         set castTimer=null
         return
     endif
-    // No initial delay: the free return button appears at the ground phase.
-    set RenjiRReturnAvailable=true
-    call UnitAddAbility(caster,RENJI_R_RETURN_ABILITY_ID)
+    // Keep automatic return six seconds after scattering; manual return can happen earlier.
     call TimerStart(castTimer,RENJI_R_RETURN_WINDOW,false,function RenjiRAutoFinish)
     set caster=null
     set castTimer=null

@@ -28,7 +28,7 @@ Renji
 
 	[R]
 		Changes relative to the original Unryze 1.1a:
-		As soon as the segments have scattered, pressing R again returns them for free and ends R restrictions on attacks, Q and E. The return action has a 1-second cooldown, with no initial delay before it becomes available.
+		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. The return action has a 1-second cooldown, with no initial delay before it becomes available.
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
