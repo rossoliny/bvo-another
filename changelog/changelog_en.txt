@@ -30,9 +30,10 @@ Renji
 		E restrictions on attacks and abilities end 1 second after casting, regardless of a hit or flight cancellation. In the original, recovery occurred 2 seconds after E ended.
 		Maximum projectile lifetime increased from 10 to 20 seconds.
 		Instead of constant pursuit speed, projectiles gain 5% of their initial speed every second: +50% after 10 seconds, +100% after 20 seconds.
-		Each E flight stores its own target and projectiles. An old flight does not affect subsequent E, Q or R casts; an unreachable target ends the flight at the time limit, and dead or missing targets/projectiles trigger cleanup.
+		Each E flight stores its own target and projectiles. An old flight does not affect subsequent E, Q or R casts; an unreachable target ends the flight at the time limit, while removed or hidden targets and dead or removed projectiles trigger cleanup.
+		Unlike the original, target death alone no longer cancels E: projectiles can reach an existing corpse and play the normal impact effect.
 
-		Renji's death no longer cancels E: projectiles keep pursuing a living target until impact or the 20-second limit. Fully removing the hero still ends the flight.
+		Renji's death no longer cancels E: projectiles keep pursuing the target until impact or the 20-second limit. Fully removing the hero still ends the flight.
 		Unlike the original, E does not block R, including the first second after casting. E recovery does not cancel active R/T restrictions.
 
 	[R]
@@ -41,6 +42,11 @@ Renji
 		Manual return does not stop movement or interrupt the hero's current actions.
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
+
+	[T]
+		Changes relative to the original Unryze 1.1a:
+		Alongside the normal final shot, a second projectile travels from the head back through the snake segments to Renji. The head does not turn for this shot.
+		Each projectile deals full final damage once to each enemy it hits; an enemy on both paths can take damage from both. Segments remain until both projectiles finish. Normal shot damage, mana cost and cooldown are preserved.
 
 _______________
 Kurosaki Ichigo
