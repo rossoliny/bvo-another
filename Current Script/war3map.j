@@ -45263,16 +45263,11 @@ function RenjiREndKnockback takes nothing returns nothing
     set durationTrigger=null
 endfunction
 
-function RenjiRPlaySweepHitSound takes unit target returns nothing
-    local sound hitSound=Default_Sound_Settings(CreateSound("Abilities\\Spells\\Human\\Thunderclap\\ThunderclapCaster.wav",false,true,true,10,10,"DefaultEAXON"))
-    // A separate, louder impact at the victim marks the stun and knockback without cutting other hits.
-    call SetSoundVolume(hitSound,127)
-    call SetSoundDistances(hitSound,0.0,1800.0)
-    call SetSoundDistanceCutoff(hitSound,1500.0)
-    call SetSoundPosition(hitSound,GetUnitX(target),GetUnitY(target),0.0)
-    call StartSound(hitSound)
-    call KillSoundWhenDone(hitSound)
-    set hitSound=null
+function RenjiRPlaySweepHitEffect takes unit target returns nothing
+    // Use the same native impact effect and embedded sound as Ikkaku's Final Madness.
+    local effect hitEffect=AddSpecialEffect("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl",GetUnitX(target),GetUnitY(target))
+    call DestroyEffect(hitEffect)
+    set hitEffect=null
 endfunction
 
 function RenjiRStartKnockback takes unit caster,unit target,real direction returns nothing
@@ -45288,7 +45283,6 @@ function RenjiRStartKnockback takes unit caster,unit target,real direction retur
     call UnitAddAbility(stunCaster,RENJI_R_STUN_ABILITY_ID)
     call IssueTargetOrderById(stunCaster,852095,target)
     call UnitApplyTimedLifeBJ(1.0,'BTLF',stunCaster)
-    call RenjiRPlaySweepHitSound(target)
     set movementTimer=CreateTimer()
     set movementKey=GetHandleId(movementTimer)
     call SaveUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_KEY,caster)
@@ -45321,21 +45315,13 @@ function RenjiRSetSegmentSlow takes boolean enabled returns nothing
     endloop
 endfunction
 
-function RenjiRPlayExplosionSound takes unit caster returns nothing
-    local sound explosionSound=Default_Sound_Settings(CreateSound("Abilities\\Spells\\Human\\Thunderclap\\ThunderclapCaster.wav",false,true,true,10,10,"DefaultEAXON"))
-    // Play one impact for the whole return, rather than nineteen overlapping sounds.
-    call SetSoundPosition(explosionSound,GetUnitX(caster),GetUnitY(caster),0.0)
-    call StartSound(explosionSound)
-    call KillSoundWhenDone(explosionSound)
-    set explosionSound=null
-endfunction
-
 function RenjiRFinish takes unit caster,boolean resetCasterMotion,boolean explodeSegments returns nothing
     local integer segmentIndex=1
     local group requirements=null
     local group explosionTargets=null
     local unit target=null
     local real explosionDamage=0.0
+    local string explosionModel="Effects\\RenjiRExplosionWithSound.mdx"
     if caster==null or caster!=RenjiRCaster or RenjiTActive or RenjiRFinishing then
         return
     endif
@@ -45351,13 +45337,14 @@ function RenjiRFinish takes unit caster,boolean resetCasterMotion,boolean explod
     if explodeSegments then
         set explosionDamage=RENJI_R_EXPLOSION_STR_MULTIPLIER*I2R(GetHeroStr(caster,true))
         set explosionTargets=CreateGroup()
-        call RenjiRPlayExplosionSound(caster)
     endif
     loop
         exitwhen segmentIndex>19
         if RenjiRSegments[segmentIndex]!=null then
             if explodeSegments then
-                call DestroyEffect(AddSpecialEffect("Effects\\RenjiRExplosion.mdx",GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex])))
+                call DestroyEffect(AddSpecialEffect(explosionModel,GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex])))
+                // Play E's explosion sound once; the remaining segment effects stay silent.
+                set explosionModel="Effects\\RenjiRExplosion.mdx"
                 call GroupEnumUnitsInRange(explosionTargets,GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex]),RENJI_R_EXPLOSION_RADIUS,null)
                 loop
                     set target=FirstOfGroup(explosionTargets)
@@ -46398,10 +46385,12 @@ function RenjiRDamageWaveTarget takes nothing returns nothing
         return
     endif
     call GroupAddUnit(RenjiRHitUnits,target)
+    // Play before damage: lethal hits must not skip the impact effect or sound.
+    call RenjiRPlaySweepHitEffect(target)
     call UnitDamageTargetBJ(caster,target,RenjiRDamage,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
     // The sweep turns clockwise, so its tangent is the segment angle minus 90 degrees.
     call RenjiRStartKnockback(caster,target,knockbackDirection)
-    call AddSpecialEffectTargetUnitBJ("chest",target,"Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl")
+    call AddSpecialEffectTargetUnitBJ("chest",target,"Effects\\RenjiRHitImpact.mdx")
     call DestroyEffect(bj_lastCreatedEffect)
     call AddSpecialEffectTargetUnitBJ("origin",target,"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
     call DestroyEffect(bj_lastCreatedEffect)

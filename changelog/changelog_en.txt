@@ -38,20 +38,21 @@ Renji
 
 	[R]
 		Changes relative to the original Unryze 1.1a:
-		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. The return action has a 1-second cooldown, with no initial delay before it becomes available.
+		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. Bankai Dismissal has a 75-second cooldown, matching the main R, with no initial delay before it becomes available.
 		Manual return does not stop movement or interrupt the hero's current actions.
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
-		Sweep hits have a separate loud Thunderclap impact sound to indicate the stun and knockback.
+		Initial sweep hits use the WarStomp effect and sound from Ikkaku's Final Madness, including lethal hits. The shared Stampede hit effect is silent for this sweep; its visuals are preserved.
 		Enemies hit by the initial rotation are now stunned for 1 second and pushed clockwise along the sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
 		After scattering, segments slow enemy movement by 50% within 200 AoE. Overlapping segment auras do not stack, and the aura is disabled during T.
-		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and one impact sound for the whole return.
+		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and the explosion sound from Renji's Higa Zekko once for the whole return.
 
 	[Descriptions]
 		Q: original 1.1a text with range 800; cast timing is omitted from the tooltip.
 		E: shortened original text with correct Strength scaling, 250 mana and recovery after 1 second; flight details are omitted.
-		R: original 1.1a text with a 1-second stun and knockback. A short return and explosion description is on the R return button.
+		R: original 1.1a text with a 1-second stun, knockback and 50% slow near the segments. The return button is named Bankai Dismissal and lists damage per segment, radius and a 75-second cooldown.
+		References to other abilities use their names: Howl Zabimaru, Higa Zekko and Hikotsu Taiho.
 		T: mechanics and descriptions match the original 1.1a; the signature is removed.
 
 _______________
