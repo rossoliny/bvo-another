@@ -45263,6 +45263,18 @@ function RenjiREndKnockback takes nothing returns nothing
     set durationTrigger=null
 endfunction
 
+function RenjiRPlaySweepHitSound takes unit target returns nothing
+    local sound hitSound=Default_Sound_Settings(CreateSound("Abilities\\Spells\\Human\\Thunderclap\\ThunderclapCaster.wav",false,true,true,10,10,"DefaultEAXON"))
+    // A separate, louder impact at the victim marks the stun and knockback without cutting other hits.
+    call SetSoundVolume(hitSound,127)
+    call SetSoundDistances(hitSound,0.0,1800.0)
+    call SetSoundDistanceCutoff(hitSound,1500.0)
+    call SetSoundPosition(hitSound,GetUnitX(target),GetUnitY(target),0.0)
+    call StartSound(hitSound)
+    call KillSoundWhenDone(hitSound)
+    set hitSound=null
+endfunction
+
 function RenjiRStartKnockback takes unit caster,unit target,real direction returns nothing
     local unit stunCaster=null
     local timer movementTimer=null
@@ -45276,6 +45288,7 @@ function RenjiRStartKnockback takes unit caster,unit target,real direction retur
     call UnitAddAbility(stunCaster,RENJI_R_STUN_ABILITY_ID)
     call IssueTargetOrderById(stunCaster,852095,target)
     call UnitApplyTimedLifeBJ(1.0,'BTLF',stunCaster)
+    call RenjiRPlaySweepHitSound(target)
     set movementTimer=CreateTimer()
     set movementKey=GetHandleId(movementTimer)
     call SaveUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_KEY,caster)
