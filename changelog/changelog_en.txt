@@ -16,6 +16,10 @@ HERO CHANGES
 
 _____
 Renji
+	[General]
+		Changes relative to the original Unryze 1.1a:
+		Spell cast point reduced from 0.4 to 0.2 seconds. Normal abilities begin taking effect sooner.
+
 	[Q]
 		Changes relative to the original Unryze 1.1a:
 		Maximum weapon length increased from 720 to 800. The hit radius around each segment remains 100; at full extension the outer hit boundary reaches 900 instead of 820, providing a 100-range margin beyond the farthest selected point.
