@@ -23,6 +23,15 @@ Renji
 		Instead of constant pursuit speed, projectiles gain 5% of their initial speed every second: +50% after 10 seconds, +100% after 20 seconds.
 		Each E flight stores its own target and projectiles. An old flight does not affect subsequent E, Q or R casts; an unreachable target ends the flight at the time limit, and dead or missing targets/projectiles trigger cleanup.
 
+		Renji's death no longer cancels E: projectiles keep pursuing a living target until impact or the 20-second limit. Fully removing the hero still ends the flight.
+		Unlike the original, E does not block R, including the first second after casting. E recovery does not cancel active R/T restrictions.
+
+	[R]
+		Changes relative to the original Unryze 1.1a:
+		As soon as the segments have scattered, pressing R again returns them for free and ends R restrictions on attacks, Q and E. The return action has a 1-second cooldown, with no initial delay before it becomes available.
+		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
+		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
+
 _______________
 Kurosaki Ichigo
 	[T]
