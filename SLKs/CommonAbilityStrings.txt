@@ -1778,3 +1778,9 @@ TargetArt=Environment\UndeadBuildingFire\UndeadSmallBuildingFire2.mdl,Environmen
 Targetattach=sprite,first
 Targetattach1=sprite,fourth
 Targetattachcount=2
+[B0R2]
+Buffart=ReplaceableTextures\CommandButtons\BTNRenjiR.blp
+Bufftip=Hihio Zabimaru
+Buffubertip=This unit is near a scattered Hihio Zabimaru segment; its movement speed is reduced by 50%.
+TargetArt=
+Spelldetail=0

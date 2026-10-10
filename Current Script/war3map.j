@@ -1650,8 +1650,23 @@ globals
     integer array RenjiTSegmentMoving
     constant integer RENJI_R_RETURN_ABILITY_ID='A0R0'
     constant real RENJI_R_RETURN_WINDOW=6.0
+    constant integer RENJI_R_STUN_ABILITY_ID='A0R1'
+    constant integer RENJI_R_SLOW_ABILITY_ID='A0R2'
+    constant real RENJI_R_KNOCKBACK_PERIOD=0.03
+    constant real RENJI_R_KNOCKBACK_STEP=12.0
+    constant real RENJI_R_KNOCKBACK_WAIT=0.2
+    constant real RENJI_R_EXPLOSION_RADIUS=200.0
+    constant real RENJI_R_EXPLOSION_STR_MULTIPLIER=7.5
+    constant integer RENJI_R_KNOCKBACK_CASTER_KEY=0
+    constant integer RENJI_R_KNOCKBACK_TARGET_KEY=1
+    constant integer RENJI_R_KNOCKBACK_DIRECTION_KEY=2
+    constant integer RENJI_R_KNOCKBACK_CASTER_X_KEY=3
+    constant integer RENJI_R_KNOCKBACK_CASTER_Y_KEY=4
+    constant integer RENJI_R_KNOCKBACK_TIMER_KEY=0
+    hashtable RenjiRKnockbackState=null
     timer RenjiRAutoFinishTimer=null
     boolean RenjiRReturnAvailable=false
+    boolean RenjiRFinishing=false
     trigger RenjiRReturnTrigger=null
     trigger RenjiRCastTrigger=null
     trigger RenjiRWaveTrigger=null
@@ -45200,27 +45215,157 @@ function RenjiRRemoveTRequirement takes nothing returns nothing
     call KillUnit(GetEnumUnit())
 endfunction
 
-function RenjiRFinish takes unit caster,boolean resetCasterMotion returns nothing
-    local integer segmentIndex=1
-    local group requirements=null
-    if caster==null or caster!=RenjiRCaster or RenjiTActive then
+function RenjiRKnockbackAreaAllowsUnit takes unit target returns boolean
+    // Use the same allowed map regions as Sanji's Party Table knockback.
+    return RectContainsUnit(sn,target) or RectContainsUnit(An,target) or RectContainsUnit(jo,target) or RectContainsUnit(ko,target) or RectContainsUnit(mo,target) or RectContainsUnit(no,target) or RectContainsUnit(oo,target) or RectContainsUnit(po,target) or RectContainsUnit(qo,target) or RectContainsUnit(ro,target) or RectContainsUnit(so,target) or RectContainsUnit(Ro,target) or RectContainsUnit(So,target) or RectContainsUnit(vo,target) or RectContainsUnit(xo,target)
+endfunction
+
+function RenjiRDestroyKnockbackTree takes nothing returns nothing
+    call KillDestructable(GetEnumDestructable())
+endfunction
+
+function RenjiRUpdateKnockback takes nothing returns nothing
+    local timer movementTimer=GetExpiredTimer()
+    local integer movementKey=GetHandleId(movementTimer)
+    local unit caster=LoadUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_KEY)
+    local unit target=LoadUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_TARGET_KEY)
+    local real direction=LoadReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_DIRECTION_KEY)*bj_DEGTORAD
+    local location nextPosition=null
+    if not IsUnitAliveBJ(caster) or not IsUnitAliveBJ(target) then
+        call PauseTimer(movementTimer)
+    elseif RenjiRKnockbackAreaAllowsUnit(target) then
+        set nextPosition=Location(GetUnitX(target)+RENJI_R_KNOCKBACK_STEP*Cos(direction),GetUnitY(target)+RENJI_R_KNOCKBACK_STEP*Sin(direction))
+        // Preserve Sanji's pathing-aware movement, facing and tree-clearing radius.
+        call SetUnitPositionLoc(target,nextPosition)
+        call SetUnitFacingTimed(target,bj_RADTODEG*Atan2(LoadReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_Y_KEY)-GetUnitY(target),LoadReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_X_KEY)-GetUnitX(target)),0.0)
+        call UG(200.0,nextPosition,function RenjiRDestroyKnockbackTree)
+        call RemoveLocation(nextPosition)
+    endif
+    set caster=null
+    set target=null
+    set nextPosition=null
+    set movementTimer=null
+endfunction
+
+function RenjiREndKnockback takes nothing returns nothing
+    local trigger durationTrigger=GetTriggeringTrigger()
+    local integer durationKey=GetHandleId(durationTrigger)
+    local timer movementTimer=LoadTimerHandle(RenjiRKnockbackState,durationKey,RENJI_R_KNOCKBACK_TIMER_KEY)
+    // Preserve both 0.2-second waits from Sanji Q; never sleep inside the damage enumeration.
+    call TriggerSleepAction(RENJI_R_KNOCKBACK_WAIT)
+    call TriggerSleepAction(RENJI_R_KNOCKBACK_WAIT)
+    call PauseTimer(movementTimer)
+    call FlushChildHashtable(RenjiRKnockbackState,GetHandleId(movementTimer))
+    call DestroyTimer(movementTimer)
+    call FlushChildHashtable(RenjiRKnockbackState,durationKey)
+    call DestroyTrigger(durationTrigger)
+    set movementTimer=null
+    set durationTrigger=null
+endfunction
+
+function RenjiRStartKnockback takes unit caster,unit target,real direction returns nothing
+    local unit stunCaster=null
+    local timer movementTimer=null
+    local trigger durationTrigger=null
+    local integer movementKey=0
+    // Sanji Q excludes magic-immune and already paused targets from its knockback.
+    if not IsUnitAliveBJ(caster) or not IsUnitAliveBJ(target) or IsUnitPaused(target) or IsUnitType(target,UNIT_TYPE_MAGIC_IMMUNE) then
         return
     endif
+    set stunCaster=CreateUnit(GetOwningPlayer(caster),'u002',GetUnitX(target),GetUnitY(target),bj_UNIT_FACING)
+    call UnitAddAbility(stunCaster,RENJI_R_STUN_ABILITY_ID)
+    call IssueTargetOrderById(stunCaster,852095,target)
+    call UnitApplyTimedLifeBJ(1.0,'BTLF',stunCaster)
+    set movementTimer=CreateTimer()
+    set movementKey=GetHandleId(movementTimer)
+    call SaveUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_KEY,caster)
+    call SaveUnitHandle(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_TARGET_KEY,target)
+    call SaveReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_DIRECTION_KEY,direction)
+    call SaveReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_X_KEY,GetUnitX(caster))
+    call SaveReal(RenjiRKnockbackState,movementKey,RENJI_R_KNOCKBACK_CASTER_Y_KEY,GetUnitY(caster))
+    call TimerStart(movementTimer,RENJI_R_KNOCKBACK_PERIOD,true,function RenjiRUpdateKnockback)
+    set durationTrigger=CreateTrigger()
+    call SaveTimerHandle(RenjiRKnockbackState,GetHandleId(durationTrigger),RENJI_R_KNOCKBACK_TIMER_KEY,movementTimer)
+    call TriggerAddAction(durationTrigger,function RenjiREndKnockback)
+    call TriggerExecute(durationTrigger)
+    set stunCaster=null
+    set movementTimer=null
+    set durationTrigger=null
+endfunction
+
+function RenjiRSetSegmentSlow takes boolean enabled returns nothing
+    local integer segmentIndex=1
+    loop
+        exitwhen segmentIndex>19
+        if GetUnitTypeId(RenjiRSegments[segmentIndex])!=0 then
+            if enabled and not RenjiTActive then
+                call UnitAddAbility(RenjiRSegments[segmentIndex],RENJI_R_SLOW_ABILITY_ID)
+            else
+                call UnitRemoveAbility(RenjiRSegments[segmentIndex],RENJI_R_SLOW_ABILITY_ID)
+            endif
+        endif
+        set segmentIndex=segmentIndex+1
+    endloop
+endfunction
+
+function RenjiRPlayExplosionSound takes unit caster returns nothing
+    local sound explosionSound=Default_Sound_Settings(CreateSound("Abilities\\Spells\\Human\\Thunderclap\\ThunderclapCaster.wav",false,true,true,10,10,"DefaultEAXON"))
+    // Play one impact for the whole return, rather than nineteen overlapping sounds.
+    call SetSoundPosition(explosionSound,GetUnitX(caster),GetUnitY(caster),0.0)
+    call StartSound(explosionSound)
+    call KillSoundWhenDone(explosionSound)
+    set explosionSound=null
+endfunction
+
+function RenjiRFinish takes unit caster,boolean resetCasterMotion,boolean explodeSegments returns nothing
+    local integer segmentIndex=1
+    local group requirements=null
+    local group explosionTargets=null
+    local unit target=null
+    local real explosionDamage=0.0
+    if caster==null or caster!=RenjiRCaster or RenjiTActive or RenjiRFinishing then
+        return
+    endif
+    // Explosion damage may kill Renji through another trigger; do not finish R twice.
+    set RenjiRFinishing=true
     call RenjiRStopAutoFinish()
     call DisableTrigger(RenjiRWaveTrigger)
     call DisableTrigger(RenjiRSpreadTrigger)
     call RenjiRRemoveReturnButton(caster)
+    call RenjiRSetSegmentSlow(false)
     // Hiding the original ability preserves its level and running cooldown.
     call SetPlayerAbilityAvailable(GetOwningPlayer(caster),'A0BP',true)
+    if explodeSegments then
+        set explosionDamage=RENJI_R_EXPLOSION_STR_MULTIPLIER*I2R(GetHeroStr(caster,true))
+        set explosionTargets=CreateGroup()
+        call RenjiRPlayExplosionSound(caster)
+    endif
     loop
         exitwhen segmentIndex>19
         if RenjiRSegments[segmentIndex]!=null then
-            call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl",GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex])))
+            if explodeSegments then
+                call DestroyEffect(AddSpecialEffect("Effects\\RenjiRExplosion.mdx",GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex])))
+                call GroupEnumUnitsInRange(explosionTargets,GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex]),RENJI_R_EXPLOSION_RADIUS,null)
+                loop
+                    set target=FirstOfGroup(explosionTargets)
+                    exitwhen target==null
+                    call GroupRemoveUnit(explosionTargets,target)
+                    if IsUnitEnemy(target,GetOwningPlayer(caster)) and not IsUnitType(target,UNIT_TYPE_STRUCTURE) and GetUnitAbilityLevel(target,'A01Q')==0 and IsUnitAliveBJ(target) then
+                        // Every segment has its own hit: overlapping explosions can damage the same enemy.
+                        call UnitDamageTargetBJ(caster,target,explosionDamage,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
+                    endif
+                endloop
+            else
+                call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl",GetUnitX(RenjiRSegments[segmentIndex]),GetUnitY(RenjiRSegments[segmentIndex])))
+            endif
             call RemoveUnit(RenjiRSegments[segmentIndex])
             set RenjiRSegments[segmentIndex]=null
         endif
         set segmentIndex=segmentIndex+1
     endloop
+    if explosionTargets!=null then
+        call DestroyGroup(explosionTargets)
+    endif
     if RenjiRCastPosition!=null then
         call RemoveLocation(RenjiRCastPosition)
         set RenjiRCastPosition=null
@@ -45250,12 +45395,15 @@ function RenjiRFinish takes unit caster,boolean resetCasterMotion returns nothin
     call DestroyGroup(requirements)
     set requirements=null
     set RenjiRCaster=null
+    set RenjiRFinishing=false
+    set explosionTargets=null
+    set target=null
 endfunction
 
 function RenjiRAutoFinish takes nothing returns nothing
     // A cancelled cast cannot finish a later R, even after a cooldown reset.
     if GetExpiredTimer()==RenjiRAutoFinishTimer and RenjiRReturnAvailable and not RenjiTActive then
-        call RenjiRFinish(RenjiRCaster,true)
+        call RenjiRFinish(RenjiRCaster,true,true)
     endif
 endfunction
 
@@ -45264,7 +45412,7 @@ function RenjiRReturnCondition takes nothing returns boolean
 endfunction
 
 function RenjiRReturn takes nothing returns nothing
-    call RenjiRFinish(GetTriggerUnit(),false)
+    call RenjiRFinish(GetTriggerUnit(),false,true)
 endfunction
 
 function InitRenjiRReturnTrigger takes nothing returns nothing
@@ -45303,7 +45451,7 @@ function RenjiHandleDeath takes nothing returns nothing
         set RenjiWSelfDamageSource=null
     endif
     if GetDyingUnit()==RenjiRCaster and not RenjiTActive then
-        call RenjiRFinish(RenjiRCaster,true)
+        call RenjiRFinish(RenjiRCaster,true,false)
     endif
 endfunction
 
@@ -46228,15 +46376,24 @@ function RenjiRWaveDamageFilter takes nothing returns boolean
 endfunction
 
 function RenjiRDamageWaveTarget takes nothing returns nothing
+    local unit caster=RenjiRCaster
+    local unit target=GetEnumUnit()
+    local real knockbackDirection=RenjiRSegmentAngle-90.0
     if RenjiRCaster==null then
+        set caster=null
+        set target=null
         return
     endif
-    call GroupAddUnit(RenjiRHitUnits,GetEnumUnit())
-    call UnitDamageTargetBJ(RenjiRCaster,GetEnumUnit(),RenjiRDamage,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-    call AddSpecialEffectTargetUnitBJ("chest",GetEnumUnit(),"Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl")
+    call GroupAddUnit(RenjiRHitUnits,target)
+    call UnitDamageTargetBJ(caster,target,RenjiRDamage,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
+    // The sweep turns clockwise, so its tangent is the segment angle minus 90 degrees.
+    call RenjiRStartKnockback(caster,target,knockbackDirection)
+    call AddSpecialEffectTargetUnitBJ("chest",target,"Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
-    call AddSpecialEffectTargetUnitBJ("origin",GetEnumUnit(),"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
+    call AddSpecialEffectTargetUnitBJ("origin",target,"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
+    set caster=null
+    set target=null
 endfunction
 
 function RenjiRDestroyDestructable takes nothing returns nothing
@@ -46306,6 +46463,7 @@ function RenjiRUpdateWave takes nothing returns nothing
 endfunction
 
 function InitRenjiRWaveTrigger takes nothing returns nothing
+    set RenjiRKnockbackState=InitHashtable()
     set RenjiRWaveTrigger=CreateTrigger()
     call DisableTrigger(RenjiRWaveTrigger)
     call TriggerRegisterTimerEventPeriodic(RenjiRWaveTrigger,.06)
@@ -46341,6 +46499,7 @@ function RenjiRUpdateSpread takes nothing returns nothing
         endloop
         if(((RenjiRSpreadTicks>=60)))then
             call DisableTrigger(GetTriggeringTrigger())
+            call RenjiRSetSegmentSlow(true)
         endif
     else
         call DisableTrigger(GetTriggeringTrigger())
@@ -46470,6 +46629,7 @@ function RenjiTCast takes nothing returns nothing
     set RenjiTPhase=1
     set RenjiTPathIndex=100
     set RenjiTActive=true
+    call RenjiRSetSegmentSlow(false)
     call RenjiRStopAutoFinish()
     call RenjiRRemoveReturnButton(RenjiTCaster)
     call DisableTrigger(RenjiRSpreadTrigger)
@@ -46570,7 +46730,7 @@ function RenjiTCast takes nothing returns nothing
         set RenjiTMoveIndex=RenjiTMoveIndex+1
     endloop
     set RenjiTPathIndex=0
-    call RenjiRFinish(RenjiRCaster,true)
+    call RenjiRFinish(RenjiRCaster,true,false)
 endfunction
 
 function InitRenjiTCastTrigger takes nothing returns nothing

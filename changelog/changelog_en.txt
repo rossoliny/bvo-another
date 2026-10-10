@@ -43,6 +43,10 @@ Renji
 		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
 		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
 
+		Enemies hit by the initial rotation are now stunned for 1 second and pushed clockwise along the sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
+		After scattering, segments slow enemy movement by 50% within 200 AoE. Overlapping segment auras do not stack, and the aura is disabled during T.
+		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and one impact sound for the whole return.
+
 _______________
 Kurosaki Ichigo
 	[T]
