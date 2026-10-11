@@ -2548,3 +2548,10 @@ Description="A magical armor. Gives +15 armor, +35% attack speed."
 Name=Moon Armor
 Tip=Purchase Moon Armor
 Ubertip="A magical armor. Gives +15 armor, +35% attack speed."
+
+[I087]
+Art=ReplaceableTextures\CommandButtons\BTNbootsoftravel.blp
+Description=|cffffcc00Gives:|r|n+75 movement speed|n+30% attack speed|n+10 all stats|n|cffffcc00Requires:|r|nShihoin's Boots|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Shihoin's Boots|r
+Name=Demonic Boots (recipe)
+Tip=Demonic Boots
+Ubertip=|cffffcc00Gives:|r|n+75 movement speed|n+30% attack speed|n+10 all stats|n|cffffcc00Requires:|r|nShihoin's Boots|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Shihoin's Boots|r

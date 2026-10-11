@@ -28832,37 +28832,50 @@ function lEv takes nothing returns nothing
     call TriggerAddAction(Sv,function lVv)
 endfunction
 
-function Trig_DemonicBoot_Conditions takes nothing returns boolean
-    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),'I00C')==true) then
-        return false
-    endif
-        return true
+function DemonicBootsHasComponent takes unit itemOwner returns boolean
+    return UnitHasItemOfTypeBJ(itemOwner,'I00C')
 endfunction
 
-function Trig_DemonicBoot_Func001C takes nothing returns boolean
-    if not (UnitHasItemOfTypeBJ(GetTriggerUnit(),'I05C')==true) then
-        return false
-    endif
-        return true
+function DemonicBootsAssemble takes unit itemOwner returns nothing
+    call RemoveItem(GetItemOfTypeFromUnitBJ(itemOwner,'I00C'))
+    call AddSpecialEffectTargetUnitBJ("origin",itemOwner,"Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl")
+    call DestroyEffectBJ(GetLastCreatedEffectBJ())
+    call UnitAddItemByIdSwapped('I05B',itemOwner)
 endfunction
 
-function Trig_DemonicBoot_Actions takes nothing returns nothing
-    if Trig_DemonicBoot_Func001C() then
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I00C'))
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I05C'))
-        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl")
-        call DestroyEffectBJ(GetLastCreatedEffectBJ())
-        call UnitAddItemByIdSwapped('I05B',GetTriggerUnit())
+function DemonicBootsPickupCondition takes nothing returns boolean
+    return DemonicBootsHasComponent(GetTriggerUnit()) and UnitHasItemOfTypeBJ(GetTriggerUnit(),'I087')
+endfunction
+
+function DemonicBootsPickupAction takes nothing returns nothing
+    call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I087'))
+    call DemonicBootsAssemble(GetTriggerUnit())
+endfunction
+
+function DemonicBootsPurchaseCondition takes nothing returns boolean
+    return IsUnitType(GetBuyingUnit(),UNIT_TYPE_HERO) and GetItemTypeId(GetSoldItem())=='I05C'
+endfunction
+
+function DemonicBootsPurchaseAction takes nothing returns nothing
+    local unit buyingHero=GetBuyingUnit()
+    if DemonicBootsHasComponent(buyingHero) then
+        call DemonicBootsAssemble(buyingHero)
     else
-        call DoNothing()
+        call UnitAddItemByIdSwapped('I087',buyingHero)
     endif
+    set buyingHero=null
 endfunction
 
 function InitTrig_DemonicBoot takes nothing returns nothing
+    local trigger purchaseRecipeTrigger=CreateTrigger()
     set gg_trg_DemonicBoot=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(gg_trg_DemonicBoot,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(gg_trg_DemonicBoot,Condition(function Trig_DemonicBoot_Conditions))
-    call TriggerAddAction(gg_trg_DemonicBoot,function Trig_DemonicBoot_Actions)
+    call TriggerAddCondition(gg_trg_DemonicBoot,Condition(function DemonicBootsPickupCondition))
+    call TriggerAddAction(gg_trg_DemonicBoot,function DemonicBootsPickupAction)
+    call TriggerRegisterAnyUnitEventBJ(purchaseRecipeTrigger,EVENT_PLAYER_UNIT_SELL_ITEM)
+    call TriggerAddCondition(purchaseRecipeTrigger,Condition(function DemonicBootsPurchaseCondition))
+    call TriggerAddAction(purchaseRecipeTrigger,function DemonicBootsPurchaseAction)
+    set purchaseRecipeTrigger=null
 endfunction
 
 function lXv takes nothing returns boolean
@@ -32166,36 +32179,53 @@ function trig_BuyMaximillian_Init takes nothing returns nothing
     call TriggerAddAction(trig_BuyMaximillian,function trig_BuyMaximillian_Action)
 endfunction
 
-function Trig_Demonic_Armor_Conditions takes nothing returns boolean
-    return UnitHasItemOfTypeBJ(GetTriggerUnit(),'I080')or UnitHasItemOfTypeBJ(GetTriggerUnit(),'I083')
+function DemonicArmorHasComponents takes unit itemOwner returns boolean
+    return UnitHasItemOfTypeBJ(itemOwner,'I086') and UnitHasItemOfTypeBJ(itemOwner,'I04M')
 endfunction
 
-function Trig_Demonic_Armor_Func001C takes nothing returns boolean
-    return UnitHasItemOfTypeBJ(GetTriggerUnit(),'I086') and UnitHasItemOfTypeBJ(GetTriggerUnit(),'I04M')
+function DemonicArmorAssemble takes unit itemOwner returns nothing
+    call RemoveItem(GetItemOfTypeFromUnitBJ(itemOwner,'I086'))
+    call RemoveItem(GetItemOfTypeFromUnitBJ(itemOwner,'I04M'))
+    call AddSpecialEffectTargetUnitBJ("origin",itemOwner,"Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl")
+    call DestroyEffect(bj_lastCreatedEffect)
+    call AddSpecialEffectTargetUnitBJ("origin",itemOwner,"Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl")
+    call DestroyEffect(bj_lastCreatedEffect)
+    call UnitAddItemByIdSwapped('I084',itemOwner)
 endfunction
 
-function Trig_Demonic_Armor_Actions takes nothing returns nothing
-    if(Trig_Demonic_Armor_Func001C())then
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I086'))
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I04M'))
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I083'))
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I080'))
-        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl")
-        call DestroyEffect(bj_lastCreatedEffect)
-        call AddSpecialEffectTargetUnitBJ("origin",GetTriggerUnit(),"Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl")
-        call DestroyEffect(bj_lastCreatedEffect)
-        call UnitAddItemByIdSwapped('I084',GetTriggerUnit())
-    elseif UnitHasItemOfTypeBJ(GetTriggerUnit(),'I080') and not UnitHasItemOfTypeBJ(GetTriggerUnit(),'I083') then
-        call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I080'))
-        call UnitAddItemByIdSwapped('I083',GetTriggerUnit())
+function DemonicArmorPickupCondition takes nothing returns boolean
+    return DemonicArmorHasComponents(GetTriggerUnit()) and UnitHasItemOfTypeBJ(GetTriggerUnit(),'I083')
+endfunction
+
+function DemonicArmorPickupAction takes nothing returns nothing
+    call RemoveItem(GetItemOfTypeFromUnitBJ(GetTriggerUnit(),'I083'))
+    call DemonicArmorAssemble(GetTriggerUnit())
+endfunction
+
+function DemonicArmorPurchaseCondition takes nothing returns boolean
+    return IsUnitType(GetBuyingUnit(),UNIT_TYPE_HERO) and GetItemTypeId(GetSoldItem())=='I080'
+endfunction
+
+function DemonicArmorPurchaseAction takes nothing returns nothing
+    local unit buyingHero=GetBuyingUnit()
+    if DemonicArmorHasComponents(buyingHero) then
+        call DemonicArmorAssemble(buyingHero)
+    else
+        call UnitAddItemByIdSwapped('I083',buyingHero)
     endif
+    set buyingHero=null
 endfunction
 
 function InitTrig_Demonic_Armor takes nothing returns nothing
+    local trigger purchaseRecipeTrigger=CreateTrigger()
     set gg_trg_Demonic_Armor=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(gg_trg_Demonic_Armor,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(gg_trg_Demonic_Armor,Condition(function Trig_Demonic_Armor_Conditions))
-    call TriggerAddAction(gg_trg_Demonic_Armor,function Trig_Demonic_Armor_Actions)
+    call TriggerAddCondition(gg_trg_Demonic_Armor,Condition(function DemonicArmorPickupCondition))
+    call TriggerAddAction(gg_trg_Demonic_Armor,function DemonicArmorPickupAction)
+    call TriggerRegisterAnyUnitEventBJ(purchaseRecipeTrigger,EVENT_PLAYER_UNIT_SELL_ITEM)
+    call TriggerAddCondition(purchaseRecipeTrigger,Condition(function DemonicArmorPurchaseCondition))
+    call TriggerAddAction(purchaseRecipeTrigger,function DemonicArmorPurchaseAction)
+    set purchaseRecipeTrigger=null
 endfunction
 
 function Trig_Moon_Armor_Conditions takes nothing returns boolean
