@@ -1,8 +1,8 @@
 -- Console entry point for the toolkit's pack command, without its GUI launcher.
 package.path = './?.lua;./?/init.lua;' .. package.path
 require 'utility'
-local fs = require 'bee.filesystem'
-_W2L_DIR = fs.path(arg[1]):parent_path():string()
+local filesystem = require 'bee.filesystem'
+_W2L_DIR = filesystem.path(arg[1]):parent_path():string()
 local build_failed = false
 local function console_message(message)
     io.stderr:write(message, '\n')
@@ -26,21 +26,34 @@ package.loaded['share.messager'] = {
     end,
 }
 
-local source_directory = fs.path(arg[1])
-local output_map_path = fs.path(arg[2])
-local supplied_script = assert(io.read 'a')
-local release_script_content = arg[3] == 'release' and supplied_script or nil
+local source_directory = filesystem.path(arg[1])
+local output_map_path = filesystem.path(arg[2])
+local prepared_script_path = filesystem.path(assert(arg[5], 'Missing prepared JASS path'))
+local supplied_script = assert(io.load(prepared_script_path), 'Cannot read prepared JASS')
+assert(arg[3] == 'dev' or arg[3] == 'release', 'Unsupported build mode')
+local build_language = arg[4] or 'en'
+assert(build_language == 'en' or build_language == 'ru', 'Unsupported build language')
+local file_overrides = {}
+if build_language == 'ru' then
+    local localization = assert(loadfile((filesystem.path(arg[0]):parent_path() / 'localize-map.lua'):string()))()
+    local translated_fields, translated_files
+    file_overrides, translated_fields, translated_files = localization.load_overrides(filesystem,
+        source_directory, source_directory:parent_path() / 'w3x-content-ru')
+    console_message(('RU: %d translated fields in %d profiles; other text uses the base language'):format(
+        translated_fields, translated_files))
+end
+file_overrides['scripts/war3map.j'] = supplied_script
 local load_plugins = require 'backend.plugin'
 package.loaded['backend.plugin'] = function(converter, register_plugin)
     load_plugins(converter, register_plugin)
-    if release_script_content then
-        register_plugin('Build', {
-            info = { name = 'Release script' },
-            on_pack = function(plugin, converter, output_archive)
-                output_archive:set('scripts\\war3map.j', release_script_content)
-            end,
-        })
-    end
+    register_plugin('Build', {
+        info = { name = 'Build text and script' },
+        on_pack = function(plugin, converter, output_archive)
+            for filename, content in pairs(file_overrides) do
+                output_archive:set(filename:gsub('/', '\\'), content)
+            end
+        end,
+    })
 end
 
 table.insert(arg, 1, 'pack')
@@ -48,14 +61,14 @@ local succeeded, failure = xpcall(function()
     require('backend.cli.pack')()
     if build_failed then return end
     local archive = assert(require('ffi.stormlib').open(output_map_path, true))
+    for filename, expected_content in pairs(file_overrides) do
+        assert(archive:load_file(filename:gsub('/', '\\')) == expected_content,
+            'Missing or incorrect packed override: ' .. filename)
+    end
     local file_list = assert(archive:load_file('(listfile)'))
     for filename in file_list:gmatch('[^\r\n]+') do
-        local expected_content
-        if filename:lower() == 'scripts\\war3map.j' and release_script_content then
-            expected_content = release_script_content
-        else
-            expected_content = assert(io.load(source_directory / filename), filename)
-        end
+        local expected_content = file_overrides[filename:gsub('\\', '/'):lower()]
+            or assert(io.load(source_directory / filename), filename)
         assert(archive:load_file(filename) == expected_content,
             'Packed file differs from source: ' .. filename)
     end
