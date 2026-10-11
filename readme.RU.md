@@ -41,7 +41,7 @@ BvO от Rossoliny опен соурсный.
 * *[Rossoliny#0686](https://discord.com/users/0686)*
 
 # Releases
-#### *[Актуальная версия](https://github.com/rossoliny/bvo-another/releases/tag/%231.3)*
+#### *[Актуальная версия](https://github.com/rossoliny/bvo-another/releases/tag/%231.4)*
 #### *[Все версии](https://github.com/rossoliny/bvo-another/releases)*
 
 #### Игра не видит карту?
