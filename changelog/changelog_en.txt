@@ -1,3 +1,36 @@
+-------------------------------------------
+UPDATE #1.3 — 11.10.2026, SINCE RELEASE #1.2
+-------------------------------------------
+
+Renji:
+- Normal ability cast point reduced from 0.4 to 0.1 seconds.
+- Q: weapon length increased from 720 to 800, with the outer hit boundary reaching 900. Swing direction is fixed when cast; visual segments match damage checks.
+- W: ported the 1.1c mechanics. The explosion occurs after 0.4 seconds and can be cancelled by changing the preparation order. Damage is a single physical hit; stun lasts 0.5 seconds, and self damage applies only inside the blast radius.
+- E: attacks and abilities recover 1 second after casting. E no longer blocks R. Projectiles last up to 20 seconds and gain 5% of their initial speed every second.
+- E: fixed repeated casts and flight cleanup. Renji's or the target's death alone no longer cancels the flight.
+- R: a full 360-degree rotation following 1.1c, a 1-second stun and knockback along the swing. Queued movement is cleared after the rotation.
+- R: segments scatter in 1 second across a 1500-wide area in front of the cast position and slow enemies by 50% within 200 AoE.
+- R: added free manual return through Bankai Dismissal after the rotation, including during scattering. Return restores attacks, Q and E and preserves current actions; unavailable during T.
+- R: on return or expiration, each segment deals 7.5 x current total STR damage within 200 AoE. Explosion damage stacks. Segments disappear without explosions after T or on death.
+- Fixed R timers and updated Q/W/E/R and Bankai Dismissal effects, sounds and descriptions.
+
+Items:
+- Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
+- Restored medal stock at Medal Exchange.
+- Fixed the disabled Demonic Armor icon.
+
+Scoreboard and INFO:
+- Ported the 1.1c scoreboard with colored K/D/L/GPM, hero icons, team totals, game mode and elapsed time.
+- Fixed startup display, empty slots, departed players and Ichigo's Hollow Form. Purchases do not count as income; enemy GPM is hidden.
+- Restored INFO text and added Rossoliny to map and interface names.
+
+Release map:
+- Completely removed the test cheat system from the release script copy, including activation, currency, levels, items, mana, cooldown resets and -oneshot.
+- Built from the current gameplay sources; SLK packaging completed without errors or warnings.
+- File: BvO_Rossoliny1.1a_11.10.2026.w3x.
+
+The cumulative development changes below include test features that are absent from the release map.
+
 ----
 BUGS
 ----
