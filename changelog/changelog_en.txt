@@ -2,6 +2,9 @@
 UPDATE #1.3 — 11.10.2026, SINCE RELEASE #1.2
 -------------------------------------------
 
+Ichigo:
+- When Hollow Form expires, Ichigo preserves the Hollow unit's paused state. Ichigo left on the main map can no longer move during a duel, 3v3 or 5v5; pauses from immobilizing abilities are also preserved.
+
 Renji:
 - Normal ability cast point reduced from 0.4 to 0.1 seconds.
 - Q: weapon length increased from 720 to 800, with the outer hit boundary reaching 900. Swing direction is fixed when cast; visual segments match damage checks.
