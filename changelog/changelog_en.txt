@@ -20,6 +20,9 @@ Renji:
 Enel:
 - R (Mamaragan): fixed repeated lightning strikes caused by Spell Shield on Darkness Sphere and God's Sphere, including the second top boss. Shield activations no longer trigger R.
 
+Golem/Oz arena:
+- Fixed escaping through invisible waygates after the final Oz spawns. All four exit waygates are disabled until his death, then reopened.
+
 Items:
 - Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
 - Restored medal stock at Medal Exchange.

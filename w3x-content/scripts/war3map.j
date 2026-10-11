@@ -2105,15 +2105,15 @@ globals
     unit gG=null
     unit hG=null
     unit iG=null
-    unit jG=null
+    unit ozNorthwestExitWaygate=null
     unit kG=null
     unit mG=null
     unit nG=null
     item oG=null
     unit pG=null
-    unit qG=null
-    unit rG=null
-    unit sG=null
+    unit ozNortheastExitWaygate=null
+    unit ozSoutheastExitWaygate=null
+    unit ozSouthwestExitWaygate=null
     unit tG=null
     unit uG=null
     unit vG=null
@@ -5721,10 +5721,10 @@ function X6 takes nothing returns nothing
     call WaygateSetDestination(u,GetRectCenterX(wn),GetRectCenterY(wn))
     call WaygateActivate(u,true)
     call SetUnitColor(u,ConvertPlayerColor(0))
-    set jG=CreateUnit(p,'nwgt',-2944.,6976.,270.)
-    call WaygateSetDestination(jG,GetRectCenterX(tn),GetRectCenterY(tn))
-    call WaygateActivate(jG,true)
-    call SetUnitColor(jG,ConvertPlayerColor(10))
+    set ozNorthwestExitWaygate=CreateUnit(p,'nwgt',-2944.,6976.,270.)
+    call WaygateSetDestination(ozNorthwestExitWaygate,GetRectCenterX(tn),GetRectCenterY(tn))
+    call WaygateActivate(ozNorthwestExitWaygate,true)
+    call SetUnitColor(ozNorthwestExitWaygate,ConvertPlayerColor(10))
     set u=CreateUnit(p,'nwgt',2752.,-2368.,270.)
     call WaygateSetDestination(u,GetRectCenterX(mo),GetRectCenterY(mo))
     call WaygateActivate(u,true)
@@ -5764,18 +5764,18 @@ function X6 takes nothing returns nothing
     call WaygateActivate(iG,true)
     call SetUnitColor(iG,ConvertPlayerColor(9))
     set mG=CreateUnit(p,'nfoh',-704.,64.,270.)
-    set sG=CreateUnit(p,'nwgt',-2944.,5312.,270.)
-    call WaygateSetDestination(sG,GetRectCenterX(tn),GetRectCenterY(tn))
-    call WaygateActivate(sG,true)
-    call SetUnitColor(sG,ConvertPlayerColor(10))
-    set rG=CreateUnit(p,'nwgt',-256.,5312.,270.)
-    call WaygateSetDestination(rG,GetRectCenterX(tn),GetRectCenterY(tn))
-    call WaygateActivate(rG,true)
-    call SetUnitColor(rG,ConvertPlayerColor(10))
-    set qG=CreateUnit(p,'nwgt',-256.,6976.,270.)
-    call WaygateSetDestination(qG,GetRectCenterX(tn),GetRectCenterY(tn))
-    call WaygateActivate(qG,true)
-    call SetUnitColor(qG,ConvertPlayerColor(10))
+    set ozSouthwestExitWaygate=CreateUnit(p,'nwgt',-2944.,5312.,270.)
+    call WaygateSetDestination(ozSouthwestExitWaygate,GetRectCenterX(tn),GetRectCenterY(tn))
+    call WaygateActivate(ozSouthwestExitWaygate,true)
+    call SetUnitColor(ozSouthwestExitWaygate,ConvertPlayerColor(10))
+    set ozSoutheastExitWaygate=CreateUnit(p,'nwgt',-256.,5312.,270.)
+    call WaygateSetDestination(ozSoutheastExitWaygate,GetRectCenterX(tn),GetRectCenterY(tn))
+    call WaygateActivate(ozSoutheastExitWaygate,true)
+    call SetUnitColor(ozSoutheastExitWaygate,ConvertPlayerColor(10))
+    set ozNortheastExitWaygate=CreateUnit(p,'nwgt',-256.,6976.,270.)
+    call WaygateSetDestination(ozNortheastExitWaygate,GetRectCenterX(tn),GetRectCenterY(tn))
+    call WaygateActivate(ozNortheastExitWaygate,true)
+    call SetUnitColor(ozNortheastExitWaygate,ConvertPlayerColor(10))
     set u=CreateUnit(p,'n00Y',-6912.,1088.,270.)
     set u=CreateUnit(p,'n00Y',5504.,1152.,270.)
 endfunction
@@ -7684,7 +7684,7 @@ function s1 takes nothing returns nothing
         call ForGroupBJ(im,function q1)
         call DestroyGroup(im)
         set im=null
-        set ue[22]=GetUnitLoc(sG)
+        set ue[22]=GetUnitLoc(ozSouthwestExitWaygate)
         call WaygateSetDestinationLocBJ(gG,ue[22])
     else
         call RemoveRect(mo)
@@ -16878,16 +16878,16 @@ function rRv takes nothing returns nothing
     call RemoveLocation(ue[22])
     set ue[22]=null
     if(((B7==1)))then
-        set ue[22]=GetUnitLoc(sG)
+        set ue[22]=GetUnitLoc(ozSouthwestExitWaygate)
     else
         if(((B7==2)))then
-            set ue[22]=GetUnitLoc(jG)
+            set ue[22]=GetUnitLoc(ozNorthwestExitWaygate)
         else
             if(((B7==3)))then
-                set ue[22]=GetUnitLoc(qG)
+                set ue[22]=GetUnitLoc(ozNortheastExitWaygate)
             else
                 if(((B7==4)))then
-                    set ue[22]=GetUnitLoc(rG)
+                    set ue[22]=GetUnitLoc(ozSoutheastExitWaygate)
                 endif
             endif
         endif
@@ -18881,10 +18881,14 @@ function EVv takes nothing returns nothing
                                             call EnableTrigger(Qt)
                                             call EnableTrigger(Rt)
                                             call DisableTrigger(Nt)
-                                            call ShowUnitHide(jG)
-                                            call ShowUnitHide(sG)
-                                            call ShowUnitHide(qG)
-                                            call ShowUnitHide(rG)
+                                            call WaygateActivate(ozNorthwestExitWaygate,false)
+                                            call WaygateActivate(ozSouthwestExitWaygate,false)
+                                            call WaygateActivate(ozNortheastExitWaygate,false)
+                                            call WaygateActivate(ozSoutheastExitWaygate,false)
+                                            call ShowUnitHide(ozNorthwestExitWaygate)
+                                            call ShowUnitHide(ozSouthwestExitWaygate)
+                                            call ShowUnitHide(ozNortheastExitWaygate)
+                                            call ShowUnitHide(ozSoutheastExitWaygate)
                                         endif
                                     endif
                                 endif
@@ -18968,10 +18972,14 @@ function Ecv takes nothing returns nothing
     call DestroyEffect(bj_lastCreatedEffect)
     call AddSpecialEffectLocBJ(GetRectCenter(fp),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
-    call ShowUnitShow(jG)
-    call ShowUnitShow(sG)
-    call ShowUnitShow(qG)
-    call ShowUnitShow(rG)
+    call WaygateActivate(ozNorthwestExitWaygate,true)
+    call WaygateActivate(ozSouthwestExitWaygate,true)
+    call WaygateActivate(ozNortheastExitWaygate,true)
+    call WaygateActivate(ozSoutheastExitWaygate,true)
+    call ShowUnitShow(ozNorthwestExitWaygate)
+    call ShowUnitShow(ozSouthwestExitWaygate)
+    call ShowUnitShow(ozNortheastExitWaygate)
+    call ShowUnitShow(ozSoutheastExitWaygate)
     if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
         call TriggerExecute(pu)
     endif
