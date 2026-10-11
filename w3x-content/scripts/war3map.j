@@ -75928,6 +75928,7 @@ endfunction
 function RepickHasEnoughGold takes nothing returns boolean
     return(GetPlayerState(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD)>=300)
 endfunction
+// Repick debug script: tests/repick-diagnostics.j.
 function RepickAction takes nothing returns nothing
     if(RepickHasEnoughGold())then
         if(RepickPoolHasHeroes())then
