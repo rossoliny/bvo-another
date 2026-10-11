@@ -36,8 +36,14 @@ Items:
 - Preserved prices and restrictions for the level book and +100 bonus; spent medals are refunded when the bonus cannot be applied.
 
 Development cheats:
+- Gameplay cheats require personal activation with -cheats bvo-rossoliny, including single-player games. Only the player who enters the command receives access; gameplay cheats are excluded from release maps.
 - Added -oz <1..11>: removes the current Oz without rewards and spawns the requested stage through the normal spawn logic. Killing it continues the normal sequence with unchanged delays and rewards; the final Oz closes the exits until his death. Replacement cancels the previous pending stage spawn, and invalid input reports an error without changing state. Cheat activation is required; the command is excluded from release maps.
 - Replaced -createitem with -giveitem <rawcode> [number 1–10]. Adds an item directly to the inventory of your own hero or the hero at the specified position in the scoreboard, including enemy bots. Cheat activation is required; invalid codes or numbers, missing heroes and full inventories produce an error without creating an item.
+- Replaced -mana/-nomana with a single -nomana command without arguments: repeated use toggles infinite mana for your own main hero. The setting persists through transformations.
+- Renamed -nc to -nocd. Without arguments, it toggles cooldown resets for your own main hero after casting an ability.
+- Added -oneshot without arguments: toggles the mode for all your units. Positive damage dealt to an enemy triggers bonus damage equal to 100% of the target's maximum HP.
+- Added -event, -event1, -event3 and -event5 without arguments: start normal event preparation without waiting for the timer. -event selects a random available format; the other commands request 1v1, 3v3 and 5v5. Game modes, hero selection and player counts, including bots, are checked; another request during preparation or combat is rejected.
+- Added -refresh without arguments: resets ability and item cooldowns for your own main hero once per command.
 
 Scoreboard and INFO:
 - Ported the 1.1c scoreboard with colored K/D/L/GPM, hero icons, team totals, game mode and elapsed time.
@@ -168,11 +174,17 @@ Statistics stop changing when the winner is determined; deaths during the ending
 TEST COMMANDS
 -------------
 
-All cheats require personal activation, including single-player games. Only the activating player receives access.
-The -level N command uses only the command author's own hero.
-The -giveitem XXXX [1–10] command replaces -createitem and adds an item directly to your own hero's inventory when no number is provided, or to the hero at the specified position in the scoreboard, including enemy bots. Invalid codes or numbers, missing heroes and full inventories do not create an item.
-Added -gold N and -lumber N to add the specified amount of gold or medals only to the player who entered the command.
-Added -mana and -nomana to enable or disable infinite mana only for the player's own hero; the setting persists through transformations.
-The -nc command resets cooldowns only for the enabling player's own hero.
+Gameplay cheats require personal activation with -cheats bvo-rossoliny, including single-player games. Only the activating player receives access. These commands are excluded from release maps.
+-level <1..99> sets your own main hero's level, including lowering it. Example: -level 25.
+-giveitem <rawcode> [number 1–10] adds an item directly to your own hero's inventory when no number is provided, or to the hero at the specified position in the scoreboard, including enemy bots. Examples: -giveitem bspd, -giveitem bspd 6. Invalid codes or numbers, missing heroes and full inventories do not create an item.
+-gold <1..100000000> and -lumber <1..100000000> add gold or medals only to the player who entered the command. Examples: -gold 10000, -lumber 1000. Number format and overflow are checked.
+-nomana without arguments toggles mana restoration for your own main hero every 0.1 seconds and after casting an ability. The setting persists through transformations. -mana is no longer used.
+-nocd without arguments toggles cooldown resets for your own main hero after casting an ability. This replaces the former -nc command.
+-oneshot without arguments toggles the mode for all your units: positive damage dealt to an enemy triggers bonus damage equal to 100% of the target's maximum HP.
+For -nomana, -nocd and -oneshot, the first use enables the mode and the next use disables it.
+-refresh without arguments resets ability and item cooldowns for your own main hero once per command.
+-event without arguments starts preparation for a random available event without waiting for the timer. -event1, -event3 and -event5 request 1v1, 3v3 and 5v5. Fixed formats require at least 1, 3 or 5 players per team; bots count. Requests are rejected before the game starts, while hero selection is incomplete, when the format is disabled, when there are too few players, or during preparation or combat.
+-oz <1..11> replaces the current Oz with the requested stage without rewards for the removed unit. Killing it continues the normal sequence; the final Oz closes the exits until his death. Example: -oz 11. The command is unavailable before hero selection ends and in No Waygates mode.
 Every cheat use displays a map system notification to all players for 10 seconds: a colored [ЧИТЫ] prefix, player name, command, parameters and result. Activation is also announced, with the activation code hidden from the notification.
+Separate diagnostic commands and their launch conditions are documented in cheats/README.md.
 
