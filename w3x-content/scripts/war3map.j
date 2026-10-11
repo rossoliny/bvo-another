@@ -81641,6 +81641,69 @@ function TestCommands_OneShotInit takes nothing returns nothing
 endfunction
 
 
+function TestCommands_EventChat takes nothing returns nothing
+    local player commandPlayer = GetTriggerPlayer()
+    local integer commandPlayerIndex = GetPlayerId(commandPlayer)
+    local string commandText = GetEventPlayerChatString()
+    local integer playerIndex = 0
+    local integer firstTeamPlayers = 0
+    local integer secondTeamPlayers = 0
+    local boolean heroesReady = true
+    if not TestCommands_Access[commandPlayerIndex] then
+        call TestCommands_Message(commandPlayer,commandText,"Отказ: доступ к читам не активирован")
+    elseif commandText != "-event" then
+        call TestCommands_Message(commandPlayer,commandText,"Ошибка: используйте -event без аргументов")
+    elseif N4 or q == null or s == null or Xs == null or not IsTriggerEnabled(Xs) then
+        call TestCommands_Message(commandPlayer,commandText,"Отказ: игра ещё не началась, завершена или события отключены")
+    elseif w or IsTriggerEnabled(nt) or TimerGetRemaining(q) <= 0. then
+        call TestCommands_Message(commandPlayer,commandText,"Отказ: событие уже запускается или идёт")
+    else
+        loop
+            exitwhen playerIndex >= 12
+            if GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+                if IsPlayerInForce(Player(playerIndex),e) or IsPlayerInForce(Player(playerIndex),f) then
+                    if not IsUnitType(m[playerIndex+1],UNIT_TYPE_HERO) or GetUnitTypeId(m[playerIndex+1]) == 0 or GetOwningPlayer(m[playerIndex+1]) != Player(playerIndex) then
+                        set heroesReady = false
+                    endif
+                    if IsPlayerInForce(Player(playerIndex),e) then
+                        set firstTeamPlayers = firstTeamPlayers+1
+                    else
+                        set secondTeamPlayers = secondTeamPlayers+1
+                    endif
+                endif
+            endif
+            set playerIndex = playerIndex+1
+        endloop
+        if firstTeamPlayers < 1 or secondTeamPlayers < 1 then
+            call TestCommands_Message(commandPlayer,commandText,"Отказ: нужны игроки в обеих командах")
+        elseif not heroesReady then
+            call TestCommands_Message(commandPlayer,commandText,"Отказ: дождитесь выбора героев всеми игроками")
+        elseif T7[1] and (T7[3] or firstTeamPlayers < 3 or secondTeamPlayers < 3) and (T7[5] or firstTeamPlayers < 5 or secondTeamPlayers < 5) then
+            call TestCommands_Message(commandPlayer,commandText,"Отказ: нет доступного формата события для текущих команд")
+        else
+            // Expire the existing wait timer so the normal selector and countdown run.
+            // A zero remaining time also blocks another command before expiration fires.
+            call TimerStart(q,0.,false,null)
+            call TestCommands_Message(commandPlayer,commandText,"Запущена подготовка следующего события")
+        endif
+    endif
+    set commandPlayer = null
+endfunction
+
+function TestCommands_EventInit takes nothing returns nothing
+    local trigger eventChatTrigger = CreateTrigger()
+    local integer playerIndex = 0
+    loop
+        exitwhen playerIndex >= 12
+        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            call TriggerRegisterPlayerChatEvent(eventChatTrigger,Player(playerIndex),"-event",false)
+        endif
+        set playerIndex = playerIndex+1
+    endloop
+    call TriggerAddAction(eventChatTrigger,function TestCommands_EventChat)
+    set eventChatTrigger = null
+endfunction
+
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
     local trigger testChat = CreateTrigger()
@@ -81665,6 +81728,7 @@ function TestCommands_Init takes nothing returns nothing
     set testSpells = null
     set testMana = null
     call TestCommands_OneShotInit()
+    call TestCommands_EventInit()
 endfunction
 
 function main takes nothing returns nothing
