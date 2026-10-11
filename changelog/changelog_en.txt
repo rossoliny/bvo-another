@@ -25,9 +25,6 @@ Items:
 - Restored medal stock at Medal Exchange.
 - Fixed the disabled Demonic Armor icon.
 
-Repick:
-- Fixed the shared hero pool being destroyed by the group-removal flag left after Nami's V. Hero replacement and subsequent repicks by other players preserve the pool; cost, the 60-second window and one repick per player are unchanged.
-
 Development cheats:
 - Replaced -createitem with -giveitem <rawcode> [number 1–10]. Adds an item directly to the inventory of your own hero or the hero at the specified position in the scoreboard, including enemy bots. Cheat activation is required; invalid codes or numbers, missing heroes and full inventories produce an error without creating an item.
 

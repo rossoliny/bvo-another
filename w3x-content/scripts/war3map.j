@@ -75891,7 +75891,6 @@ function Hhx takes nothing returns boolean
     return(k4==false)
 endfunction
 function HHx takes nothing returns boolean
-    set bj_wantDestroyGroup=false
     return(IsUnitGroupEmptyBJ(i4)==false)
 endfunction
 function Hjx takes nothing returns boolean
