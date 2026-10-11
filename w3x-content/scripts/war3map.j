@@ -39935,6 +39935,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     local integer abilityLevel
     local real hollowDuration
     local item currItem = null
+    local boolean wasHollowPaused = false
     set Xg=GetTriggerUnit()
     set abilityLevel = GetUnitAbilityLevelSwapped('A04A',Xg)
     set hollowDuration = (15.+(1.*I2R(abilityLevel)))
@@ -40143,6 +40144,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
     set G[0]=null
     call TriggerSleepAction((15.+(1.*I2R(GetUnitAbilityLevelSwapped('A04A',Xg)))))
     if(((ck)))then
+        set wasHollowPaused=IsUnitPaused(Ck)
         set ck=false
         set r9[1000]=GetUnitLoc(Ck)
         set r9[1001]=GetRectCenter(io)
@@ -40186,7 +40188,7 @@ function Ichigo_HollowForm_Action takes nothing returns nothing
         call ModifyHeroStat(0,Xg,2,(Ek[1]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
         call ModifyHeroStat(1,Xg,2,(Ek[2]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
         call ModifyHeroStat(2,Xg,2,Ek[3])
-        call PauseUnit(Xg,false)
+        call PauseUnit(Xg,wasHollowPaused)
         call SetUnitInvulnerable(Xg,false)
         call UnitRemoveBuffsBJ(1,Xg)
         //call SetWidgetLife(Xg,I2R(Ek[6]))
