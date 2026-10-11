@@ -1,5 +1,5 @@
 ID;PWXL;N;E
-B;Y906;X95;D0 0 905 94
+B;Y907;X95;D0 0 906 94
 C;Y1;X1;K"alias"
 C;X2;K"code"
 C;X3;K"comments"
@@ -25708,4 +25708,22 @@ C;X92;K""
 C;X93;K""
 C;X94;K""
 C;X95;K""
+C;Y907;X1;K"ABhp"
+C;X2;K"AIml"
+C;X3;K"BookShopHealthBonus"
+C;X7;K1
+C;X9;K"other"
+C;X11;K2
+C;X15;K"_"
+C;X16;K0.0
+C;X17;K0.0
+C;X18;K0.0
+C;X19;K0.0
+C;X21;K0.0
+C;X22;K0.0
+C;X23;K0
+C;X35;K"_"
+C;X43;K-45
+C;X55;K"_"
+C;X75;K"_"
 E

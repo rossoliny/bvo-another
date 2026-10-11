@@ -638,7 +638,7 @@ C;Y32;X1;K"I00H"
 C;X5;K"PowerUp"
 C;X6;K3
 C;X7;K3
-C;X8;K"A05N"
+C;X8;K"A066"
 C;X9;K"AIgo"
 C;X11;K1
 C;X12;K200
@@ -5801,7 +5801,7 @@ C;X33;K255
 C;X34;K255
 C;Y284;X1;K"lmbr"
 C;X5;K"PowerUp"
-C;X8;K"AIlu"
+C;X8;K"A066"
 C;X9;K"AIlu"
 C;X11;K1
 C;X12;K200
@@ -5824,7 +5824,7 @@ C;Y285;X1;K"manh"
 C;X5;K"PowerUp"
 C;X6;K1
 C;X7;K1
-C;X8;K"AImh"
+C;X8;K"A066"
 C;X9;K"AImi"
 C;X11;K1
 C;X12;K200
@@ -6486,7 +6486,7 @@ C;Y316;X1;K"tdx2"
 C;X5;K"PowerUp"
 C;X6;K2
 C;X7;K5
-C;X8;K"AIgm"
+C;X8;K"A066"
 C;X9;K"AIgm"
 C;X11;K1
 C;X12;K200
@@ -6555,7 +6555,7 @@ C;Y319;X1;K"tin2"
 C;X5;K"PowerUp"
 C;X6;K2
 C;X7;K5
-C;X8;K"AItm"
+C;X8;K"A066"
 C;X9;K"AItm"
 C;X11;K1
 C;X12;K200
@@ -6601,7 +6601,7 @@ C;Y321;X1;K"tpow"
 C;X5;K"PowerUp"
 C;X6;K2
 C;X7;K5
-C;X8;K"AIxm"
+C;X8;K"A066"
 C;X9;K"AIxm"
 C;X11;K1
 C;X12;K200
@@ -6624,7 +6624,7 @@ C;Y322;X1;K"tst2"
 C;X5;K"PowerUp"
 C;X6;K2
 C;X7;K5
-C;X8;K"AInm"
+C;X8;K"A066"
 C;X9;K"AInm"
 C;X11;K1
 C;X12;K200

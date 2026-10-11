@@ -1389,11 +1389,6 @@ globals
     trigger zy=null
     trigger Ay=null
     trigger ay=null
-    trigger By=null
-    trigger by=null
-    trigger Cy=null
-    trigger cy=null
-    trigger Dy=null
     trigger Ey=null
     trigger Fy=null
     trigger Gy=null
@@ -35404,169 +35399,140 @@ function Wiv takes nothing returns boolean
     return(GetHeroLevel(GetManipulatingUnit())<50)or(((GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)))
 endfunction
 
-function Wav takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]==false)and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetHeroLevel(GetManipulatingUnit())<50)or(((GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)))))
+function BookShopIsRewardItem takes integer rewardItemType returns boolean
+    return rewardItemType == 'lmbr' or rewardItemType == 'I00H' or rewardItemType == 'tst2' or rewardItemType == 'tdx2' or rewardItemType == 'tin2' or rewardItemType == 'tpow' or rewardItemType == 'manh' or rewardItemType == 'tkno' or rewardItemType == 'I01I'
 endfunction
 
-function Wnv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]==false)and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetHeroLevel(GetManipulatingUnit())<50)or(((GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)))))))
+function BookShopRefundMedals takes player receivingPlayer, integer medalCost, string failureMessage returns nothing
+    call DisplayTimedTextToPlayer(receivingPlayer,0.,0.,4.,failureMessage)
+    call AdjustPlayerStateBJ(medalCost,receivingPlayer,PLAYER_STATE_RESOURCE_LUMBER)
 endfunction
 
-function WVv takes nothing returns boolean
-    return(GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)
-endfunction
-
-function WEv takes nothing returns boolean
-    return(((GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)))
-endfunction
-
-function WXv takes nothing returns boolean
-    return(GetHeroLevel(GetManipulatingUnit())<50)
-endfunction
-
-function WOv takes nothing returns nothing
-    if(((GetHeroLevel(GetManipulatingUnit())<50)))then
-        call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                              |cffffcc00Your level is too low|r")
-        call AdjustPlayerStateBJ(30,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_LUMBER)
+function BookShopApplyAttributeBonus takes unit receivingHero returns boolean
+    local integer receivingHeroType = GetUnitTypeId(receivingHero)
+    local integer receivingPlayerIndex = GetPlayerId(GetOwningPlayer(receivingHero))+1
+    if(((((receivingHeroType=='U009')or(receivingHeroType=='O004')or(receivingHeroType=='O005')or(receivingHeroType=='U00A')or(receivingHeroType=='O001')or(receivingHeroType=='EC08')or(receivingHeroType=='EC12')or(receivingHeroType=='E003')or(receivingHeroType=='OC10')or(receivingHeroType=='O000')or(receivingHeroType=='O002')or(receivingHeroType=='O003')or(receivingHeroType=='NC03')or(receivingHeroType=='UC13')or(receivingHeroType=='N002')or(receivingHeroType=='N00C')or(receivingHeroType=='N007')or(receivingHeroType=='N004')or(receivingHeroType=='N000')or(receivingHeroType=='N005')or(receivingHeroType=='N006')or(receivingHeroType=='N00W')or(receivingHeroType=='N00T')))))then
+        call UnitAddAbility(receivingHero,'A03Y')
+        set o4[receivingPlayerIndex]=true
+        set s4[receivingPlayerIndex]=true
     else
-        if(((((GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())!=0)))))then
-            call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                              |cffffcc00You still have unlearned ability|r")
-            call AdjustPlayerStateBJ(30,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_LUMBER)
-        endif
-    endif
-endfunction
-
-function WRv takes nothing returns nothing
-    set By=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(By,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(By,Condition(function Wnv))
-    call TriggerAddAction(By,function WOv)
-endfunction
-
-function WIv takes nothing returns boolean
-    return(GetUnitAbilityLevelSwapped('A03Y',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A00L',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A028',GetManipulatingUnit())!=0)
-endfunction
-
-function WAv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))])and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitAbilityLevelSwapped('A03Y',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A00L',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A028',GetManipulatingUnit())!=0)))
-endfunction
-
-function WNv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))])and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(((GetUnitAbilityLevelSwapped('A03Y',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A00L',GetManipulatingUnit())!=0)or(GetUnitAbilityLevelSwapped('A028',GetManipulatingUnit())!=0)))))
-endfunction
-
-function Wbv takes nothing returns nothing
-    call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                              |cffffcc00This item works only once|r")
-    call AdjustPlayerStateBJ(30,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_LUMBER)
-endfunction
-
-function WBv takes nothing returns nothing
-    set by=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(by,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(by,Condition(function WNv))
-    call TriggerAddAction(by,function Wbv)
-endfunction
-
-function Wcv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]==false)and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())==0)
-endfunction
-
-function WCv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='I01I')and(o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]==false)and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())>=50)and(GetHeroSkillPoints(GetManipulatingUnit())==0)))
-endfunction
-
-function Wdv takes nothing returns boolean
-    return(GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E004')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='E001')or(GetUnitTypeId(GetManipulatingUnit())=='N00S')
-endfunction
-
-function WDv takes nothing returns boolean
-    return(((GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E004')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='E001')or(GetUnitTypeId(GetManipulatingUnit())=='N00S')))
-endfunction
-
-function Wfv takes nothing returns boolean
-    return(GetUnitTypeId(GetManipulatingUnit())=='N00U')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='N009')or(GetUnitTypeId(GetManipulatingUnit())=='N00R')or(GetUnitTypeId(GetManipulatingUnit())=='U00S')or(GetUnitTypeId(GetManipulatingUnit())=='U00T')or(GetUnitTypeId(GetManipulatingUnit())=='U005')or(GetUnitTypeId(GetManipulatingUnit())=='U006')or(GetUnitTypeId(GetManipulatingUnit())=='U007')or(GetUnitTypeId(GetManipulatingUnit())=='U008')or(GetUnitTypeId(GetManipulatingUnit())=='H004')or(GetUnitTypeId(GetManipulatingUnit())=='H00U')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U004')or(GetUnitTypeId(GetManipulatingUnit())=='N003')or(GetUnitTypeId(GetManipulatingUnit())=='N008')
-endfunction
-
-function WFv takes nothing returns boolean
-    return(((GetUnitTypeId(GetManipulatingUnit())=='N00U')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='N009')or(GetUnitTypeId(GetManipulatingUnit())=='N00R')or(GetUnitTypeId(GetManipulatingUnit())=='U00S')or(GetUnitTypeId(GetManipulatingUnit())=='U00T')or(GetUnitTypeId(GetManipulatingUnit())=='U005')or(GetUnitTypeId(GetManipulatingUnit())=='U006')or(GetUnitTypeId(GetManipulatingUnit())=='U007')or(GetUnitTypeId(GetManipulatingUnit())=='U008')or(GetUnitTypeId(GetManipulatingUnit())=='H004')or(GetUnitTypeId(GetManipulatingUnit())=='H00U')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U004')or(GetUnitTypeId(GetManipulatingUnit())=='N003')or(GetUnitTypeId(GetManipulatingUnit())=='N008')))
-endfunction
-
-function Wgv takes nothing returns boolean
-    return(GetUnitTypeId(GetManipulatingUnit())=='U009')or(GetUnitTypeId(GetManipulatingUnit())=='O004')or(GetUnitTypeId(GetManipulatingUnit())=='O005')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='NC03')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N007')or(GetUnitTypeId(GetManipulatingUnit())=='N004')or(GetUnitTypeId(GetManipulatingUnit())=='N000')or(GetUnitTypeId(GetManipulatingUnit())=='N005')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00T')
-endfunction
-
-function WGv takes nothing returns boolean
-    return(((GetUnitTypeId(GetManipulatingUnit())=='U009')or(GetUnitTypeId(GetManipulatingUnit())=='O004')or(GetUnitTypeId(GetManipulatingUnit())=='O005')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='NC03')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N007')or(GetUnitTypeId(GetManipulatingUnit())=='N004')or(GetUnitTypeId(GetManipulatingUnit())=='N000')or(GetUnitTypeId(GetManipulatingUnit())=='N005')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00T')))
-endfunction
-
-function Whv takes nothing returns nothing
-    if(((((GetUnitTypeId(GetManipulatingUnit())=='U009')or(GetUnitTypeId(GetManipulatingUnit())=='O004')or(GetUnitTypeId(GetManipulatingUnit())=='O005')or(GetUnitTypeId(GetManipulatingUnit())=='U00A')or(GetUnitTypeId(GetManipulatingUnit())=='O001')or(GetUnitTypeId(GetManipulatingUnit())=='EC08')or(GetUnitTypeId(GetManipulatingUnit())=='EC12')or(GetUnitTypeId(GetManipulatingUnit())=='E003')or(GetUnitTypeId(GetManipulatingUnit())=='OC10')or(GetUnitTypeId(GetManipulatingUnit())=='O000')or(GetUnitTypeId(GetManipulatingUnit())=='O002')or(GetUnitTypeId(GetManipulatingUnit())=='O003')or(GetUnitTypeId(GetManipulatingUnit())=='NC03')or(GetUnitTypeId(GetManipulatingUnit())=='UC13')or(GetUnitTypeId(GetManipulatingUnit())=='N002')or(GetUnitTypeId(GetManipulatingUnit())=='N00C')or(GetUnitTypeId(GetManipulatingUnit())=='N007')or(GetUnitTypeId(GetManipulatingUnit())=='N004')or(GetUnitTypeId(GetManipulatingUnit())=='N000')or(GetUnitTypeId(GetManipulatingUnit())=='N005')or(GetUnitTypeId(GetManipulatingUnit())=='N006')or(GetUnitTypeId(GetManipulatingUnit())=='N00W')or(GetUnitTypeId(GetManipulatingUnit())=='N00T')))))then
-        call UnitAddAbility(GetManipulatingUnit(),'A03Y')
-        set o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
-        set s4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
-    else
-        if(((((GetUnitTypeId(GetManipulatingUnit())=='N00U')or(GetUnitTypeId(GetManipulatingUnit())=='H01Q')or(GetUnitTypeId(GetManipulatingUnit())=='N009')or(GetUnitTypeId(GetManipulatingUnit())=='N00R')or(GetUnitTypeId(GetManipulatingUnit())=='U00S')or(GetUnitTypeId(GetManipulatingUnit())=='U00T')or(GetUnitTypeId(GetManipulatingUnit())=='U005')or(GetUnitTypeId(GetManipulatingUnit())=='U006')or(GetUnitTypeId(GetManipulatingUnit())=='U007')or(GetUnitTypeId(GetManipulatingUnit())=='U008')or(GetUnitTypeId(GetManipulatingUnit())=='H004')or(GetUnitTypeId(GetManipulatingUnit())=='H00U')or(GetUnitTypeId(GetManipulatingUnit())=='H003')or(GetUnitTypeId(GetManipulatingUnit())=='H00E')or(GetUnitTypeId(GetManipulatingUnit())=='H01B')or(GetUnitTypeId(GetManipulatingUnit())=='H01C')or(GetUnitTypeId(GetManipulatingUnit())=='H01D')or(GetUnitTypeId(GetManipulatingUnit())=='H01E')or(GetUnitTypeId(GetManipulatingUnit())=='H01F')or(GetUnitTypeId(GetManipulatingUnit())=='H00I')or(GetUnitTypeId(GetManipulatingUnit())=='H00J')or(GetUnitTypeId(GetManipulatingUnit())=='UC11')or(GetUnitTypeId(GetManipulatingUnit())=='U004')or(GetUnitTypeId(GetManipulatingUnit())=='N003')or(GetUnitTypeId(GetManipulatingUnit())=='N008')))))then
-            call UnitAddAbility(GetManipulatingUnit(),'A028')
-            set o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
-            set r4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
+        if(((((receivingHeroType=='N00U')or(receivingHeroType=='H01Q')or(receivingHeroType=='N009')or(receivingHeroType=='N00R')or(receivingHeroType=='U00S')or(receivingHeroType=='U00T')or(receivingHeroType=='U005')or(receivingHeroType=='U006')or(receivingHeroType=='U007')or(receivingHeroType=='U008')or(receivingHeroType=='H004')or(receivingHeroType=='H00U')or(receivingHeroType=='H003')or(receivingHeroType=='H00E')or(receivingHeroType=='H01B')or(receivingHeroType=='H01C')or(receivingHeroType=='H01D')or(receivingHeroType=='H01E')or(receivingHeroType=='H01F')or(receivingHeroType=='H00I')or(receivingHeroType=='H00J')or(receivingHeroType=='UC11')or(receivingHeroType=='U004')or(receivingHeroType=='N003')or(receivingHeroType=='N008')))))then
+            call UnitAddAbility(receivingHero,'A028')
+            set o4[receivingPlayerIndex]=true
+            set r4[receivingPlayerIndex]=true
         else
-            if(((((GetUnitTypeId(GetManipulatingUnit())=='N00X')or(GetUnitTypeId(GetManipulatingUnit())=='E004')or(GetUnitTypeId(GetManipulatingUnit())=='E000')or(GetUnitTypeId(GetManipulatingUnit())=='E002')or(GetUnitTypeId(GetManipulatingUnit())=='E001')or(GetUnitTypeId(GetManipulatingUnit())=='N00S')))))then
-                call UnitAddAbility(GetManipulatingUnit(),'A00L')
-                set o4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
-                set t4[(1+GetPlayerId(GetOwningPlayer(GetManipulatingUnit())))]=true
+            if(((((receivingHeroType=='N00X')or(receivingHeroType=='E004')or(receivingHeroType=='E000')or(receivingHeroType=='E002')or(receivingHeroType=='E001')or(receivingHeroType=='N00S')))))then
+                call UnitAddAbility(receivingHero,'A00L')
+                set o4[receivingPlayerIndex]=true
+                set t4[receivingPlayerIndex]=true
             endif
         endif
     endif
-    call AddSpecialEffectTargetUnitBJ("origin",GetManipulatingUnit(),"Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdl")
+    if not o4[receivingPlayerIndex] then
+        return false
+    endif
+    call AddSpecialEffectTargetUnitBJ("origin",receivingHero,"Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
-    call AddSpecialEffectTargetUnitBJ("origin",GetManipulatingUnit(),"Abilities\\Spells\\NightElf\\Taunt\\TauntCaster.mdl")
+    call AddSpecialEffectTargetUnitBJ("origin",receivingHero,"Abilities\\Spells\\NightElf\\Taunt\\TauntCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
+    return true
 endfunction
 
-function WHv takes nothing returns nothing
-    set Cy=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(Cy,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(Cy,Condition(function WCv))
-    call TriggerAddAction(Cy,function Whv)
+function BookShopApplyHealthBonus takes unit receivingUnit returns boolean
+    local real previousHealth = GetWidgetLife(receivingUnit)
+    // In Warcraft III 1.26, removing level 2 of this zero/-45 life ability adds 45 maximum HP.
+    if not UnitAddAbility(receivingUnit,'ABhp') then
+        return false
+    endif
+    if SetUnitAbilityLevel(receivingUnit,'ABhp',2) != 2 then
+        call UnitRemoveAbility(receivingUnit,'ABhp')
+        return false
+    endif
+    call UnitRemoveAbility(receivingUnit,'ABhp')
+    call SetWidgetLife(receivingUnit,previousHealth+45.)
+    return true
 endfunction
 
-function Wjv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='tkno')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())>=50)
+function BookShopApplyReward takes unit receivingUnit, item rewardItem, boolean isPurchase returns nothing
+    local integer rewardItemType = GetItemTypeId(rewardItem)
+    local player receivingPlayer = GetOwningPlayer(receivingUnit)
+    local integer receivingPlayerIndex = GetPlayerId(receivingPlayer)+1
+    if not BookShopIsRewardItem(rewardItemType) or GetItemUserData(rewardItem) == 1 then
+        set receivingPlayer = null
+        return
+    endif
+    // Leave hero-only ground rewards available when a non-hero attempts to pick them up.
+    if not isPurchase and GetHeroLevel(receivingUnit) == 0 and rewardItemType != 'lmbr' and rewardItemType != 'I00H' and rewardItemType != 'manh' then
+        set receivingPlayer = null
+        return
+    endif
+    // A purchase can fire both pickup and sale events; only its first event awards the reward.
+    call SetItemUserData(rewardItem,1)
+    if rewardItemType == 'lmbr' then
+        call AdjustPlayerStateBJ(30,receivingPlayer,PLAYER_STATE_RESOURCE_LUMBER)
+    elseif rewardItemType == 'I00H' then
+        call AdjustPlayerStateBJ(1000,receivingPlayer,PLAYER_STATE_RESOURCE_GOLD)
+    elseif rewardItemType == 'manh' then
+        if not BookShopApplyHealthBonus(receivingUnit) then
+            call BookShopRefundMedals(receivingPlayer,1,"                                                          |cffffcc00Your hero cannot use this item|r")
+        endif
+    elseif GetHeroLevel(receivingUnit) > 0 then
+        if rewardItemType == 'tst2' then
+            call SetHeroStr(receivingUnit,GetHeroStr(receivingUnit,false)+2,true)
+        elseif rewardItemType == 'tdx2' then
+            call SetHeroAgi(receivingUnit,GetHeroAgi(receivingUnit,false)+2,true)
+        elseif rewardItemType == 'tin2' then
+            call SetHeroInt(receivingUnit,GetHeroInt(receivingUnit,false)+4,true)
+        elseif rewardItemType == 'tpow' then
+            call SetHeroStr(receivingUnit,GetHeroStr(receivingUnit,false)+1,true)
+            call SetHeroAgi(receivingUnit,GetHeroAgi(receivingUnit,false)+1,true)
+            call SetHeroInt(receivingUnit,GetHeroInt(receivingUnit,false)+1,true)
+        elseif rewardItemType == 'tkno' then
+            if GetHeroLevel(receivingUnit) >= 50 then
+                call BookShopRefundMedals(receivingPlayer,10,"                                                          |cffffcc00Your level is too high to use this item|r")
+            else
+                call SetHeroLevel(receivingUnit,GetHeroLevel(receivingUnit)+1,true)
+            endif
+        elseif rewardItemType == 'I01I' then
+            if o4[receivingPlayerIndex] then
+                call BookShopRefundMedals(receivingPlayer,30,"                                                              |cffffcc00This item works only once|r")
+            elseif GetHeroLevel(receivingUnit) < 50 then
+                call BookShopRefundMedals(receivingPlayer,30,"                                                              |cffffcc00Your level is too low|r")
+            elseif GetHeroSkillPoints(receivingUnit) != 0 then
+                call BookShopRefundMedals(receivingPlayer,30,"                                                              |cffffcc00You still have unlearned ability|r")
+            else
+                if not BookShopApplyAttributeBonus(receivingUnit) then
+                    call BookShopRefundMedals(receivingPlayer,30,"                                                          |cffffcc00Your hero cannot use this item|r")
+                endif
+            endif
+        endif
+    elseif rewardItemType == 'I01I' then
+        call BookShopRefundMedals(receivingPlayer,30,"                                                          |cffffcc00Your hero cannot use this item|r")
+    elseif rewardItemType == 'tkno' then
+        call BookShopRefundMedals(receivingPlayer,10,"                                                          |cffffcc00Your hero cannot use this item|r")
+    else
+        call BookShopRefundMedals(receivingPlayer,2,"                                                          |cffffcc00Your hero cannot use this item|r")
+    endif
+    // Auto-used powerups may already be dead; revive their handles before removing them completely.
+    call SetWidgetLife(rewardItem,1.)
+    call RemoveItem(rewardItem)
+    set receivingPlayer = null
 endfunction
 
-function WJv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='tkno')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())>=50)))
+function BookShopRewardAction takes nothing returns nothing
+    if GetTriggerEventId() == EVENT_PLAYER_UNIT_SELL_ITEM then
+        call BookShopApplyReward(GetBuyingUnit(),GetSoldItem(),true)
+    else
+        call BookShopApplyReward(GetManipulatingUnit(),GetManipulatedItem(),false)
+    endif
 endfunction
 
-function Wkv takes nothing returns nothing
-    call DisplayTimedTextToForce(m6(GetOwningPlayer(GetManipulatingUnit())),4.,"                                                          |cffffcc00Your level is too high to use this item|r")
-    call AdjustPlayerStateBJ(10,GetOwningPlayer(GetManipulatingUnit()),PLAYER_STATE_RESOURCE_LUMBER)
-endfunction
-
-function WKv takes nothing returns nothing
-    set cy=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(cy,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(cy,Condition(function WJv))
-    call TriggerAddAction(cy,function Wkv)
-endfunction
-
-function Wlv takes nothing returns boolean
-    return(GetItemTypeId(GetManipulatedItem())=='tkno')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())<50)
-endfunction
-
-function WLv takes nothing returns boolean
-    return(((GetItemTypeId(GetManipulatedItem())=='tkno')and(MG(GetManipulatingUnit(),UNIT_TYPE_HERO))and(GetHeroLevel(GetManipulatingUnit())<50)))
-endfunction
-
-function Wmv takes nothing returns nothing
-    call UnitAddItemByIdSwapped('I02I',GetManipulatingUnit())
-endfunction
-
-function WMv takes nothing returns nothing
-    set Dy=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(Dy,EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    call TriggerAddCondition(Dy,Condition(function WLv))
-    call TriggerAddAction(Dy,function Wmv)
+function BookShopInit takes nothing returns nothing
+    local trigger bookRewardTrigger = CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(bookRewardTrigger,EVENT_PLAYER_UNIT_SELL_ITEM)
+    call TriggerRegisterAnyUnitEventBJ(bookRewardTrigger,EVENT_PLAYER_UNIT_PICKUP_ITEM)
+    call TriggerAddAction(bookRewardTrigger,function BookShopRewardAction)
+    set bookRewardTrigger = null
 endfunction
 
 function Is_Unit_Vastolorde takes unit who returns boolean
@@ -80496,11 +80462,7 @@ function Q3x takes nothing returns nothing
     call w7v()
     call Wvv()
     call Wov()
-    call WRv()
-    call WBv()
-    call WHv()
-    call WKv()
-    call WMv()
+    call BookShopInit()
     call InitTrig_DemonicBoot()
     call InitTrig_Moon_Armor()
     call InitTrig_Demonic_Armor()

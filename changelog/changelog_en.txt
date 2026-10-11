@@ -32,6 +32,8 @@ Items:
 - Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
 - Restored medal stock at Medal Exchange.
 - Fixed the disabled Demonic Armor icon.
+- Medals, gold exchange, attribute, health and level books, and the +100 bonus are now awarded directly, including purchases under Hex. Purchasing and picking up the same item cannot award its reward twice.
+- Preserved prices and restrictions for the level book and +100 bonus; spent medals are refunded when the bonus cannot be applied.
 
 Development cheats:
 - Added -oz <1..11>: removes the current Oz without rewards and spawns the requested stage through the normal spawn logic. Killing it continues the normal sequence with unchanged delays and rewards; the final Oz closes the exits until his death. Replacement cancels the previous pending stage spawn, and invalid input reports an error without changing state. Cheat activation is required; the command is excluded from release maps.

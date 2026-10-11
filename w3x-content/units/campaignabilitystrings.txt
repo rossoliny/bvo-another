@@ -9899,3 +9899,11 @@ Art=
 Order=thunderbolt
 Researchubertip=Stuns units caught in the Shakkaho explosion for 0.5 seconds.|n|nUpdated by Rossoliny.
 Ubertip=Stuns units caught in the Shakkaho explosion for 0.5 seconds.|n|nUpdated by Rossoliny.
+
+[ABhp]
+Art=,
+Name=Book Shop Health Bonus
+Tip=Book Shop Health Bonus,Book Shop Health Bonus
+Ubertip="Permanently increases maximum health by 45. Updated by Rossoliny.","Permanently increases maximum health by 45. Updated by Rossoliny."
+Researchtip=Book Shop Health Bonus,Book Shop Health Bonus
+Researchubertip="Permanently increases maximum health by 45. Updated by Rossoliny.","Permanently increases maximum health by 45. Updated by Rossoliny."
