@@ -547,16 +547,18 @@ Ubertip="Renji commands his Zanpakuto to stretch, become longer than its regular
 Animnames=stand,ready
 Art=ReplaceableTextures\CommandButtons\BTNRenjiW.blp
 Buttonpos=1,2
+Casterattach=origin
 Hotkey=W
 Name=Hado #31: Shakkaho
-Order=flamestrike
+Order=channel
 ResearchArt=ReplaceableTextures\CommandButtons\BTNRenjiW.blp
 Researchbuttonpos=1
 Researchhotkey=W
 Researchtip=Learn Hado #31: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level %d|r]
-Researchubertip=Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffffcc00Level 1|r - (600 + (20x hero level)) damage.|n|cffffcc00Level 2|r - (700 + (20x hero level)) damage.|n|cffffcc00Level 3|r - (800 + (20x hero level)) damage.|n|cffffcc00Level 4|r - (900 + (20x hero level)) damage.|n|cffffcc00Level 5|r - (1000 + (20x hero level)) damage.|n|n|cffc3dbffCooldown:|r 15 seconds.|n|cffc3dbffMana cost:|r 175.
+Researchubertip=Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffffcc00Level 1|r - (600 + (20x hero level)) damage.|n|cffffcc00Level 2|r - (700 + (20x hero level)) damage.|n|cffffcc00Level 3|r - (800 + (20x hero level)) damage.|n|cffffcc00Level 4|r - (900 + (20x hero level)) damage.|n|cffffcc00Level 5|r - (1000 + (20x hero level)) damage.|n|n|cffc3dbffCooldown:|r 15 seconds.|n|cffc3dbffMana cost:|r 175.|n|nUpdated by Rossoliny.
+Targetattach=origin
 Tip=Hado #31: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level 1|r],Hado #32: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level 2|r],Hado #33: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level 3|r],Hado #34: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level 4|r],Hado #35: Shakkaho [|cffffcc00W|r] - [|cffffcc00Level 5|r]
-Ubertip=Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (600 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (700 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (800 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (900 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (1000 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.
+Ubertip=Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (600 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.|n|nUpdated by Rossoliny.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (700 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.|n|nUpdated by Rossoliny.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (800 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.|n|nUpdated by Rossoliny.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (900 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.|n|nUpdated by Rossoliny.,Red Fire Cannon. Renji sends a powerful Hado spell to the targeted area after casting it for .4 seconds. Dealing (1000 + (20x hero level)) damage to all enemies within 300 AoE.|nThe Explosion deals damage to Renji as well.|n|cffff0000Casting|r|n|n|cffc3dbffCooldown:|r 15 seconds.|n|nUpdated by Rossoliny.
 
 [A015]
 Art=ReplaceableTextures\CommandButtons\BTNClawsOfAttack.blp
@@ -9891,3 +9893,9 @@ Art=
 Order=
 Researchubertip=Slows enemy movement by 50% within 200 AoE of a scattered segment. Overlapping segment auras do not stack. Disabled during Hikotsu Taiho.|n|nUpdated by Rossoliny.
 Ubertip=Slows enemy movement by 50% within 200 AoE of a scattered segment. Overlapping segment auras do not stack. Disabled during Hikotsu Taiho.|n|nUpdated by Rossoliny.
+[A0W0]
+Name=Hado #31: Shakkaho Stun
+Art=
+Order=thunderbolt
+Researchubertip=Stuns units caught in the Shakkaho explosion for 0.5 seconds.|n|nUpdated by Rossoliny.
+Ubertip=Stuns units caught in the Shakkaho explosion for 0.5 seconds.|n|nUpdated by Rossoliny.

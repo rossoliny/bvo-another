@@ -25,6 +25,13 @@ Renji
 		Maximum weapon length increased from 720 to 800. The hit radius around each segment remains 100; at full extension the outer hit boundary reaches 900 instead of 820, providing a 100-range margin beyond the farthest selected point.
 		The swing direction is fixed toward the selected point when cast. Visual segments and damage checks use the same coordinates. Damage, mana cost and cooldown are preserved.
 
+	[W]
+		Changes relative to the original Unryze 1.1a:
+		Hado #31: Shakkaho is ported from Unryze 1.1c: Channel replaces Flame Strike; a per-cast timer explodes after 0.4 seconds only if the preparation order is still active.
+		Damage is one physical hit instead of the original War Stomp and separate hero-level hit. The formula remains (500 + 100 x ability level + 20 x hero level), radius 300, mana cost 175, cooldown 15 seconds and cast range 750.
+		Stun increases from 0.1 to 0.5 seconds. Self damage and stun apply only when Renji himself is within the explosion radius; another friendly hero near the blast no longer causes remote self damage.
+		Cancellation follows 1.1c: changing the preparation order prevents the explosion, without a scripted cooldown reset or mana refund. The old projectile/finish handlers are removed and the bot order is updated.
+
 	[E]
 		Changes relative to the original Unryze 1.1a:
 		E restrictions on attacks and abilities end 1 second after casting, regardless of a hit or flight cancellation. In the original, recovery occurred 2 seconds after E ended.
@@ -39,6 +46,7 @@ Renji
 	[R]
 		Changes relative to the original Unryze 1.1a:
 		Rotation follows 1.1c: the fully extended snake starts in front of Renji, turns 360 degrees in 10-degree steps every 0.03 seconds, and finishes at the original facing. The current 19 segments and tapered tail are retained for compatibility with T.
+		Queued movement is cleared once immediately before control returns after the rotation; manual Bankai Dismissal continues preserving current actions.
 		Segments then land across a 1500-unit-wide area in front of the cast position, up to 1.3 snake lengths (1605.5 units) forward. Shuffled width slots and depth variation prevent a straight-line layout. Airborne scatter is shortened from the original 1.8 seconds to 1 second; landing points are clipped at the playable map border.
 		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. Bankai Dismissal has a 75-second cooldown, matching the main R, with no initial delay before it becomes available.
 		Manual return does not stop movement or interrupt the hero's current actions.
@@ -51,6 +59,7 @@ Renji
 		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and the explosion sound from Renji's Higa Zekko once for the whole return.
 
 	[Descriptions]
+		W: original 1.1c learn and normal descriptions are restored on all levels, with the project signature appended.
 		Q: original 1.1a text with range 800; cast timing is omitted from the tooltip.
 		E: shortened original text with correct Strength scaling, 250 mana and recovery after 1 second; flight details are omitted.
 		R: original 1.1a text with a 1-second stun, knockback and 50% slow near the segments. The return button is named Bankai Dismissal and lists damage per segment, radius and a 75-second cooldown.

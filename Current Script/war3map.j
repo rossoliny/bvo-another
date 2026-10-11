@@ -319,7 +319,7 @@ globals
     group ld=null
     group Jd=null
     location Kd=null
-    location Ld=null
+    location AIAbilityTargetPosition=null
     location Md=null
     group array Nd
     location array Od
@@ -666,7 +666,7 @@ globals
     integer array xk
     group array yk
     boolean RenjiDisarmed=false
-    unit Ak=null
+    unit RenjiHero=null
     group RenjiRHitUnits=null
     boolean RenjiTActive=false
     group RenjiTBlastHitUnits=null
@@ -999,7 +999,7 @@ globals
     sound cr=null
     sound Dr=null
     sound Er=null
-    sound Fr=null
+    sound RenjiWSound=null
     sound Gr=null
     sound Hr=null
     sound Ir=null
@@ -1589,9 +1589,7 @@ globals
     group RenjiQTargets=null
     trigger RenjiQCastTrigger=null
     trigger RenjiQWaveTrigger=null
-    trigger lB=null
-    trigger JB=null
-    trigger KB=null
+    trigger RenjiWCastTrigger=null
     trigger gg_trg_DemonicBoot=null
     trigger gg_trg_Moon_Armor=null
     trigger gg_trg_Demonic_Armor=null
@@ -1614,6 +1612,18 @@ globals
     timer array RenjiEActiveFlights
     integer RenjiEFlightCount=0
     trigger RenjiETrigger=null
+    constant real RENJI_W_UPDATE_PERIOD=0.01
+    constant integer RENJI_W_PREPARATION_TICKS=40
+    constant real RENJI_W_BLAST_RADIUS=300.0
+    constant integer RENJI_W_STUN_ABILITY_ID='A0W0'
+    constant integer RENJI_W_CASTER_KEY=0
+    constant integer RENJI_W_TARGET_X_KEY=1
+    constant integer RENJI_W_TARGET_Y_KEY=2
+    constant integer RENJI_W_LEVEL_KEY=3
+    constant integer RENJI_W_TICKS_KEY=4
+    constant integer RENJI_W_ORDER_KEY=5
+    constant integer RENJI_W_ACTIVE_TIMER_KEY=6
+    hashtable RenjiWState=null
     unit RenjiWSelfDamageSource=null
     unit RenjiRCaster=null
     unit RenjiTCaster=null
@@ -3889,14 +3899,14 @@ function l6 takes nothing returns nothing
     call SetSoundDistanceCutoff(qp,1000.)
     call SetSoundConeAngles(qp,.0,.0,127)
     call SetSoundConeOrientation(qp,.0,.0,.0)
-    set Fr=CreateSound("Sounds\\Bleach\\Spells\\Renji\\Shakkahou.mp3",false,true,false,10,10,"DefaultEAXON")
-    call SetSoundChannel(Fr,0)
-    call SetSoundVolume(Fr,100)
-    call SetSoundPitch(Fr,1.)
-    call SetSoundDistances(Fr,.0,1800.)
-    call SetSoundDistanceCutoff(Fr,1000.)
-    call SetSoundConeAngles(Fr,.0,.0,127)
-    call SetSoundConeOrientation(Fr,.0,.0,.0)
+    set RenjiWSound=CreateSound("Sounds\\Bleach\\Spells\\Renji\\Shakkahou.mp3",false,true,false,10,10,"DefaultEAXON")
+    call SetSoundChannel(RenjiWSound,0)
+    call SetSoundVolume(RenjiWSound,100)
+    call SetSoundPitch(RenjiWSound,1.)
+    call SetSoundDistances(RenjiWSound,.0,1800.)
+    call SetSoundDistanceCutoff(RenjiWSound,1000.)
+    call SetSoundConeAngles(RenjiWSound,.0,.0,127)
+    call SetSoundConeOrientation(RenjiWSound,.0,.0,.0)
     set tq=CreateSound("Sounds\\Bleach\\Spells\\Renji\\HigaZekko.mp3",false,true,false,10,10,"DefaultEAXON")
     call SetSoundChannel(tq,0)
     call SetSoundVolume(tq,100)
@@ -8602,21 +8612,24 @@ function TK takes nothing returns boolean
     return(((GetPlayerController(GetOwningPlayer(GetTriggerUnit()))==MAP_CONTROL_COMPUTER)and(MG(GetTriggerUnit(),UNIT_TYPE_HERO))and(MG(GetAttacker(),UNIT_TYPE_HERO))and(UnitHasBuffBJ(GetTriggerUnit(),'B023')==false)and(UnitHasBuffBJ(GetTriggerUnit(),'B022')==false)and(UnitHasBuffBJ(GetTriggerUnit(),'BPSE')==false)and(IsUnitEnemy(GetAttacker(),GetOwningPlayer(GetTriggerUnit())))))
 endfunction
 
-function UK takes nothing returns nothing
+function AIUsePointAbilitiesWhenAttacked takes nothing returns nothing
     call TriggerSleepAction(1.)
-    set Ld=GetUnitLoc(GetAttacker())
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852593,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852580,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852218,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852125,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852121,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852089,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852488,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852592,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852221,Ld)
-    call IssuePointOrderByIdLoc(GetTriggerUnit(),852224,Ld)
-    call RemoveLocation(Ld)
-    set Ld=null
+    set AIAbilityTargetPosition=GetUnitLoc(GetAttacker())
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852593,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852580,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852218,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852125,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852121,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852089,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852488,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852592,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852221,AIAbilityTargetPosition)
+    call IssuePointOrderByIdLoc(GetTriggerUnit(),852224,AIAbilityTargetPosition)
+    if GetUnitTypeId(GetTriggerUnit())=='H01Q' then
+        call IssuePointOrder(GetTriggerUnit(),"roar",GetLocationX(AIAbilityTargetPosition),GetLocationY(AIAbilityTargetPosition))
+    endif
+    call RemoveLocation(AIAbilityTargetPosition)
+    set AIAbilityTargetPosition=null
     call DisableTrigger(GetTriggeringTrigger())
     call TriggerSleepAction(.25)
     call EnableTrigger(GetTriggeringTrigger())
@@ -8627,7 +8640,7 @@ function VK takes nothing returns nothing
     call DisableTrigger(Ns)
     call TriggerRegisterAnyUnitEventBJ(Ns,EVENT_PLAYER_UNIT_ATTACKED)
     call TriggerAddCondition(Ns,Condition(function TK))
-    call TriggerAddAction(Ns,function UK)
+    call TriggerAddAction(Ns,function AIUsePointAbilitiesWhenAttacked)
 endfunction
 
 function WK takes nothing returns boolean
@@ -9913,7 +9926,7 @@ function WO takes nothing returns nothing
         call TriggerRegisterUnitEvent(NF,nj,EVENT_UNIT_ISSUED_TARGET_ORDER)
     endif
     if(((GetUnitTypeId(GetEnteringUnit())=='H01Q')))then
-        set Ak=GetEnteringUnit()
+        set RenjiHero=GetEnteringUnit()
         set E9[57]=GetRectCenter(to)
         set lh[9]=1
         loop
@@ -9924,7 +9937,7 @@ function WO takes nothing returns nothing
         call RemoveLocation(E9[57])
         set E9[57]=null
         call TriggerExecute(DB)
-        call TriggerRegisterUnitEvent(NF,Ak,EVENT_UNIT_ISSUED_TARGET_ORDER)
+        call TriggerRegisterUnitEvent(NF,RenjiHero,EVENT_UNIT_ISSUED_TARGET_ORDER)
     endif
     if(((GetUnitTypeId(GetEnteringUnit())=='UC13')))then
         set oj=GetEnteringUnit()
@@ -45124,19 +45137,17 @@ function Bye takes nothing returns nothing
 endfunction
 
 function BYe takes nothing returns boolean
-    return(Ak==null)
+    return(RenjiHero==null)
 endfunction
 
 function RenjiBindHeroEvents takes nothing returns nothing
-    if(((Ak==null)))then
+    if(((RenjiHero==null)))then
         call DestroyTrigger(EB)
         call DestroyTrigger(RenjiDeathTrigger)
         call DestroyTrigger(RenjiDisarmedAttackTrigger)
         call DestroyTrigger(RenjiQCastTrigger)
         call DestroyTrigger(RenjiQWaveTrigger)
-        call DestroyTrigger(lB)
-        call DestroyTrigger(JB)
-        call DestroyTrigger(KB)
+        call DestroyTrigger(RenjiWCastTrigger)
         call DestroyTrigger(RenjiETrigger)
         call DestroyTrigger(RenjiRCastTrigger)
         call DestroyTrigger(RenjiRReturnTrigger)
@@ -45147,16 +45158,15 @@ function RenjiBindHeroEvents takes nothing returns nothing
         call DestroyTrigger(RenjiTMovementTrigger)
         call DestroyTrigger(RenjiTBlastTrigger)
     else
-        call TriggerRegisterUnitEvent(EB,Ak,EVENT_UNIT_SPELL_CAST)
-        call TriggerRegisterUnitEvent(RenjiDeathTrigger,Ak,EVENT_UNIT_DEATH)
-        call TriggerRegisterUnitEvent(RenjiQCastTrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(lB,Ak,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(JB,Ak,EVENT_UNIT_SPELL_FINISH)
-        call TriggerRegisterUnitEvent(RenjiETrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(RenjiRCastTrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(RenjiRReturnTrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(QB,Ak,EVENT_UNIT_SPELL_CAST)
-        call TriggerRegisterUnitEvent(RenjiTCastTrigger,Ak,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(EB,RenjiHero,EVENT_UNIT_SPELL_CAST)
+        call TriggerRegisterUnitEvent(RenjiDeathTrigger,RenjiHero,EVENT_UNIT_DEATH)
+        call TriggerRegisterUnitEvent(RenjiQCastTrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(RenjiWCastTrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(RenjiETrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(RenjiRCastTrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(RenjiRReturnTrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(QB,RenjiHero,EVENT_UNIT_SPELL_CAST)
+        call TriggerRegisterUnitEvent(RenjiTCastTrigger,RenjiHero,EVENT_UNIT_SPELL_EFFECT)
     endif
 endfunction
 
@@ -45689,36 +45699,6 @@ function InitRenjiQWaveTrigger takes nothing returns nothing
     call TriggerAddAction(RenjiQWaveTrigger,function RenjiQUpdateWave)
 endfunction
 
-function cHe takes nothing returns boolean
-    return(GetSpellAbilityId()=='A014')
-endfunction
-
-function cje takes nothing returns nothing
-    set sk[4]=GetTriggerUnit()
-    set uk[4]=GetSpellTargetLoc()
-    set uk[5]=GetUnitLoc(sk[4])
-    call TriggerSleepAction(4.)
-    call RemoveLocation(uk[4])
-    set uk[4]=null
-    call RemoveLocation(uk[5])
-    set uk[5]=null
-    set sk[4]=null
-endfunction
-
-function cJe takes nothing returns nothing
-    set lB=CreateTrigger()
-    call TriggerAddCondition(lB,Condition(function cHe))
-    call TriggerAddAction(lB,function cje)
-endfunction
-
-function cke takes nothing returns boolean
-    return(GetSpellAbilityId()=='A014')
-endfunction
-
-function cKe takes nothing returns boolean
-    return(R[(1+GetPlayerId(GetFilterPlayer()))])
-endfunction
-
 function cle takes nothing returns boolean
     return(Z7[(1+GetPlayerId(GetOwningPlayer(GetEnumUnit())))])and(UnitHasBuffBJ(GetEnumUnit(),'B004')==false)
 endfunction
@@ -45783,177 +45763,128 @@ function Trig_Shakkahou_Func021Func004001 takes nothing returns boolean
     return GetBooleanAnd(((IsUnitDeadBJ(A[88])==false)),(GetBooleanAnd(((MG(A[88],UNIT_TYPE_HERO)==false)),((A[88]!=null)))))
 endfunction
 
-function cte takes nothing returns boolean
-    return(IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(sk[4])))
-endfunction
-
-function cTe takes nothing returns boolean
-    return(MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)
-endfunction
-
-function cue takes nothing returns boolean
-    return(MG(GetFilterUnit(),UNIT_TYPE_MECHANICAL)==false)
-endfunction
-
-function cUe takes nothing returns boolean
-    return(MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)
-endfunction
-
-function cwe takes nothing returns boolean
-    return(IsUnitDeadBJ(GetFilterUnit())==false)
-endfunction
-
-function cWe takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),((IsUnitDeadBJ(GetFilterUnit())==false)))
-endfunction
-
-function cye takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MECHANICAL)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),((IsUnitDeadBJ(GetFilterUnit())==false)))))
-endfunction
-
-function cYe takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MECHANICAL)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),((IsUnitDeadBJ(GetFilterUnit())==false)))))))
-endfunction
-
-function cze takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(sk[4])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MECHANICAL)==false)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),((IsUnitDeadBJ(GetFilterUnit())==false)))))))))
-endfunction
-
-function cZe takes nothing returns nothing
-    call UnitDamageTargetBJ(sk[4],GetEnumUnit(),(20.*I2R(GetHeroLevel(sk[4]))),ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-endfunction
-
-function c_e takes nothing returns boolean
-    return(MG(GetFilterUnit(),UNIT_TYPE_HERO))
-endfunction
-
-function c0e takes nothing returns boolean
-    return(GetOwningPlayer(GetFilterUnit())==GetOwningPlayer(sk[4]))
-endfunction
-
-function c1e takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_HERO))),((GetOwningPlayer(GetFilterUnit())==GetOwningPlayer(sk[4]))))
-endfunction
-
-function c2e takes nothing returns boolean
-    return(IsUnitGroupEmptyBJ(yk[1])==false)
-endfunction
-
-function c3e takes nothing returns boolean
-    return(sk[5]!=null)
-endfunction
-
-function c4e takes nothing returns boolean
-    return(IsUnitDeadBJ(sk[5])==false)
-endfunction
-
-function c5e takes nothing returns boolean
-    return GetBooleanAnd(((sk[5]!=null)),((IsUnitDeadBJ(sk[5])==false)))
-endfunction
-
-function c6e takes nothing returns nothing
-    call KillDestructable(GetEnumDestructable())
-endfunction
-
-function c7e takes nothing returns boolean
-    return(IsTriggerEnabled(KB))
-endfunction
-
-function c8e takes nothing returns nothing
-    call CreateNUnitsAtLocFacingLocBJ(1,'h001',GetOwningPlayer(sk[4]),uk[5],uk[4])
-    set sk[5]=bj_lastCreatedUnit
-    call UnitApplyTimedLifeBJ(2.,'BTLF',sk[5])
-    call EnableTrigger(KB)
-    call CreateTextTagUnitBJ("Hado #31: Shakkaho",sk[4],0,10.,100,100.,100.,0)
-    call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
-    call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.)
-    call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function cKe)))
-    set Km[17]=GetUnitLoc(sk[5])
-    call PlaySoundAtPointBJ(Fr,100,Km[17],0)
-    call RemoveLocation(Km[17])
-    set Km[17]=null
-    call TriggerSleepAction(.01)
-    call ResetUnitAnimation(sk[4])
-    call AddSpecialEffectLocBJ(uk[4],"war3mapImported\\explosion.mdx")
-    call DestroyEffect(bj_lastCreatedEffect)
-    call AddSpecialEffectLocBJ(uk[4],"Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdl")
-    call DestroyEffect(bj_lastCreatedEffect)
-    call CreateNUnitsAtLoc(1,'u002',GetOwningPlayer(sk[4]),uk[4],bj_UNIT_FACING)
-    set RenjiWSelfDamageSource=bj_lastCreatedUnit
-    call UnitAddAbility(RenjiWSelfDamageSource,'A0BJ')
-    call SetUnitAbilityLevelSwapped('A0BJ',RenjiWSelfDamageSource,GetUnitAbilityLevelSwapped('A014',sk[4]))
-    call IssueImmediateOrderById(RenjiWSelfDamageSource,852127)
-    call UnitApplyTimedLifeBJ(2.,'BTLF',RenjiWSelfDamageSource)
-    set RenjiWSelfDamageSource=null
-    set yk[1]=e6(300.,uk[4],Condition(function cze))
-    call ForGroupBJ(yk[1],function cZe)
-    call DestroyGroup(yk[1])
-    set yk[1]=null
-    set yk[1]=e6(300.,uk[4],Condition(function c1e))
-    if(((IsUnitGroupEmptyBJ(yk[1])==false)))then
-        call CreateNUnitsAtLoc(1,'u002',Player(12),uk[4],bj_UNIT_FACING)
-        set RenjiWSelfDamageSource=bj_lastCreatedUnit
-        call UnitDamageTargetBJ(RenjiWSelfDamageSource,sk[4],((500.+(20.*I2R(GetHeroLevel(sk[4]))))+(100.*I2R(GetUnitAbilityLevelSwapped('A014',sk[4])))),ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-        call UnitApplyTimedLifeBJ(2.,'BTLF',RenjiWSelfDamageSource)
-        set RenjiWSelfDamageSource=null
+function RenjiWCleanupCast takes timer castTimer returns nothing
+    local integer castKey=GetHandleId(castTimer)
+    local unit caster=LoadUnitHandle(RenjiWState,castKey,RENJI_W_CASTER_KEY)
+    local integer casterKey=GetHandleId(caster)
+    if LoadTimerHandle(RenjiWState,casterKey,RENJI_W_ACTIVE_TIMER_KEY)==castTimer then
+        call RemoveSavedHandle(RenjiWState,casterKey,RENJI_W_ACTIVE_TIMER_KEY)
     endif
-    call DestroyGroup(yk[1])
-    set yk[1]=null
-    if((GetBooleanAnd(((sk[5]!=null)),((IsUnitDeadBJ(sk[5])==false)))))then
-        call RemoveUnit(sk[5])
+    call PauseTimer(castTimer)
+    call FlushChildHashtable(RenjiWState,castKey)
+    call DestroyTimer(castTimer)
+    set caster=null
+endfunction
+
+function RenjiWTargetIsEligible takes unit caster,unit target returns boolean
+    // Match 1.1c's DefaultUnitFilter and enemy check, including Renji himself in the blast.
+    return IsUnitAliveBJ(target) and not IsUnitHidden(target) and GetUnitAbilityLevel(target,'A01Q')==0 and not IsUnitType(target,UNIT_TYPE_STRUCTURE) and not IsUnitType(target,UNIT_TYPE_MECHANICAL) and not IsUnitType(target,UNIT_TYPE_MAGIC_IMMUNE) and (target==caster or IsUnitEnemy(caster,GetOwningPlayer(target)))
+endfunction
+
+function RenjiWStunTarget takes unit target returns nothing
+    local unit stunCaster=null
+    if IsUnitAliveBJ(target) then
+        // A neutral dummy can stun both enemies and Renji, as 1.1c's CC dummy does.
+        set stunCaster=CreateUnit(Player(13),'u002',GetUnitX(target),GetUnitY(target),bj_UNIT_FACING)
+        call UnitAddAbility(stunCaster,RENJI_W_STUN_ABILITY_ID)
+        call UnitShareVision(target,Player(13),true)
+        call IssueTargetOrder(stunCaster,"thunderbolt",target)
+        call UnitShareVision(target,Player(13),false)
+        call UnitApplyTimedLife(stunCaster,'BTLF',1.0)
     endif
-    set sk[4]=null
-    set sk[5]=null
-    call UG(300.,uk[4],function c6e)
-    call TriggerSleepAction(1.)
-    if(((IsTriggerEnabled(KB))))then
-        call DisableTrigger(KB)
-    endif
+    set stunCaster=null
 endfunction
 
-function c9e takes nothing returns nothing
-    set JB=CreateTrigger()
-    call TriggerAddCondition(JB,Condition(function cke))
-    call TriggerAddAction(JB,function c8e)
-endfunction
-
-function Cve takes nothing returns boolean
-    return(sk[5]!=null)
-endfunction
-
-function Cee takes nothing returns boolean
-    return(DistanceBetweenPoints(uk[4],uk[6])<70.)and(MG(sk[5],UNIT_TYPE_HERO)==false)
-endfunction
-
-function Cxe takes nothing returns boolean
-    return(IsUnitDeadBJ(sk[5])==false)
-endfunction
-
-function Coe takes nothing returns boolean
-    return(((DistanceBetweenPoints(uk[4],uk[6])<70.)and(MG(sk[5],UNIT_TYPE_HERO)==false)))
-endfunction
-
-function Cre takes nothing returns nothing
-    set uk[6]=PG(GetUnitLoc(sk[5]),47.,AngleBetweenPoints(GetUnitLoc(sk[5]),uk[4]))
-    call SetUnitPositionLocFacingLocBJ(sk[5],uk[6],uk[4])
-    if(((((DistanceBetweenPoints(uk[4],uk[6])<70.)and(MG(sk[5],UNIT_TYPE_HERO)==false)))))then
-        if(((IsUnitDeadBJ(sk[5])==false)))then
-            call RemoveUnit(sk[5])
+function RenjiWExplode takes unit caster,integer abilityLevel,real targetX,real targetY returns nothing
+    local group targets=CreateGroup()
+    local unit target=null
+    // 1.1c uses a damage dummy owned by the caster's player; preserve that attribution.
+    local unit damageSource=CreateUnit(GetOwningPlayer(caster),'u002',targetX,targetY,bj_UNIT_FACING)
+    local real damage=0.0
+    call UnitApplyTimedLife(damageSource,'BTLF',1.0)
+    call PlaySoundOnUnitBJ(RenjiWSound,100.0,caster)
+    call SetUnitAnimation(caster,"stand")
+    call DestroyEffect(AddSpecialEffect("war3mapImported\\explosion.mdx",targetX,targetY))
+    call DestroyEffect(AddSpecialEffect("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdl",targetX,targetY))
+    call GroupEnumUnitsInRange(targets,targetX,targetY,RENJI_W_BLAST_RADIUS,null)
+    loop
+        set target=FirstOfGroup(targets)
+        exitwhen target==null
+        call GroupRemoveUnit(targets,target)
+        if RenjiWTargetIsEligible(caster,target) then
+            set damage=500.0+100.0*I2R(abilityLevel)+20.0*I2R(GetHeroLevel(caster))
+            if target==caster then
+                set RenjiWSelfDamageSource=damageSource
+            endif
+            // All damage is one physical hit, rather than 1.1a's War Stomp plus level damage.
+            call UnitDamageTargetBJ(damageSource,target,damage,ATTACK_TYPE_HERO,DAMAGE_TYPE_NORMAL)
+            set RenjiWSelfDamageSource=null
+            call RenjiWStunTarget(target)
         endif
-        call DisableTrigger(GetTriggeringTrigger())
+    endloop
+    call DestroyGroup(targets)
+    set targets=null
+    set target=null
+    set damageSource=null
+endfunction
+
+function RenjiWUpdatePreparation takes nothing returns nothing
+    local timer castTimer=GetExpiredTimer()
+    local integer castKey=GetHandleId(castTimer)
+    local unit caster=LoadUnitHandle(RenjiWState,castKey,RENJI_W_CASTER_KEY)
+    local integer castTicks=LoadInteger(RenjiWState,castKey,RENJI_W_TICKS_KEY)+1
+    if GetUnitTypeId(caster)==0 or not IsUnitAliveBJ(caster) or LoadTimerHandle(RenjiWState,GetHandleId(caster),RENJI_W_ACTIVE_TIMER_KEY)!=castTimer then
+        call RenjiWCleanupCast(castTimer)
+    else
+        call SaveInteger(RenjiWState,castKey,RENJI_W_TICKS_KEY,castTicks)
+        if castTicks>=RENJI_W_PREPARATION_TICKS then
+            // As in 1.1c, the blast only happens if the preparation order is still current.
+            if GetUnitCurrentOrder(caster)==LoadInteger(RenjiWState,castKey,RENJI_W_ORDER_KEY) then
+                call RenjiWExplode(caster,LoadInteger(RenjiWState,castKey,RENJI_W_LEVEL_KEY),LoadReal(RenjiWState,castKey,RENJI_W_TARGET_X_KEY),LoadReal(RenjiWState,castKey,RENJI_W_TARGET_Y_KEY))
+            endif
+            // Damage callbacks may start a new W after a cooldown reset and clean up this timer.
+            if LoadTimerHandle(RenjiWState,GetHandleId(caster),RENJI_W_ACTIVE_TIMER_KEY)==castTimer then
+                call RenjiWCleanupCast(castTimer)
+            endif
+        endif
     endif
-    call RemoveLocation(uk[6])
-    set uk[6]=null
+    set caster=null
+    set castTimer=null
 endfunction
 
-function Cie takes nothing returns nothing
-    set KB=CreateTrigger()
-    call DisableTrigger(KB)
-    call TriggerRegisterTimerEventPeriodic(KB,.02)
-    call TriggerAddCondition(KB,Condition(function Cve))
-    call TriggerAddAction(KB,function Cre)
+function RenjiWCastCondition takes nothing returns boolean
+    return GetSpellAbilityId()=='A014'
 endfunction
 
+function RenjiWCast takes nothing returns nothing
+    local unit caster=GetTriggerUnit()
+    local integer casterKey=GetHandleId(caster)
+    local timer previousTimer=LoadTimerHandle(RenjiWState,casterKey,RENJI_W_ACTIVE_TIMER_KEY)
+    local timer castTimer=null
+    local integer castKey=0
+    if previousTimer!=null then
+        call RenjiWCleanupCast(previousTimer)
+    endif
+    set castTimer=CreateTimer()
+    set castKey=GetHandleId(castTimer)
+    call SaveTimerHandle(RenjiWState,casterKey,RENJI_W_ACTIVE_TIMER_KEY,castTimer)
+    call SaveUnitHandle(RenjiWState,castKey,RENJI_W_CASTER_KEY,caster)
+    call SaveInteger(RenjiWState,castKey,RENJI_W_LEVEL_KEY,GetUnitAbilityLevel(caster,'A014'))
+    call SaveInteger(RenjiWState,castKey,RENJI_W_ORDER_KEY,GetUnitCurrentOrder(caster))
+    call SaveReal(RenjiWState,castKey,RENJI_W_TARGET_X_KEY,GetSpellTargetX())
+    call SaveReal(RenjiWState,castKey,RENJI_W_TARGET_Y_KEY,GetSpellTargetY())
+    call TimerStart(castTimer,RENJI_W_UPDATE_PERIOD,true,function RenjiWUpdatePreparation)
+    set previousTimer=null
+    set castTimer=null
+    set caster=null
+endfunction
+
+function InitRenjiWTriggers takes nothing returns nothing
+    set RenjiWState=InitHashtable()
+    set RenjiWCastTrigger=CreateTrigger()
+    call TriggerAddCondition(RenjiWCastTrigger,Condition(function RenjiWCastCondition))
+    call TriggerAddAction(RenjiWCastTrigger,function RenjiWCast)
+endfunction
 
 function RenjiECastCondition takes nothing returns boolean
     return GetSpellAbilityId()=='A0BN'
@@ -46378,6 +46309,8 @@ function RenjiRCast takes nothing returns nothing
     endif
     // Capture the landing layout before movement resumes or cast coordinates are cleared.
     call RenjiRPrepareSpread()
+    // Replace queued movement while still paused, before returning control.
+    call IssueImmediateOrder(RenjiRCaster,"stop")
     call PauseUnit(RenjiRCaster,false)
     call SetUnitTimeScalePercent(RenjiRCaster,100.)
     call ResetUnitAnimation(RenjiRCaster)
@@ -80693,9 +80626,7 @@ function Q3x takes nothing returns nothing
     call InitRenjiDisarmedAttackTrigger()
     call InitRenjiQCastTrigger()
     call InitRenjiQWaveTrigger()
-    call cJe()
-    call c9e()
-    call Cie()
+    call InitRenjiWTriggers()
     call InitRenjiETrigger()
     call InitRenjiRCastTrigger()
     call InitRenjiRReturnTrigger()
