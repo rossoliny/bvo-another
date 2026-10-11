@@ -3,7 +3,7 @@ FIXES
 -Fix Ichigo Hollow Form refreshes all item cooldowns.
 -Fix Enel's R is able to strike hundrends times, bug with Darkness Spere.
 -Fix Ichigo is able to move during duel if during duel he transformed from Hollow Form back to normal.
--Fix OZ-zone portals allow to leave zone when final OZ is spawned.
+-DONE: Fix OZ-zone portals allow to leave zone when final OZ is spawned. The issue did not reproduce during the user's check with a cheat.
 -Forbid rapire based items to be combined outside of base so nobody can build item right after leaving rapire-zone.
 -Fix Hell Crusher stacking.
 -Fix Nami dissapear after Mihawk's T.
