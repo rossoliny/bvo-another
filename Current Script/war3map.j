@@ -1,4 +1,20 @@
 globals
+    string MapDisplayName = "BvO Another v1.1a Rossoliny"
+    string Scoreboard_ModeName = "TBD"
+    timer Scoreboard_Timer = null
+    integer Scoreboard_ElapsedSeconds = 0
+    integer Scoreboard_Team2Row = 0
+    integer array Scoreboard_PlayerRows
+    integer array Scoreboard_PlayerTeams
+    integer array Scoreboard_PlayerLevels
+    boolean array Scoreboard_PlayerLeft
+    integer array Scoreboard_GoldBaseline
+    integer array Scoreboard_GoldEarned
+    integer array Scoreboard_PlayerGPM
+    integer array Scoreboard_TeamKills
+    integer array Scoreboard_TeamDeaths
+    integer array Scoreboard_TeamLevels
+    integer array Scoreboard_TeamGPM
     boolean array TestCommands_Access
     boolean array TestCommands_NoCooldown
     boolean array TestCommands_InfiniteMana
@@ -71,7 +87,7 @@ globals
     integer U=0
     unit V=null
     boolean W=false
-    multiboard X=null
+    multiboard Scoreboard=null
     unit array Y
     unit array Z
     boolean d4=false
@@ -82,7 +98,7 @@ globals
     group i4=null
     integer j4=0
     boolean k4=false
-    string m4
+    string GameModeSelection
     boolean array n4
     boolean array o4
     integer array p4
@@ -1096,9 +1112,9 @@ globals
     trigger At=null
     trigger at=null
     trigger Bt=null
-    trigger bt=null
-    trigger Ct=null
-    trigger ct=null
+    trigger Scoreboard_CreateTrigger=null
+    trigger Scoreboard_RefreshTrigger=null
+    trigger Scoreboard_IconTrigger=null
     trigger Dt=null
     trigger Et=null
     trigger Ft=null
@@ -2101,6 +2117,377 @@ globals
     boolexpr KG=null
 endglobals
 
+// The visible multiboard title changes every second; map identity must not depend on it.
+function MapIdentity_IsUnexpected takes nothing returns boolean
+    return MapDisplayName != "BvO Another v1.1a Rossoliny"
+endfunction
+
+function Scoreboard_GetPlayerColor takes integer playerId returns string
+    if playerId == 0 then
+        return "|c00FF0303"
+    elseif playerId == 1 then
+        return "|c000042FF"
+    elseif playerId == 2 then
+        return "|c001CE6B9"
+    elseif playerId == 3 then
+        return "|c00540081"
+    elseif playerId == 4 then
+        return "|c00FFFC01"
+    elseif playerId == 5 then
+        return "|c00FF8000"
+    elseif playerId == 6 then
+        return "|c0020C000"
+    elseif playerId == 7 then
+        return "|c00E55BB0"
+    elseif playerId == 8 then
+        return "|c00959697"
+    elseif playerId == 9 then
+        return "|c007EBFF1"
+    elseif playerId == 10 then
+        return "|c00106246"
+    endif
+    return "|c004E2A04"
+endfunction
+
+function Scoreboard_TwoDigits takes integer value returns string
+    if value < 10 then
+        return "0" + I2S(value)
+    endif
+    return I2S(value)
+endfunction
+
+function Scoreboard_FormatTime takes integer elapsedSeconds returns string
+    local integer hours = R2I(I2R(elapsedSeconds) / 3600.)
+    local integer minutes = R2I(I2R(ModuloInteger(elapsedSeconds,3600)) / 60.)
+    return Scoreboard_TwoDigits(hours) + ":" + Scoreboard_TwoDigits(minutes) + ":" + Scoreboard_TwoDigits(ModuloInteger(elapsedSeconds,60))
+endfunction
+
+function Scoreboard_SetValue takes integer column, integer row, string value returns nothing
+    local multiboarditem cell
+    if Scoreboard != null and row > 0 then
+        set cell = MultiboardGetItem(Scoreboard,row-1,column-1)
+        call MultiboardSetItemValue(cell,value)
+        call MultiboardReleaseItem(cell)
+        set cell = null
+    endif
+endfunction
+
+function Scoreboard_SetStyle takes integer column, integer row, boolean showValue, boolean showIcon returns nothing
+    local multiboarditem cell = MultiboardGetItem(Scoreboard,row-1,column-1)
+    call MultiboardSetItemStyle(cell,showValue,showIcon)
+    call MultiboardReleaseItem(cell)
+    set cell = null
+endfunction
+
+function Scoreboard_GetHeroIcon takes integer heroTypeId returns string
+    if heroTypeId == 'H01F' or heroTypeId == 'H01G' or heroTypeId == 'H01H' or heroTypeId == 'H01I' or heroTypeId == 'H01J' then
+        return "ReplaceableTextures\\CommandButtons\\BTNichi.blp"
+    endif
+    if(((heroTypeId=='U009')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNsquall.blp"
+    endif
+    if(((heroTypeId=='H01Q')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNrenji.blp"
+    endif
+    if(((heroTypeId=='U00A')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNtousen.blp"
+    endif
+    if(((heroTypeId=='N00U')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNcroc.blp"
+    endif
+    if(((heroTypeId=='N00X')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNkuma.blp"
+    endif
+    if(((heroTypeId=='N00T')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNbrook.blp"
+    endif
+    if(((heroTypeId=='N00S')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNmoria.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='N00R')),((heroTypeId=='N009')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNAokiji.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='O005')),((heroTypeId=='O004')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNSasuke.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='O003')),((heroTypeId=='O002')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNsoifong.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='U00T')),((heroTypeId=='U00S')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNikakku.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='U00V')),((heroTypeId=='U00U')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNneliel.blp"
+    endif
+    if(((heroTypeId=='EC08')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNuryu.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='E003')),((heroTypeId=='EC12')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNhitsu.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='H00J')),((heroTypeId=='H00I')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNevilichigo.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='H004')),((heroTypeId=='H00U')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNchad.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='H00E')),((heroTypeId=='H003')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNichi.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='O000')),((heroTypeId=='OC10')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNyoruichi-chan.blp"
+    endif
+    if(((heroTypeId=='O001')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNrukia.blp"
+    endif
+    if(((heroTypeId=='NC03')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNaizen.blp"
+    endif
+    if(((heroTypeId=='UC13')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNbyakuya.blp"
+    endif
+    if(((heroTypeId=='UC11')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNoyama.blp"
+    endif
+    if(((heroTypeId=='U004')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNkenpachi.blp"
+    endif
+    if(((heroTypeId=='E004')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNinoue.blp"
+    endif
+    if(((heroTypeId=='N006')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNlucci.blp"
+    endif
+    if(((heroTypeId=='N003')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNzoro.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='N00C')),((heroTypeId=='N002')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNluffy.blp"
+    endif
+    if(((heroTypeId=='N007')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNusp.blp"
+    endif
+    if((GetBooleanOr(((heroTypeId=='N000')),((heroTypeId=='N004')))))then
+        return "ReplaceableTextures\\CommandButtons\\BTNsanji.blp"
+    endif
+    if(((heroTypeId=='N005')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNace.blp"
+    endif
+    if(((heroTypeId=='N008')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNmihawk.blp"
+    endif
+    if(((heroTypeId=='E000')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNrobin.blp"
+    endif
+    if(((heroTypeId=='E002')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNenel.blp"
+    endif
+    if(((heroTypeId=='E001')))then
+        return "ReplaceableTextures\\CommandButtons\\BTNnami.blp"
+    endif
+    return ""
+endfunction
+
+function Scoreboard_UpdatePlayer takes player boardPlayer returns nothing
+    local integer playerIndex = GetPlayerId(boardPlayer) + 1
+    local integer boardRow = Scoreboard_PlayerRows[playerIndex]
+    local string nameColor = Scoreboard_GetPlayerColor(playerIndex-1)
+    local string heroIcon
+    local multiboarditem cell
+    if Scoreboard == null or boardRow == 0 then
+        return
+    endif
+    if GetPlayerSlotState(boardPlayer) == PLAYER_SLOT_STATE_LEFT or Scoreboard_PlayerLeft[playerIndex] then
+        set nameColor = "|c00708090"
+    endif
+    if GetUnitTypeId(m[playerIndex]) != 0 then
+        set Scoreboard_PlayerLevels[playerIndex] = GetHeroLevel(m[playerIndex])
+        set heroIcon = Scoreboard_GetHeroIcon(GetUnitTypeId(m[playerIndex]))
+        if heroIcon != "" then
+            set cell = MultiboardGetItem(Scoreboard,boardRow-1,0)
+            call MultiboardSetItemIcon(cell,heroIcon)
+            call MultiboardReleaseItem(cell)
+            set cell = null
+        endif
+    endif
+    call Scoreboard_SetValue(1,boardRow,nameColor + GetPlayerName(boardPlayer) + "|r")
+    call Scoreboard_SetValue(2,boardRow,"|c00FF0000" + I2S(d[playerIndex]) + "|r")
+    call Scoreboard_SetValue(3,boardRow,"|c007EBFF1" + I2S(Scoreboard_Deaths[playerIndex]) + "|r")
+    call Scoreboard_SetValue(4,boardRow,"|c0000FFFF" + I2S(Scoreboard_PlayerLevels[playerIndex]) + "|r")
+    call Scoreboard_SetValue(5,boardRow,"|c00FFD700" + I2S(Scoreboard_PlayerGPM[playerIndex]) + "|r")
+endfunction
+
+function Scoreboard_Update takes nothing returns nothing
+    local integer playerIndex = 1
+    local integer teamIndex = 1
+    local integer teamRow
+    if Scoreboard == null then
+        return
+    endif
+    loop
+        exitwhen teamIndex > 2
+        set Scoreboard_TeamKills[teamIndex] = 0
+        set Scoreboard_TeamDeaths[teamIndex] = 0
+        set Scoreboard_TeamLevels[teamIndex] = 0
+        set Scoreboard_TeamGPM[teamIndex] = 0
+        set teamIndex = teamIndex + 1
+    endloop
+    loop
+        exitwhen playerIndex > 12
+        if Scoreboard_PlayerRows[playerIndex] != 0 then
+            call Scoreboard_UpdatePlayer(Player(playerIndex-1))
+            set teamIndex = Scoreboard_PlayerTeams[playerIndex]
+            set Scoreboard_TeamKills[teamIndex] = Scoreboard_TeamKills[teamIndex] + d[playerIndex]
+            set Scoreboard_TeamDeaths[teamIndex] = Scoreboard_TeamDeaths[teamIndex] + Scoreboard_Deaths[playerIndex]
+            set Scoreboard_TeamLevels[teamIndex] = Scoreboard_TeamLevels[teamIndex] + Scoreboard_PlayerLevels[playerIndex]
+            set Scoreboard_TeamGPM[teamIndex] = Scoreboard_TeamGPM[teamIndex] + Scoreboard_PlayerGPM[playerIndex]
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    set teamIndex = 1
+    loop
+        exitwhen teamIndex > 2
+        set teamRow = 3
+        if teamIndex == 2 then
+            set teamRow = Scoreboard_Team2Row
+        endif
+        call Scoreboard_SetValue(2,teamRow,"|c00FF0000" + I2S(Scoreboard_TeamKills[teamIndex]) + "|r")
+        call Scoreboard_SetValue(3,teamRow,"|c007EBFF1" + I2S(Scoreboard_TeamDeaths[teamIndex]) + "|r")
+        call Scoreboard_SetValue(4,teamRow,"|c0000FFFF" + I2S(Scoreboard_TeamLevels[teamIndex]) + "|r")
+        set teamIndex = teamIndex + 1
+    endloop
+    // Only UI values depend on the local player, matching 1.1c's team GPM visibility.
+    if IsPlayerInForce(GetLocalPlayer(),e) then
+        call Scoreboard_SetValue(5,3,"|c00FFD700" + I2S(Scoreboard_TeamGPM[1]) + "|r")
+        call Scoreboard_SetValue(5,Scoreboard_Team2Row,"")
+    else
+        call Scoreboard_SetValue(5,3,"")
+        call Scoreboard_SetValue(5,Scoreboard_Team2Row,"|c00FFD700" + I2S(Scoreboard_TeamGPM[2]) + "|r")
+    endif
+    call Scoreboard_SetValue(1,1,"|c00FFD700Mode: |c0000ffff" + Scoreboard_ModeName + "|r")
+    call MultiboardSetTitleText(Scoreboard,"Team Score: |c00FF0000" + I2S(h) + "|r / |c0000FF00" + I2S(j) + " |r | Win = |c0000ffff" + I2S(k) + "|r | Time: |c0000ffff" + Scoreboard_FormatTime(Scoreboard_ElapsedSeconds) + "|r")
+endfunction
+
+function Scoreboard_Tick takes nothing returns nothing
+    local integer playerIndex = 1
+    local integer currentGold
+    if N4 then
+        return
+    endif
+    set Scoreboard_ElapsedSeconds = Scoreboard_ElapsedSeconds + 1
+    loop
+        exitwhen playerIndex > 12
+        if Scoreboard_PlayerRows[playerIndex] != 0 and not Scoreboard_PlayerLeft[playerIndex] and GetPlayerSlotState(Player(playerIndex-1)) == PLAYER_SLOT_STATE_PLAYING then
+            set currentGold = GetPlayerState(Player(playerIndex-1),PLAYER_STATE_RESOURCE_GOLD)
+            if currentGold > Scoreboard_GoldBaseline[playerIndex] then
+                set Scoreboard_GoldEarned[playerIndex] = Scoreboard_GoldEarned[playerIndex] + currentGold - Scoreboard_GoldBaseline[playerIndex]
+            endif
+            set Scoreboard_GoldBaseline[playerIndex] = currentGold
+            if Scoreboard_ElapsedSeconds >= 60 then
+                set Scoreboard_PlayerGPM[playerIndex] = (Scoreboard_GoldEarned[playerIndex] * 60) / Scoreboard_ElapsedSeconds
+            endif
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    call Scoreboard_Update()
+endfunction
+
+function Scoreboard_Create takes nothing returns nothing
+    local integer playerIndex = 1
+    local integer team1Players = 0
+    local integer team2Players = 0
+    local integer totalRows
+    local integer row = 1
+    local integer column
+    local real columnWidth
+    local multiboarditem cell
+    loop
+        exitwhen playerIndex > 12
+        if GetPlayerSlotState(Player(playerIndex-1)) == PLAYER_SLOT_STATE_PLAYING and IsPlayerInForce(Player(playerIndex-1),e) then
+            set team1Players = team1Players + 1
+            set Scoreboard_PlayerRows[playerIndex] = 4 + team1Players
+            set Scoreboard_PlayerTeams[playerIndex] = 1
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    set playerIndex = 1
+    loop
+        exitwhen playerIndex > 12
+        if GetPlayerSlotState(Player(playerIndex-1)) == PLAYER_SLOT_STATE_PLAYING and IsPlayerInForce(Player(playerIndex-1),f) then
+            set team2Players = team2Players + 1
+            set Scoreboard_PlayerRows[playerIndex] = 7 + team1Players + team2Players
+            set Scoreboard_PlayerTeams[playerIndex] = 2
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    set Scoreboard_Team2Row = 6 + team1Players
+    set totalRows = 7 + team1Players + team2Players
+    set N[799] = 8
+    call CreateMultiboardBJ(5,totalRows,MapDisplayName)
+    set Scoreboard = bj_lastCreatedMultiboard
+    call MultiboardSetItemsValueColor(Scoreboard,255,205,50,255)
+    loop
+        exitwhen row > totalRows
+        set column = 1
+        loop
+            exitwhen column > 5
+            set columnWidth = .022
+            if column == 1 then
+                set columnWidth = .10
+            elseif column == 5 then
+                set columnWidth = .0265
+            endif
+            set cell = MultiboardGetItem(Scoreboard,row-1,column-1)
+            call MultiboardSetItemWidth(cell,columnWidth)
+            call MultiboardSetItemValue(cell,"")
+            call MultiboardSetItemStyle(cell,column != 5,false)
+            if row == 2 or row == 4 or row == 5 + team1Players or row == 7 + team1Players then
+                call MultiboardSetItemStyle(cell,false,false)
+            endif
+            call MultiboardReleaseItem(cell)
+            set column = column + 1
+        endloop
+        set row = row + 1
+    endloop
+    set playerIndex = 1
+    loop
+        exitwhen playerIndex > 12
+        set row = Scoreboard_PlayerRows[playerIndex]
+        if row != 0 then
+            set Scoreboard_GoldBaseline[playerIndex] = GetPlayerState(Player(playerIndex-1),PLAYER_STATE_RESOURCE_GOLD)
+            set cell = MultiboardGetItem(Scoreboard,row-1,0)
+            call MultiboardSetItemStyle(cell,true,true)
+            call MultiboardSetItemIcon(cell,"UI\\Console\\Human\\human-transport-slot.blp")
+            call MultiboardReleaseItem(cell)
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    set cell = null
+    call Scoreboard_SetStyle(5,1,true,false)
+    call Scoreboard_SetStyle(5,3,true,false)
+    call Scoreboard_SetStyle(5,Scoreboard_Team2Row,true,false)
+    call Scoreboard_SetValue(2,1,"|c00FF0000K|r")
+    call Scoreboard_SetValue(3,1,"|c007EBFF1D|r")
+    call Scoreboard_SetValue(4,1,"|c0000FFFFL|r")
+    call Scoreboard_SetValue(5,1,"|c00FFD700GPM|r")
+    call Scoreboard_SetValue(1,3,"|c00FF0000Team 1|r")
+    call Scoreboard_SetValue(1,Scoreboard_Team2Row,"|c0000FF00Team 2|r")
+    call Scoreboard_Update()
+    call MultiboardMinimize(Scoreboard,true)
+    call MultiboardMinimize(Scoreboard,false)
+    call EnableTrigger(Scoreboard_RefreshTrigger)
+    call DestroyTimer(GetExpiredTimer())
+endfunction
+
+function Scoreboard_ScheduleCreation takes nothing returns nothing
+    local timer creationTimer = CreateTimer()
+    // Warcraft III cannot display multiboards during map initialization.
+    call TimerStart(creationTimer,.01,false,function Scoreboard_Create)
+    set creationTimer = null
+    call DestroyTrigger(GetTriggeringTrigger())
+endfunction
+
+
 function MG takes unit NG,unittype OG returns boolean
     return(IsUnitType(NG,OG)!=null)
 endfunction
@@ -2489,7 +2876,7 @@ function I6 takes nothing returns nothing
     set i4=CreateGroup()
     set j4=0
     set k4=false
-    set m4=""
+    set GameModeSelection=""
     set i=0
     loop
         exitwhen(i>1)
@@ -5697,7 +6084,7 @@ function BH takes nothing returns boolean
     return(((CountPlayersInForceBJ(t6(Condition(function xH)))>=5)and(CountPlayersInForceBJ(t6(Condition(function AH)))>=5)))
 endfunction
 
-function bH takes nothing returns nothing
+function Match_InitializeTeams takes nothing returns nothing
     set bj_forLoopAIndex=1
     set bj_forLoopAIndexEnd=6
     loop
@@ -5723,7 +6110,7 @@ function bH takes nothing returns nothing
     set M9=t6(Condition(function jH))
     call ForForce(M9,function kH)
     call ClearSelection()
-    set m4="BvO Another v1.1a -"
+    set GameModeSelection="BvO Another v1.1a Rossoliny -"
     set H7=" "
     set u4=0
     set N[799]=8
@@ -5772,13 +6159,13 @@ function bH takes nothing returns nothing
     if(((((CountPlayersInForceBJ(t6(Condition(function xH)))>=5)and(CountPlayersInForceBJ(t6(Condition(function AH)))>=5)))))then
         call EnableTrigger(W3)
     endif
-    call TriggerExecute(bt)
+    call TriggerExecute(Scoreboard_CreateTrigger)
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
 function CH takes nothing returns nothing
     set xs=CreateTrigger()
-    call TriggerAddAction(xs,function bH)
+    call TriggerAddAction(xs,function Match_InitializeTeams)
 endfunction
 
 function cH takes nothing returns nothing
@@ -6251,83 +6638,83 @@ function IH takes nothing returns boolean
 endfunction
 
 function lH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -ar")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -ar")
 endfunction
 
 function JH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -np")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -np")
 endfunction
 
 function KH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -hs")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -hs")
 endfunction
 
 function LH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -ds")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -ds")
 endfunction
 
 function MH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -nd")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -nd")
 endfunction
 
 function NH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -n3")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -n3")
 endfunction
 
 function OH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -n5")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -n5")
 endfunction
 
 function PH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -ne")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -ne")
 endfunction
 
 function QH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -ns")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -ns")
 endfunction
 
 function RH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -nr")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -nr")
 endfunction
 
 function SH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -fh")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -fh")
 endfunction
 
 function TH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -sh")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -sh")
 endfunction
 
 function UH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -nh")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -nh")
 endfunction
 
 function VH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -sc")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -sc")
 endfunction
 
 function WH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -bh")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -bh")
 endfunction
 
 function XH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -nf")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -nf")
 endfunction
 
 function YH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -nw")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -nw")
 endfunction
 
 function ZH takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -bo")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -bo")
 endfunction
 
 function dI takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -oo")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -oo")
 endfunction
 
 function eI takes nothing returns boolean
-    return(m4=="BvO Another v1.1a -so")
+    return(GameModeSelection=="BvO Another v1.1a Rossoliny -so")
 endfunction
 
 function fI takes nothing returns boolean
@@ -6744,7 +7131,7 @@ function tl takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function ul takes nothing returns nothing
+function GameModes_ApplySelection takes nothing returns nothing
     if(((a8==false)))then
         call EnableTrigger(sF)
     endif
@@ -6754,7 +7141,7 @@ function ul takes nothing returns nothing
     endif
     if(((g4==false)))then
         call DisplayTextToForce(bj_FORCE_ALL_PLAYERS,(E[1]+" has defaulted to Normal Mode. You will get 300 gold refunded when you pick a hero."))
-        call MultiboardSetTitleText(X,"BvO Another v1.1a Normal")
+        set Scoreboard_ModeName = "Normal"
         call DestroyTrigger(Q3)
         call DestroyTrigger(R3)
         call DestroyTrigger(S3)
@@ -6776,66 +7163,66 @@ function ul takes nothing returns nothing
         call DestroyTrigger(mF)
         call DestroyTrigger(nF)
     else
-        call MultiboardSetTitleText(X,m4)
-        if(((m4=="BvO Another v1.1a -ar")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a All Random")
+        set Scoreboard_ModeName = SubString(GameModeSelection,StringLength(MapDisplayName)+1,StringLength(GameModeSelection))
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -ar")))then
+            set Scoreboard_ModeName = "All Random"
         endif
-        if(((m4=="BvO Another v1.1a -np")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Powerups")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -np")))then
+            set Scoreboard_ModeName = "No Powerups"
         endif
-        if(((m4=="BvO Another v1.1a -hs")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Half Score")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -hs")))then
+            set Scoreboard_ModeName = "Half Score"
         endif
-        if(((m4=="BvO Another v1.1a -ds")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Double Score")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -ds")))then
+            set Scoreboard_ModeName = "Double Score"
         endif
-        if(((m4=="BvO Another v1.1a -nd")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Duel")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -nd")))then
+            set Scoreboard_ModeName = "No Duel"
         endif
-        if(((m4=="BvO Another v1.1a -n3")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No 3 vs 3 Battle")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -n3")))then
+            set Scoreboard_ModeName = "No 3 vs 3 Battle"
         endif
-        if(((m4=="BvO Another v1.1a -n5")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No 5 vs 5 Battle")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -n5")))then
+            set Scoreboard_ModeName = "No 5 vs 5 Battle"
         endif
-        if(((m4=="BvO Another v1.1a -ne")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Events")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -ne")))then
+            set Scoreboard_ModeName = "No Events"
         endif
-        if(((m4=="BvO Another v1.1a -ns")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Swap")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -ns")))then
+            set Scoreboard_ModeName = "No Swap"
         endif
-        if(((m4=="BvO Another v1.1a -nr")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Repick")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -nr")))then
+            set Scoreboard_ModeName = "No Repick"
         endif
-        if(((m4=="BvO Another v1.1a -fh")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Fast Hunt")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -fh")))then
+            set Scoreboard_ModeName = "Fast Hunt"
         endif
-        if(((m4=="BvO Another v1.1a -sh")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Slow Hunt")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -sh")))then
+            set Scoreboard_ModeName = "Slow Hunt"
         endif
-        if(((m4=="BvO Another v1.1a -nh")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Never Hunt")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -nh")))then
+            set Scoreboard_ModeName = "Never Hunt"
         endif
-        if(((m4=="BvO Another v1.1a -sc")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Super Creep")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -sc")))then
+            set Scoreboard_ModeName = "Super Creep"
         endif
-        if(((m4=="BvO Another v1.1a -bh")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Bounty Hunter")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -bh")))then
+            set Scoreboard_ModeName = "Bounty Hunter"
         endif
-        if(((m4=="BvO Another v1.1a -nf")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Fountain")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -nf")))then
+            set Scoreboard_ModeName = "No Fountain"
         endif
-        if(((m4=="BvO Another v1.1a -nw")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a No Waygates")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -nw")))then
+            set Scoreboard_ModeName = "No Waygates"
         endif
-        if(((m4=="BvO Another v1.1a -bo")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Bleach Only")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -bo")))then
+            set Scoreboard_ModeName = "Bleach Only"
         endif
-        if(((m4=="BvO Another v1.1a -oo")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a One Piece Only")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -oo")))then
+            set Scoreboard_ModeName = "One Piece Only"
         endif
-        if(((m4=="BvO Another v1.1a -so")))then
-            call MultiboardSetTitleText(X,"BvO Another v1.1a Selection Off")
+        if(((GameModeSelection=="BvO Another v1.1a Rossoliny -so")))then
+            set Scoreboard_ModeName = "Selection Off"
         endif
     endif
     if(((k4==false)))then
@@ -6855,7 +7242,7 @@ function ul takes nothing returns nothing
             endif
             set j4=j4+1
         endloop
-        call TriggerExecute(Ct)
+        call TriggerExecute(Scoreboard_RefreshTrigger)
         call ForForce(t6(Condition(function PI)),function SI)
         set bd=YG(bj_mapInitialPlayableArea,Condition(function XI))
         call ForGroupBJ(bd,function ol)
@@ -6894,7 +7281,7 @@ endfunction
 function vl takes nothing returns nothing
     set As=CreateTrigger()
     call TriggerRegisterTimerEventSingle(As,15.)
-    call TriggerAddAction(As,function ul)
+    call TriggerAddAction(As,function GameModes_ApplySelection)
 endfunction
 
 function wl takes nothing returns boolean
@@ -7258,7 +7645,7 @@ function s1 takes nothing returns nothing
                 set Cd=null
                 call DestroyGroup(bd)
                 set bd=null
-                call TriggerExecute(Ct)
+                call TriggerExecute(Scoreboard_RefreshTrigger)
             endif
             set j4=j4+1
         endloop
@@ -7493,7 +7880,7 @@ function C1 takes nothing returns nothing
     call SetTerrainTypeBJ(wd,'Ybtl',-1,3,1)
     call RemoveLocation(wd)
     set wd=null
-    set m4="BvO Another v1.1a -"
+    set GameModeSelection="BvO Another v1.1a Rossoliny -"
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
@@ -7563,14 +7950,14 @@ function N1 takes nothing returns nothing
         call SetTerrainTypeBJ(zd,'Fgrd',-1,14,1)
         call SetTerrainTypeBJ(Ad,'Fgrd',-1,14,1)
         call SetTerrainTypeBJ(ad,'Lgrd',-1,12,1)
-        set m4="BvO Another v1.1a -"
+        set GameModeSelection="BvO Another v1.1a Rossoliny -"
     else
         if(((f4==2)))then
             call SetTerrainTypeBJ(xd,'Lgrs',-1,24,1)
             call SetTerrainTypeBJ(bj[1],'Lgrs',-1,24,1)
             call SetTerrainTypeBJ(bj[2],'Lgrs',-1,24,1)
             call SetTerrainTypeBJ(yd,'Yhdg',-1,12,1)
-            set m4="BvO Another v1.1a -"
+            set GameModeSelection="BvO Another v1.1a Rossoliny -"
         else
             if(((f4==3)))then
                 call SetTerrainTypeBJ(xd,'Agrs',-1,24,1)
@@ -7580,7 +7967,7 @@ function N1 takes nothing returns nothing
                 call SetTerrainTypeBJ(zd,'Alvd',-1,14,1)
                 call SetTerrainTypeBJ(Ad,'Alvd',-1,14,1)
                 call SetTerrainTypeBJ(ad,'Alvd',-1,12,1)
-                set m4="BvO Another v1.1a -"
+                set GameModeSelection="BvO Another v1.1a Rossoliny -"
             else
                 if(((f4==4)))then
                     call SetTerrainTypeBJ(xd,'Bdsr',-1,24,1)
@@ -7590,7 +7977,7 @@ function N1 takes nothing returns nothing
                     call SetTerrainTypeBJ(yd,'Bdsd',-1,12,1)
                     call SetTerrainTypeBJ(zd,'Bdsd',-1,14,1)
                     call SetTerrainTypeBJ(Ad,'Bdsd',-1,14,1)
-                    set m4="BvO Another v1.1a -"
+                    set GameModeSelection="BvO Another v1.1a Rossoliny -"
                 else
                     if(((f4==5)))then
                         call SetTerrainTypeBJ(xd,'Wdro',-1,24,1)
@@ -7600,7 +7987,7 @@ function N1 takes nothing returns nothing
                         call SetTerrainTypeBJ(zd,'Grds',-1,14,1)
                         call SetTerrainTypeBJ(Ad,'Grds',-1,14,1)
                         call SetTerrainTypeBJ(ad,'Grds',-1,12,1)
-                        set m4="BvO Another v1.1a -"
+                        set GameModeSelection="BvO Another v1.1a Rossoliny -"
                     else
                         if(((f4==6)))then
                             call SetTerrainTypeBJ(xd,'Zsan',-1,24,1)
@@ -7610,7 +7997,7 @@ function N1 takes nothing returns nothing
                             call SetTerrainTypeBJ(zd,'Zbks',-1,14,1)
                             call SetTerrainTypeBJ(Ad,'Zbks',-1,14,1)
                             call SetTerrainTypeBJ(ad,'Zbks',-1,12,1)
-                            set m4="BvO Another v1.1a -"
+                            set GameModeSelection="BvO Another v1.1a Rossoliny -"
                         else
                             if(((f4==7)))then
                                 call SetTerrainTypeBJ(xd,'Vgrs',-1,24,1)
@@ -7620,7 +8007,7 @@ function N1 takes nothing returns nothing
                                 call SetTerrainTypeBJ(zd,'Qcbp',-1,14,1)
                                 call SetTerrainTypeBJ(Ad,'Vcbp',-1,14,1)
                                 call SetTerrainTypeBJ(ad,'Vcbp',-1,12,1)
-                                set m4="BvO Another v1.1a -"
+                                set GameModeSelection="BvO Another v1.1a Rossoliny -"
                             else
                                 if(((f4==8)))then
                                     call SetTerrainTypeBJ(xd,'Bdrt',-1,24,1)
@@ -7630,7 +8017,7 @@ function N1 takes nothing returns nothing
                                     call SetTerrainTypeBJ(zd,'Klgb',-1,14,1)
                                     call SetTerrainTypeBJ(Ad,'Klgb',-1,14,1)
                                     call SetTerrainTypeBJ(ad,'Klgb',-1,12,1)
-                                    set m4="BvO Another v1.1a -"
+                                    set GameModeSelection="BvO Another v1.1a Rossoliny -"
                                 else
                                     if(((f4==9)))then
                                         call SetTerrainTypeBJ(xd,'Cdrt',-1,24,1)
@@ -7640,7 +8027,7 @@ function N1 takes nothing returns nothing
                                         call SetTerrainTypeBJ(zd,'Clvg',-1,14,1)
                                         call SetTerrainTypeBJ(Ad,'Cpos',-1,14,1)
                                         call SetTerrainTypeBJ(ad,'Cpos',-1,12,1)
-                                        set m4="BvO Another v1.1a -"
+                                        set GameModeSelection="BvO Another v1.1a Rossoliny -"
                                     else
                                         if(((f4==10)))then
                                             call SetTerrainTypeBJ(xd,'Fdrg',-1,24,1)
@@ -7650,7 +8037,7 @@ function N1 takes nothing returns nothing
                                             call SetTerrainTypeBJ(zd,'Lrok',-1,14,1)
                                             call SetTerrainTypeBJ(Ad,'Frok',-1,14,1)
                                             call SetTerrainTypeBJ(ad,'Frok',-1,12,1)
-                                            set m4="BvO Another v1.1a -"
+                                            set GameModeSelection="BvO Another v1.1a Rossoliny -"
                                         else
                                             if(((f4==11)))then
                                                 call SetTerrainTypeBJ(xd,'Ldrg',-1,24,1)
@@ -7660,12 +8047,12 @@ function N1 takes nothing returns nothing
                                                 call SetTerrainTypeBJ(zd,'Lgrd',-1,14,1)
                                                 call SetTerrainTypeBJ(Ad,'Lgrd',-1,14,1)
                                                 call SetTerrainTypeBJ(ad,'Lgrd',-1,12,1)
-                                                set m4="BvO Another v1.1a -"
+                                                set GameModeSelection="BvO Another v1.1a Rossoliny -"
                                             else
                                                 call SetTerrainTypeBJ(xd,'Ygsb',-1,24,1)
                                                 call SetTerrainTypeBJ(bj[1],'Ygsb',-1,24,1)
                                                 call SetTerrainTypeBJ(bj[2],'Ygsb',-1,24,1)
-                                                set m4="BvO Another v1.1a -"
+                                                set GameModeSelection="BvO Another v1.1a Rossoliny -"
                                             endif
                                         endif
                                     endif
@@ -7707,29 +8094,29 @@ function O1 takes nothing returns nothing
     call TriggerAddAction(Ds,function N1)
 endfunction
 
-function P1 takes nothing returns nothing
-    call CreateQuestBJ(0,"Contacts","TRIGSTR_6743","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
+function MapInfo_CreateQuests takes nothing returns nothing
+    call CreateQuestBJ(0,"Contacts","If you have any suggestions, comments, or bug reports please write to me in Discord:\n|c001ce6b9Rossoliny#0686|r\n\nOr if you want to share ideas, bugs/glitches go and create new issues in my GitHub page:\n|c001ce6b9https://github.com/rossoliny/bvo-another/issues|r\n","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(0,"Modes & Commands","TRIGSTR_7224","ReplaceableTextures\\CommandButtons\\BTNManual3.blp")
+    call CreateQuestBJ(0,"Modes & Commands","Game Modes:\n-allrandom(-ar), -nopowerups(-np), -halfscore(-hs), -doublescore(-ds), -noduel(-nd), -no3vs3(-n3), -no5vs5(-n5), -noevents(-ne), -noswap(-ns), -norepick(-nr), -fasthunt(-fh), -slowhunt(-sh), -neverhunt(-nh), -supercreep(-sc), -bountyhunter(-bh), -nofountain(-nf), -nowaygates(-nw), -bleachonly(-bo), onepieceonly(-oo) -selectionoff(-so)\n\n\nGame Commands:\n-ms, -ma, -clear, -unstuck, -text on, -text off, -camera high(-ch), -camera low(-cl), -camera autolock(-ca), -camera normal(-cn), -help, -gameinfo\n\nSpecific Commands:\n-repick (if available), -swap (if available), -random (if you have no hero picked yet), -bounty/-b (Bounty Hunter mode), -chance/-c (if you play with Soi Fon)","ReplaceableTextures\\CommandButtons\\BTNManual3.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(0,"Credits","TRIGSTR_704","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
+    call CreateQuestBJ(0,"Credits","The first of all, thanks to Tite Kubo & Eiichiro Oda for their splendid creations. Blizzard for the World Editor, DotA Allstars, Naruto vs Bleach, FoC, and other Anime maps as my source of inspirations.\n\nAlso huge thanks to Kurogane for making this map, as it inspired me to give it a second breath with all models updated to HQ and I've also decided to give spells icons and of course sounds. I hope you will enjoy playing this map!\n\nThanks to the following sites:\n* vendev.info\n* Chaosrealm.info\n* xenforo.gamerisle.org\n* Hive Workshop\n* The Helper\n* Wc3campaigns\n* Epicwar\n* Wikipedia\n\n-Unryze\n\n\nBig thanks to Unryze for his help when I only started with this map.\n\n-Rossoliny\n","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(0,"Special Credits","TRIGSTR_127","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
+    call CreateQuestBJ(0,"Special Credits","Special thanks to:\nKurogane, Unryze, Outrunner, Nelu_o, Kira_Izuru_3th, Aeris, Aokiji, Abaraizer, Bleacher, bubble, BuRNeD, Casanova, DarkWanderer, DeathGod, Dionysis, Dope, Es&t, Fullmetall, Getsuga, hellgab, Hirako Shinji, ib4ka, kelvinator44, Ken-Chan, Kooh, Miksa, Musashi, Mr. Klauz, Neliel Tu Oderschvank, nud0Ls, Odin, One_Of_A_KinD, Pa[i]n, PirateOf7Sea, RoboKy, Sado_Yasutora, samlebeau, senbonsakura, SHP_Luffy, Somahiro, tayco, Tsukihiko12, Vietnam Boy","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Latest Version","TRIGSTR_6747","ReplaceableTextures\\CommandButtons\\BTNScrollofRegeneration.blp")
+    call CreateQuestBJ(2,"Latest Version","Get the latest version and read the changelog from:\n|c001ce6b9https://github.com/rossoliny/bvo-another/releases|r","ReplaceableTextures\\CommandButtons\\BTNScrollofRegeneration.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Author Comments","TRIGSTR_6891","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
+    call CreateQuestBJ(2,"Author Comments","Finally, BvO Another v1.1a Rossoliny is done!! Thanks to all people who helped me until this point.\nSome pictures, icons and other texture qualities were reduced due to BvO's texture compression, I recommend you to set the Texture Quality to 'High' on Warcraft III Video Options.\nThis map wasn't edited for AI, so if you found any bugs involving AI, sadly it might not change very fast, but I plan to do so in the future, however AI can never replace human.\nI would appreciate any kind of feedback about the map on my vk group: https://vk.com/acfwc3 as in the future I plan to rebalance the map, so your thoughts will be very useful.\n\n-Unryze\n\nThis version was updated by Rossoliny. Unryze's contacts are deleted due to be invalid.\n\n-Rossoliny\n","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Model Credits","TRIGSTR_057","ReplaceableTextures\\CommandButtons\\BTNCloakOfFlames.blp")
+    call CreateQuestBJ(2,"Model Credits","Modelers/animators/skinners:\nUnryze, Bandai Namco, Black Stan, Callahan, Conny Bengtsson, Daelin, Falcke, Gothar_Esp, JetFangInferno, kkangtemplar, Lady Kelaodesi, MOD, NarutoJ, Pyritie, RED BARON, Shinigami12, Tranquil, Vestras, WILLTHEALMIGHTY, Rossoliny\n\nIf you use models from this map, please add this names to your credit section!\n","ReplaceableTextures\\CommandButtons\\BTNCloakOfFlames.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Hidden Hero","TRIGSTR_110","ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp")
+    call CreateQuestBJ(2,"Hidden Hero","How to get the hidden heroes:\n> Play with -ar mode\n    or\n> use -random to pick your hero\n    and also\n> Be patient","ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
-function Q1 takes nothing returns nothing
+function MapInfo_Init takes nothing returns nothing
     set Es=CreateTrigger()
-    call TriggerAddAction(Es,function P1)
+    call TriggerAddAction(Es,function MapInfo_CreateQuests)
 endfunction
 
 function R1 takes nothing returns boolean
@@ -8315,7 +8702,7 @@ function bK takes nothing returns nothing
             set E[bj_forLoopAIndex]=((D[bj_forLoopAIndex]+GetUnitName(m[bj_forLoopAIndex]))+"|r")
             call SetPlayerName(Player(-1+(bj_forLoopAIndex)),GetUnitName(m[bj_forLoopAIndex]))
             call DisplayTimedTextToForce(s6(Player(-1+(bj_forLoopAIndex))),12.,(E[bj_forLoopAIndex]+(" has chosen "+GetHeroProperName(m[bj_forLoopAIndex]))))
-            call TriggerExecute(Ct)
+            call TriggerExecute(Scoreboard_RefreshTrigger)
             call ForForce(bj_FORCE_ALL_PLAYERS,function eK)
         endif
         set bj_forLoopAIndex=bj_forLoopAIndex+1
@@ -8988,21 +9375,19 @@ function ZL takes nothing returns nothing
     call CustomDefeatBJ(GetEnumPlayer(),"Error: 345!")
 endfunction
 
-function dM takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function eM takes nothing returns boolean
     return(GetUnitLifePercent(GetEnumUnit())<65.)
 endfunction
 
-function fM takes nothing returns nothing
+function AI_RetreatWoundedUnit takes nothing returns nothing
     if(((GetUnitLifePercent(GetEnumUnit())<65.)))then
         set Md=j9
         call IssuePointOrderByIdLoc(GetEnumUnit(),851983,Md)
         call RemoveLocation(Md)
         set Md=null
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForForce(bj_FORCE_ALL_PLAYERS,function ZL)
             call DisableTrigger(GetTriggeringTrigger())
         endif
@@ -9018,7 +9403,7 @@ endfunction
 
 function gM takes nothing returns nothing
     set R8=YG(bj_mapInitialPlayableArea,Condition(function XL))
-    call ForGroupBJ(R8,function fM)
+    call ForGroupBJ(R8,function AI_RetreatWoundedUnit)
     call DestroyGroup(R8)
     set R8=null
 endfunction
@@ -9698,7 +10083,7 @@ function kO takes nothing returns nothing
     set c8[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))]='moon'
     set D8[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))]='moon'
     set E8[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))]='moon'
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
 endfunction
 
 function mO takes nothing returns nothing
@@ -9744,9 +10129,7 @@ function vO takes nothing returns nothing
     call CustomDefeatBJ(GetEnumPlayer(),"Error!")
 endfunction
 
-function wO takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function xO takes nothing returns boolean
     return(GetUnitTypeId(GetEnteringUnit())=='E004')
@@ -9864,7 +10247,7 @@ function VO takes nothing returns boolean
     return(GetPlayerController(GetOwningPlayer(GetTriggerUnit()))==MAP_CONTROL_COMPUTER)
 endfunction
 
-function WO takes nothing returns nothing
+function Hero_HandleSelectionEntry takes nothing returns nothing
     if(((IsPlayerInForce(GetOwningPlayer(GetEnteringUnit()),e))))then
         set Sd=GetRectCenter(uo)
         call SetUnitPositionLocFacingBJ(GetEnteringUnit(),Sd,GetRandomReal(0,360))
@@ -9905,7 +10288,7 @@ function WO takes nothing returns nothing
         set mj=GetEnteringUnit()
         call TriggerExecute(iB)
         call DisplayTimedTextToForce(m6(GetOwningPlayer(mj)),30,"|c00ff0303Do not buy the following items for Orihime: Drake's Axe, Katen Kyoukotsu, Corrupted Desolator, Orb of Lightning, Orb of Frost, Mace of Zeus, and Frostmourne. The orb effects from these items will cause Orihime's attack to malfunction.|r")
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForGroupBJ(d6(bj_mapInitialPlayableArea),function uO)
             call ForForce(bj_FORCE_ALL_PLAYERS,function vO)
             call DisableTrigger(GetTriggeringTrigger())
@@ -10069,7 +10452,7 @@ function XO takes nothing returns nothing
     set Ws=CreateTrigger()
     call TriggerRegisterEnterRectSimple(Ws,to)
     call TriggerAddCondition(Ws,Condition(function nO))
-    call TriggerAddAction(Ws,function WO)
+    call TriggerAddAction(Ws,function Hero_HandleSelectionEntry)
 endfunction
 
 function YO takes nothing returns boolean
@@ -11733,9 +12116,7 @@ function P5 takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function R5 takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function S5 takes nothing returns boolean
     return(GetEnumUnit()==Y[2])
@@ -11757,7 +12138,7 @@ function W5 takes nothing returns boolean
     return(GetEnumUnit()==Z[1])
 endfunction
 
-function X5 takes nothing returns nothing
+function Event_RestoreParticipantHero takes nothing returns nothing
     set l[(1+GetPlayerId(GetOwningPlayer(GetEnumUnit())))]=false
     set J[(1+GetPlayerId(GetOwningPlayer(GetEnumUnit())))]=false
     call ShowUnitShow(GetEnumUnit())
@@ -11768,7 +12149,7 @@ function X5 takes nothing returns nothing
         if(((GetEnumUnit()==Y[2])))then
             call SetUnitPositionLoc(GetEnumUnit(),Yd)
             call SetUnitFacingToFaceLocTimed(GetEnumUnit(),ee,0)
-            if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+            if(((MapIdentity_IsUnexpected())))then
                 call ForGroupBJ(d6(bj_mapInitialPlayableArea),function P5)
                 call DisableTrigger(GetTriggeringTrigger())
             endif
@@ -12135,7 +12516,7 @@ function NT takes nothing returns nothing
         call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
         call SetTextTagLifespanBJ(bj_lastCreatedTextTag,.45)
         set Wd=YG(Do,Condition(function N5))
-        call ForGroupBJ(Wd,function X5)
+        call ForGroupBJ(Wd,function Event_RestoreParticipantHero)
         call DestroyGroup(Wd)
         set Wd=null
         call PlaySoundBJ(sp)
@@ -16686,11 +17067,9 @@ function rQv takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function rsv takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function rSv takes nothing returns nothing
+
+function Hero_ReturnToPlayableArea takes nothing returns nothing
     set ue[9]=GetUnitLoc(GetTriggerUnit())
     if(((z==false)))then
         call PanCameraToTimedLocForPlayer(GetOwningPlayer(GetTriggerUnit()),ue[9],.0)
@@ -16700,7 +17079,7 @@ function rSv takes nothing returns nothing
     endif
     call RemoveLocation(ue[9])
     set ue[9]=null
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function rQv)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -16714,7 +17093,7 @@ function rtv takes nothing returns nothing
     call TriggerRegisterLeaveRectSimple(Bt,mo)
     call TriggerRegisterLeaveRectSimple(Bt,Po)
     call TriggerAddCondition(Bt,Condition(function rmv))
-    call TriggerAddAction(Bt,function rSv)
+    call TriggerAddAction(Bt,function Hero_ReturnToPlayableArea)
 endfunction
 
 function rTv takes nothing returns boolean
@@ -16733,40 +17112,16 @@ endfunction
 function Scoreboard_Death takes nothing returns nothing
     local unit dyingHero = GetTriggerUnit()
     local integer playerIndex = GetPlayerId(GetOwningPlayer(dyingHero)) + 1
-    local integer boardRow = 0
     if not N4 and playerIndex >= 1 and playerIndex <= 12 and dyingHero == m[playerIndex] and dyingHero != Ck and IsUnitType(dyingHero,UNIT_TYPE_HERO) and not IsUnitIllusion(dyingHero) then
-        if IsPlayerInForce(GetOwningPlayer(dyingHero),e) then
-            set boardRow = playerIndex + 2
-        elseif IsPlayerInForce(GetOwningPlayer(dyingHero),f) then
-            set boardRow = playerIndex + 3
-        endif
-        if boardRow != 0 then
+        if Scoreboard_PlayerRows[playerIndex] != 0 then
             set Scoreboard_Deaths[playerIndex] = Scoreboard_Deaths[playerIndex] + 1
-            if X != null then
-                call MultiboardSetItemValueBJ(X,3,boardRow,I2S(Scoreboard_Deaths[playerIndex]))
-            endif
+            call Scoreboard_UpdatePlayer(GetOwningPlayer(dyingHero))
         endif
     endif
     set dyingHero = null
 endfunction
 
-function rwv takes nothing returns nothing
-    if(((IsPlayerInForce(GetEnumPlayer(),e))))then
-        call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"0")
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"0")
-        call MultiboardSetItemStyleBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),true,true)
-        call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"UI\\Console\\Human\\human-transport-slot.blp")
-    else
-        if(((IsPlayerInForce(GetEnumPlayer(),f))))then
-            call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
-            call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"0")
-            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"0")
-            call MultiboardSetItemStyleBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),true,true)
-            call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"UI\\Console\\Human\\human-transport-slot.blp")
-        endif
-    endif
-endfunction
+
 
 function rWv takes nothing returns boolean
     return(GetPlayerSlotState(GetFilterPlayer())==PLAYER_SLOT_STATE_EMPTY)
@@ -16780,67 +17135,19 @@ function rYv takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
-function rzv takes nothing returns nothing
-    if(((IsPlayerInForce(GetEnumPlayer(),e))))then
-        call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"---")
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
-    else
-        if(((IsPlayerInForce(GetEnumPlayer(),f))))then
-            call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"---")
-            call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
-            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
-        endif
-    endif
-endfunction
 
-function rZv takes nothing returns nothing
-    set bj_forLoopAIndex=1
-    set bj_forLoopAIndexEnd=12
-    loop
-        exitwhen bj_forLoopAIndex>bj_forLoopAIndexEnd
-        set d[bj_forLoopAIndex]=0
-        set Scoreboard_Deaths[bj_forLoopAIndex]=0
-        set bj_forLoopAIndex=bj_forLoopAIndex+1
-    endloop
-    set N[799]=8
-    call TriggerSleepAction(.01)
-    call CreateMultiboardBJ(3,15,("BvO Another v1.1a"))
-    set X=bj_lastCreatedMultiboard
-    set bj_forLoopAIndex=1
-    set bj_forLoopAIndexEnd=15
-    loop
-        exitwhen bj_forLoopAIndex>bj_forLoopAIndexEnd
-        call MultiboardSetItemWidthBJ(X,1,bj_forLoopAIndex,13.)
-        call MultiboardSetItemWidthBJ(X,2,bj_forLoopAIndex,2.5)
-        call MultiboardSetItemWidthBJ(X,3,bj_forLoopAIndex,2.5)
-        call MultiboardSetItemStyleBJ(X,1,bj_forLoopAIndex,true,false)
-        call MultiboardSetItemStyleBJ(X,2,bj_forLoopAIndex,true,false)
-        call MultiboardSetItemStyleBJ(X,3,bj_forLoopAIndex,true,false)
-        set bj_forLoopAIndex=bj_forLoopAIndex+1
-    endloop
-    call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
-    call MultiboardSetItemValueBJ(X,2,1,"|c00fffc01K|r")
-    call MultiboardSetItemValueBJ(X,3,1,"|c00fffc01D|r")
-    call MultiboardSetItemValueBJ(X,1,2,"|c00ff0000TEAM 1|r")
-    call MultiboardSetItemValueBJ(X,2,2,("|c00ff0000"+(I2S(h)+"|r")))
-    call MultiboardSetItemValueBJ(X,1,9,"|c0020c000TEAM 2|r")
-    call MultiboardSetItemValueBJ(X,2,9,("|c0020c000"+(I2S(j)+"|r")))
-    call ForForce(t6(Condition(function rTv)),function rwv)
-    call ForForce(t6(Condition(function rWv)),function rzv)
-    call MultiboardMinimize(X,true)
-    call MultiboardMinimize(X,false)
-    call EnableTrigger(Ct)
-    call DestroyTrigger(GetTriggeringTrigger())
-endfunction
 
-function r_v takes nothing returns nothing
+
+
+function Scoreboard_Init takes nothing returns nothing
     local trigger deathTrigger = CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
     call TriggerAddAction(deathTrigger,function Scoreboard_Death)
     set deathTrigger = null
-    set bt=CreateTrigger()
-    call TriggerAddAction(bt,function rZv)
+    set Scoreboard_CreateTrigger = CreateTrigger()
+    call TriggerAddAction(Scoreboard_CreateTrigger,function Scoreboard_ScheduleCreation)
+    set Scoreboard_Timer = CreateTimer()
+    call TimerStart(Scoreboard_Timer,1.,true,function Scoreboard_Tick)
 endfunction
 
 function r0v takes nothing returns boolean
@@ -16855,21 +17162,7 @@ function r2v takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
-function r3v takes nothing returns nothing
-    if(((IsPlayerInForce(GetEnumPlayer(),e))))then
-        call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),I2S(d[(1+GetPlayerId(GetEnumPlayer()))]))
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))]))
-        call TriggerExecute(ct)
-    else
-        if(((IsPlayerInForce(GetEnumPlayer(),f))))then
-            call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),GetPlayerName(GetEnumPlayer()))
-            call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),I2S(d[(1+GetPlayerId(GetEnumPlayer()))]))
-            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))]))
-            call TriggerExecute(ct)
-        endif
-    endif
-endfunction
+
 
 function r4v takes nothing returns boolean
     return(GetPlayerSlotState(GetFilterPlayer())==PLAYER_SLOT_STATE_EMPTY)
@@ -16883,17 +17176,7 @@ function r6v takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
-function r7v takes nothing returns nothing
-    if(((IsPlayerInForce(GetEnumPlayer(),e))))then
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),"-")
-    else
-        if(((IsPlayerInForce(GetEnumPlayer(),f))))then
-            call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
-            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),"-")
-        endif
-    endif
-endfunction
+
 
 function r8v takes nothing returns boolean
     return(m[(1+GetPlayerId(GetEnumPlayer()))]!=null)
@@ -16911,15 +17194,12 @@ function iev takes nothing returns boolean
     return(GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)
 endfunction
 
-function ixv takes nothing returns nothing
-    if(((GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)))then
-        call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(GetPlayerName(GetEnumPlayer())+"|r")))
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
-        if((GetBooleanAnd(((m[(1+GetPlayerId(GetEnumPlayer()))]!=null)),((IsUnitPaused(m[(1+GetPlayerId(GetEnumPlayer()))])==false)))))then
-            call PauseUnit(m[(1+GetPlayerId(GetEnumPlayer()))],true)
-        endif
+function Scoreboard_PauseDepartedHero takes nothing returns nothing
+    local unit departedHero = m[GetPlayerId(GetEnumPlayer())+1]
+    if GetPlayerSlotState(GetEnumPlayer()) == PLAYER_SLOT_STATE_LEFT and departedHero != null and not IsUnitPaused(departedHero) then
+        call PauseUnit(departedHero,true)
     endif
+    set departedHero = null
 endfunction
 
 function iov takes nothing returns boolean
@@ -16938,31 +17218,18 @@ function iav takes nothing returns boolean
     return(GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)
 endfunction
 
-function inv takes nothing returns nothing
-    if(((GetPlayerSlotState(GetEnumPlayer())==PLAYER_SLOT_STATE_LEFT)))then
-        call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(GetPlayerName(GetEnumPlayer())+"|r")))
-        call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
-        call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetEnumPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetEnumPlayer()))])+"|r")))
-        if((GetBooleanAnd(((m[(1+GetPlayerId(GetEnumPlayer()))]!=null)),((IsUnitPaused(m[(1+GetPlayerId(GetEnumPlayer()))])==false)))))then
-            call PauseUnit(m[(1+GetPlayerId(GetEnumPlayer()))],true)
-        endif
-    endif
+
+
+function Scoreboard_RefreshAction takes nothing returns nothing
+    call Scoreboard_Update()
+    call ForForce(e,function Scoreboard_PauseDepartedHero)
+    call ForForce(f,function Scoreboard_PauseDepartedHero)
 endfunction
 
-function iVv takes nothing returns nothing
-    call MultiboardSetItemValueBJ(X,2,2,("|c00ff0000"+(I2S(h)+"|r")))
-    call MultiboardSetItemValueBJ(X,2,9,("|c0020c000"+(I2S(j)+"|r")))
-    call ForForce(t6(Condition(function r0v)),function r3v)
-    call ForForce(t6(Condition(function r4v)),function r7v)
-    call MultiboardSetItemValueBJ(X,1,1,("|c00fffc01Win = "+(I2S(k)+" Team Score|r")))
-    call ForForce(e,function ixv)
-    call ForForce(f,function inv)
-endfunction
-
-function iEv takes nothing returns nothing
-    set Ct=CreateTrigger()
-    call DisableTrigger(Ct)
-    call TriggerAddAction(Ct,function iVv)
+function Scoreboard_InitRefreshTrigger takes nothing returns nothing
+    set Scoreboard_RefreshTrigger=CreateTrigger()
+    call DisableTrigger(Scoreboard_RefreshTrigger)
+    call TriggerAddAction(Scoreboard_RefreshTrigger,function Scoreboard_RefreshAction)
 endfunction
 
 function iXv takes nothing returns boolean
@@ -17437,221 +17704,13 @@ function nev takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
-function nxv takes nothing returns nothing
-    if(((IsPlayerInForce(GetEnumPlayer(),e))))then
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U009')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsquall.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H01Q')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrenji.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00A')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNtousen.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00U')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNcroc.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00X')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNkuma.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00T')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNbrook.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00S')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNmoria.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00R')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N009')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNAokiji.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O005')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O004')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNSasuke.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O003')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O002')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsoifong.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00T')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00S')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNikakku.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00V')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00U')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNneliel.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='EC08')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNuryu.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E003')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='EC12')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNhitsu.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00J')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00I')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNevilichigo.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H004')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00U')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNchad.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00E')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H003')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNichi.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O000')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='OC10')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNyoruichi-chan.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O001')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrukia.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='NC03')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNaizen.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='UC13')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNbyakuya.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='UC11')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNoyama.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U004')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNkenpachi.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E004')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNinoue.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N006')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNlucci.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N003')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNzoro.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00C')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N002')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNluffy.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N007')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNusp.blp")
-        endif
-        if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N000')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N004')))))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsanji.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N005')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNace.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N008')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNmihawk.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E000')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrobin.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E002')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNenel.blp")
-        endif
-        if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E001')))then
-            call MultiboardSetItemIconBJ(X,1,(2+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNnami.blp")
-        endif
-    else
-        if(((IsPlayerInForce(GetEnumPlayer(),f))))then
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U009')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsquall.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H01Q')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrenji.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00A')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNtousen.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00U')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNcroc.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00X')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNkuma.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00T')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNbrook.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00S')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNmoria.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00R')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N009')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNAokiji.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O005')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O004')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNSasuke.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O003')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O002')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsoifong.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00T')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00S')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNikakku.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00V')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U00U')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNneliel.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='EC08')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNuryu.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E003')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='EC12')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNhitsu.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00J')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00I')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNevilichigo.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H004')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00U')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNchad.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H00E')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='H003')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNichi.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O000')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='OC10')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNyoruichi-chan.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='O001')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrukia.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='NC03')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNaizen.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='UC13')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNbyakuya.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='UC11')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNoyama.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='U004')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNkenpachi.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E004')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNinoue.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N006')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNlucci.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N003')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNzoro.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N00C')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N002')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNluffy.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N007')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNusp.blp")
-            endif
-            if((GetBooleanOr(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N000')),((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N004')))))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNsanji.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N005')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNace.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='N008')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNmihawk.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E000')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNrobin.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E002')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNenel.blp")
-            endif
-            if(((GetUnitTypeId(m[(1+GetPlayerId(GetEnumPlayer()))])=='E001')))then
-                call MultiboardSetItemIconBJ(X,1,(3+(1+GetPlayerId(GetEnumPlayer()))),"ReplaceableTextures\\CommandButtons\\BTNnami.blp")
-            endif
-        endif
-    endif
+function Scoreboard_UpdateEnumPlayer takes nothing returns nothing
+    call Scoreboard_UpdatePlayer(GetEnumPlayer())
 endfunction
 
-function nov takes nothing returns nothing
-    set ct=CreateTrigger()
-    call TriggerAddAction(ct,function nxv)
+function Scoreboard_InitIconTrigger takes nothing returns nothing
+    set Scoreboard_IconTrigger=CreateTrigger()
+    call TriggerAddAction(Scoreboard_IconTrigger,function Scoreboard_UpdateEnumPlayer)
 endfunction
 
 function nrv takes nothing returns boolean
@@ -17717,7 +17776,7 @@ function nav takes nothing returns nothing
     call DisableTrigger(Ft)
     call ForForce(bj_FORCE_ALL_PLAYERS,function niv)
     call DisplayTextToForce(bj_FORCE_ALL_PLAYERS,"Team 1 Wins!")
-    call MultiboardMinimize(X,true)
+    call MultiboardMinimize(Scoreboard,true)
     call TimerDialogDisplay(s,false)
     call PauseAllUnitsBJ(true)
     call TriggerSleepAction(.5)
@@ -17794,7 +17853,7 @@ function nXv takes nothing returns nothing
     call DisableTrigger(Ft)
     call ForForce(bj_FORCE_ALL_PLAYERS,function nEv)
     call DisplayTextToForce(bj_FORCE_ALL_PLAYERS,"Team 2 Wins!")
-    call MultiboardMinimize(X,true)
+    call MultiboardMinimize(Scoreboard,true)
     call TimerDialogDisplay(s,false)
     call PauseAllUnitsBJ(true)
     call TriggerSleepAction(.5)
@@ -22312,7 +22371,7 @@ function Bvv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -22726,7 +22785,7 @@ function cev takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -23140,7 +23199,7 @@ function Cxv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -23554,7 +23613,7 @@ function dov takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -23968,7 +24027,7 @@ function Drv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -24382,7 +24441,7 @@ function fiv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[1]=(R7[1]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -24796,7 +24855,7 @@ function Fav takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -25210,7 +25269,7 @@ function gnv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -25624,7 +25683,7 @@ function GVv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -26038,7 +26097,7 @@ function hEv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -26452,7 +26511,7 @@ function HXv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -26866,7 +26925,7 @@ function jOv takes nothing returns nothing
     if(((RectContainsUnit(Do,GetDyingUnit()))and(Q7)))then
         set R7[2]=(R7[2]+1)
     endif
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ConditionalTriggerExecute(Dt)
     call ConditionalTriggerExecute(Et)
     call AdjustPlayerStateBJ((25*GetHeroLevel(GetDyingUnit())),GetOwningPlayer(GetKillingUnit()),PLAYER_STATE_RESOURCE_GOLD)
@@ -28212,18 +28271,16 @@ function ktv takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function kTv takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function kuv takes nothing returns nothing
+
+function Items_CombineAttackComponents takes nothing returns nothing
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I00P'))
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I01A'))
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I011'))
     call AddSpecialEffectTargetUnitBJ("origin",GetManipulatingUnit(),"Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     call UnitAddItemByIdSwapped('I01R',GetManipulatingUnit())
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function ktv)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -28233,7 +28290,7 @@ function kUv takes nothing returns nothing
     set uv=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(uv,EVENT_PLAYER_UNIT_PICKUP_ITEM)
     call TriggerAddCondition(uv,Condition(function kSv))
-    call TriggerAddAction(uv,function kuv)
+    call TriggerAddAction(uv,function Items_CombineAttackComponents)
 endfunction
 
 function kwv takes nothing returns boolean
@@ -28765,11 +28822,9 @@ function lvv takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function lev takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function lxv takes nothing returns nothing
+
+function Items_CombineDamageComponents takes nothing returns nothing
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I01Q'))
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I01E'))
     call RemoveItem(GetItemOfTypeFromUnitBJ(GetManipulatingUnit(),'I02C'))
@@ -28777,7 +28832,7 @@ function lxv takes nothing returns nothing
     call DestroyEffect(bj_lastCreatedEffect)
     call UnitAddItemByIdSwapped('I01T',GetManipulatingUnit())
     // wtf
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function lvv)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -28787,7 +28842,7 @@ function lov takes nothing returns nothing
     set Qv=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Qv,EVENT_PLAYER_UNIT_PICKUP_ITEM)
     call TriggerAddCondition(Qv,Condition(function K9v))
-    call TriggerAddAction(Qv,function lxv)
+    call TriggerAddAction(Qv,function Items_CombineDamageComponents)
 endfunction
 
 function lrv takes nothing returns boolean
@@ -30327,11 +30382,9 @@ function M6v takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function M7v takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function M8v takes nothing returns nothing
+
+function Items_CombinePurchasedComponents takes nothing returns nothing
     if(((((((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I02A'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I021'))))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00O'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I026'))))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00Z'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I036'))))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00V'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I02G'))))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I019'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I039'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00E'))))))))then
         if(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I02A'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I021'))))then
             call RemoveItem(GetItemOfTypeFromUnitBJ(GetBuyingUnit(),'I02A'))
@@ -30376,7 +30429,7 @@ function M8v takes nothing returns nothing
     else
         call UnitAddItemByIdSwapped('I006',GetBuyingUnit())
     endif
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function M6v)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -30386,7 +30439,7 @@ function M9v takes nothing returns nothing
     set Dw=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Dw,EVENT_PLAYER_UNIT_SELL_ITEM)
     call TriggerAddCondition(Dw,Condition(function MTv))
-    call TriggerAddAction(Dw,function M8v)
+    call TriggerAddAction(Dw,function Items_CombinePurchasedComponents)
 endfunction
 
 function pvv takes nothing returns boolean
@@ -31269,11 +31322,9 @@ function qNv takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function qbv takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function qBv takes nothing returns nothing
+
+function Items_CombineMagicDefenseComponents takes nothing returns nothing
     if(((((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00Q'))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I013'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'brac'))))or(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I011'))and(UnitHasItemOfTypeBJ(GetBuyingUnit(),'I01A'))))))))then
         if(((UnitHasItemOfTypeBJ(GetBuyingUnit(),'I00Q'))))then
             call RemoveItem(GetItemOfTypeFromUnitBJ(GetBuyingUnit(),'I00Q'))
@@ -31300,7 +31351,7 @@ function qBv takes nothing returns nothing
     else
         call UnitAddItemByIdSwapped('I00P',GetBuyingUnit())
     endif
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function qNv)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -31310,7 +31361,7 @@ function qcv takes nothing returns nothing
     set Rw=CreateTrigger()
     call TriggerRegisterAnyUnitEventBJ(Rw,EVENT_PLAYER_UNIT_SELL_ITEM)
     call TriggerAddCondition(Rw,Condition(function qnv))
-    call TriggerAddAction(Rw,function qBv)
+    call TriggerAddAction(Rw,function Items_CombineMagicDefenseComponents)
 endfunction
 
 function qCv takes nothing returns boolean
@@ -35822,17 +35873,15 @@ function yMv takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function ypv takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function yPv takes nothing returns nothing
+
+function Items_LockDroppedItemTemporarily takes nothing returns nothing
     set C7[1]=GetManipulatedItem()
     call SetItemDroppable(C7[1],false)
     call TriggerSleepAction(35.)
     call SetItemDroppable(C7[1],true)
     set C7[1]=null
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function yMv)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -35842,7 +35891,7 @@ function yqv takes nothing returns nothing
     set Ry=CreateTrigger()
     call TriggerRegisterPlayerUnitEventSimple(Ry,Player(0),EVENT_PLAYER_UNIT_USE_ITEM)
     call TriggerAddCondition(Ry,Condition(function ymv))
-    call TriggerAddAction(Ry,function yPv)
+    call TriggerAddAction(Ry,function Items_LockDroppedItemTemporarily)
 endfunction
 
 function yQv takes nothing returns boolean
@@ -42181,11 +42230,9 @@ function ODe takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function Ofe takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function OFe takes nothing returns nothing
+
+function Ability_UpdateDamageMultiplier takes nothing returns nothing
     if(((N[401]<5)))then
         set N[401]=(N[401]+1)
     endif
@@ -42253,7 +42300,7 @@ function OFe takes nothing returns nothing
         call IssueImmediateOrderById(A[408],851972)
         call DisableTrigger(GetTriggeringTrigger())
     endif
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function ODe)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -42264,7 +42311,7 @@ function Oge takes nothing returns nothing
     call DisableTrigger(Pa)
     call TriggerRegisterTimerEventPeriodic(Pa,.35)
     call TriggerAddCondition(Pa,Condition(function OXe))
-    call TriggerAddAction(Pa,function OFe)
+    call TriggerAddAction(Pa,function Ability_UpdateDamageMultiplier)
 endfunction
 
 function OGe takes nothing returns boolean
@@ -43292,9 +43339,7 @@ function Iqe takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function IQe takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function Ise takes nothing returns boolean
     return(RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))
@@ -43304,7 +43349,7 @@ function ISe takes nothing returns boolean
     return(IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))
 endfunction
 
-function Ite takes nothing returns nothing
+function Hero_MoveAlongTargetDirection takes nothing returns nothing
     if(((IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))))then
         set a9[6]=PG(GetUnitLoc(a[16]),35.,AngleBetweenPoints(B[46],B[47]))
         if(((((RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(no,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))))))then
@@ -43330,7 +43375,7 @@ function Ite takes nothing returns nothing
                 call TriggerExecute(hB)
             endif
         endif
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForGroupBJ(d6(bj_mapInitialPlayableArea),function Iqe)
             call DisableTrigger(GetTriggeringTrigger())
         endif
@@ -43347,7 +43392,7 @@ function ITe takes nothing returns nothing
     call DisableTrigger(gB)
     call TriggerRegisterTimerEventPeriodic(gB,.03)
     call TriggerAddCondition(gB,Condition(function Ile))
-    call TriggerAddAction(gB,function Ite)
+    call TriggerAddAction(gB,function Hero_MoveAlongTargetDirection)
 endfunction
 
 function Iue takes nothing returns boolean
@@ -50621,11 +50666,9 @@ function jEe takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function jXe takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function jOe takes nothing returns nothing
+
+function Ability_ExecuteTargetedGrab takes nothing returns nothing
     set A[93]=GetTriggerUnit()
     set a[31]=GetSpellTargetUnit()
     set C[20]=(1+GetUnitAbilityLevelSwapped('A04J',A[93]))
@@ -50716,7 +50759,7 @@ function jOe takes nothing returns nothing
     set A[93]=null
     set a[31]=null
     set C[20]=0
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function jEe)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -50725,7 +50768,7 @@ endfunction
 function jRe takes nothing returns nothing
     set Jb=CreateTrigger()
     call TriggerAddCondition(Jb,Condition(function HUe))
-    call TriggerAddAction(Jb,function jOe)
+    call TriggerAddAction(Jb,function Ability_ExecuteTargetedGrab)
 endfunction
 
 function jIe takes nothing returns boolean
@@ -60064,11 +60107,9 @@ function WCe takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function Wde takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function WDe takes nothing returns nothing
+
+function Zoro_ShishiSonson_Start takes nothing returns nothing
     if(((GetSpellAbilityId()=='A057')))then
         call CreateTextTagUnitBJ("Itoryu iai...",GetTriggerUnit(),0,10.,100,100.,100.,0)
         call SetTextTagVelocityBJ(bj_lastCreatedTextTag,100.,90)
@@ -60100,7 +60141,7 @@ function WDe takes nothing returns nothing
             endif
         endif
     endif
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function WCe)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -60109,7 +60150,7 @@ endfunction
 function Wfe takes nothing returns nothing
     set Ec=CreateTrigger()
     call TriggerAddCondition(Ec,Condition(function WXe))
-    call TriggerAddAction(Ec,function WDe)
+    call TriggerAddAction(Ec,function Zoro_ShishiSonson_Start)
 endfunction
 
 function WFe takes nothing returns boolean
@@ -63684,9 +63725,7 @@ function xCx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function xdx takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function xDx takes nothing returns boolean
     return(RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))
@@ -63696,7 +63735,7 @@ function xfx takes nothing returns boolean
     return(((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))
 endfunction
 
-function xFx takes nothing returns nothing
+function Hero_MoveHookedTarget takes nothing returns nothing
     if(((((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))))then
         set dg[27]=PG(GetUnitLoc(h8),45.,AngleBetweenPoints(GetUnitLoc(g8),GetUnitLoc(h8)))
         if(((((RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(no,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))))))then
@@ -63718,7 +63757,7 @@ function xFx takes nothing returns nothing
             set dg[27]=null
             call DisableTrigger(GetTriggeringTrigger())
         endif
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForGroupBJ(d6(bj_mapInitialPlayableArea),function xCx)
             call DisableTrigger(GetTriggeringTrigger())
         endif
@@ -63732,7 +63771,7 @@ function xgx takes nothing returns nothing
     call DisableTrigger(cD)
     call TriggerRegisterTimerEventPeriodic(cD,.03)
     call TriggerAddCondition(cD,Condition(function xAx))
-    call TriggerAddAction(cD,function xFx)
+    call TriggerAddAction(cD,function Hero_MoveHookedTarget)
 endfunction
 
 function xGx takes nothing returns boolean
@@ -67329,17 +67368,15 @@ function Orx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function Oix takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
 
-function Oax takes nothing returns nothing
+
+function Ace_Enkai_Start takes nothing returns nothing
     call CreateTextTagUnitBJ("Enkai...",GetTriggerUnit(),0,10.,100,100.,100.,0)
     call SetTextTagVelocityBJ(bj_lastCreatedTextTag,100.,90)
     call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
     call SetTextTagLifespanBJ(bj_lastCreatedTextTag,.7)
     call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function Oox)))
-    if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+    if(((MapIdentity_IsUnexpected())))then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function Orx)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -67348,7 +67385,7 @@ endfunction
 function Onx takes nothing returns nothing
     set vE=CreateTrigger()
     call TriggerAddCondition(vE,Condition(function Oxx))
-    call TriggerAddAction(vE,function Oax)
+    call TriggerAddAction(vE,function Ace_Enkai_Start)
 endfunction
 
 function OVx takes nothing returns boolean
@@ -68957,15 +68994,13 @@ function Amx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function AMx takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function Apx takes nothing returns boolean
     return(GetRandomInt(1,100)<=20)
 endfunction
 
-function APx takes nothing returns nothing
+function Ability_ApplyRandomAttackProc takes nothing returns nothing
     if(((GetRandomInt(1,100)<=20)))then
         set A[417]=GetTriggerUnit()
         set a[405]=GetAttacker()
@@ -68991,7 +69026,7 @@ function APx takes nothing returns nothing
         set A[418]=null
         set a[405]=null
         set c[405]=.0
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForGroupBJ(d6(bj_mapInitialPlayableArea),function Amx)
             call DisableTrigger(GetTriggeringTrigger())
         endif
@@ -69001,7 +69036,7 @@ endfunction
 function Aqx takes nothing returns nothing
     set HE=CreateTrigger()
     call TriggerAddCondition(HE,Condition(function Akx))
-    call TriggerAddAction(HE,function APx)
+    call TriggerAddAction(HE,function Ability_ApplyRandomAttackProc)
 endfunction
 
 function AQx takes nothing returns boolean
@@ -72429,15 +72464,13 @@ function DUx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
 
-function Dwx takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 
 function DWx takes nothing returns boolean
     return(((vf==false)and(of[2]<11)))
 endfunction
 
-function Dyx takes nothing returns nothing
+function Ability_CleanupAfterCast takes nothing returns nothing
     if(((((vf==false)and(of[2]<11)))))then
         set of[2]=(of[2]+1)
         call RemoveLocation(kf[2])
@@ -72449,7 +72482,7 @@ function Dyx takes nothing returns nothing
         call CreateNUnitsAtLoc(1,'h013',GetOwningPlayer(jf[1]),kf[2],mf[1])
         set nf[of[2]]=bj_lastCreatedUnit
         call SetUnitTimeScalePercent(nf[of[2]],200.)
-        if(((SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")))then
+        if(((MapIdentity_IsUnexpected())))then
             call ForGroupBJ(d6(bj_mapInitialPlayableArea),function DUx)
             call DisableTrigger(GetTriggeringTrigger())
         endif
@@ -72476,7 +72509,7 @@ function DYx takes nothing returns nothing
     set I3=CreateTrigger()
     call DisableTrigger(I3)
     call TriggerRegisterTimerEventPeriodic(I3,.03)
-    call TriggerAddAction(I3,function Dyx)
+    call TriggerAddAction(I3,function Ability_CleanupAfterCast)
 endfunction
 
 function Dzx takes nothing returns boolean
@@ -73197,7 +73230,7 @@ function FAx takes nothing returns nothing
     set g4=true
     set k4=true
     set G4[1]=true
-    set m4=(m4+"ar")
+    set GameModeSelection=(GameModeSelection+"ar")
     if(FOx())then
         set H7=(H7+"/|c007ebff1All Random|r")
     else
@@ -73242,7 +73275,7 @@ function FDx takes nothing returns nothing
         set I7=true
     endif
     call DisableTrigger(KF)
-    set m4=(m4+"np")
+    set GameModeSelection=(GameModeSelection+"np")
     call DestroyTrigger(KF)
     call DestroyTrigger(LF)
 endfunction
@@ -73281,8 +73314,8 @@ function Fjx takes nothing returns nothing
         set I7=true
     endif
     set k=(k/ 2)
-    call TriggerExecute(Ct)
-    set m4=(m4+"hs")
+    call TriggerExecute(Scoreboard_RefreshTrigger)
+    set GameModeSelection=(GameModeSelection+"hs")
 endfunction
 function FJx takes nothing returns nothing
     set S3=CreateTrigger()
@@ -73319,8 +73352,8 @@ function FMx takes nothing returns nothing
         set I7=true
     endif
     set k=(k*2)
-    call TriggerExecute(Ct)
-    set m4=(m4+"ds")
+    call TriggerExecute(Scoreboard_RefreshTrigger)
+    set GameModeSelection=(GameModeSelection+"ds")
 endfunction
 function Fpx takes nothing returns nothing
     set T3=CreateTrigger()
@@ -73360,7 +73393,7 @@ function FTx takes nothing returns nothing
         set I7=true
     endif
     set T7[1]=true
-    set m4=(m4+"nd")
+    set GameModeSelection=(GameModeSelection+"nd")
     call ForForce(M9,function Ftx)
     call RemoveRect(bn)
     call RemoveRect(An)
@@ -73405,7 +73438,7 @@ function Fzx takes nothing returns nothing
         set I7=true
     endif
     set T7[3]=true
-    set m4=(m4+"n3")
+    set GameModeSelection=(GameModeSelection+"n3")
     call DestroyTrigger(Zs)
     call DestroyTrigger(et)
     call DestroyTrigger(ft)
@@ -73446,7 +73479,7 @@ function F4x takes nothing returns nothing
         set I7=true
     endif
     set T7[5]=true
-    set m4=(m4+"n5")
+    set GameModeSelection=(GameModeSelection+"n5")
     call DestroyTrigger(dt)
     call DestroyTrigger(gt)
     call DestroyTrigger(ht)
@@ -73526,7 +73559,7 @@ function gxx takes nothing returns nothing
     set T7[1]=true
     set T7[3]=true
     set T7[5]=true
-    set m4=(m4+"ne")
+    set GameModeSelection=(GameModeSelection+"ne")
 endfunction
 function gox takes nothing returns nothing
     set X3=CreateTrigger()
@@ -73562,7 +73595,7 @@ function gEx takes nothing returns nothing
         set I7=true
     endif
     set a8=true
-    set m4=(m4+"ns")
+    set GameModeSelection=(GameModeSelection+"ns")
     call DestroyTrigger(sF)
     call DestroyTrigger(tF)
     call DestroyTrigger(uF)
@@ -73602,7 +73635,7 @@ function gbx takes nothing returns nothing
         set I7=true
     endif
     call DisableTrigger(qF)
-    set m4=(m4+"nr")
+    set GameModeSelection=(GameModeSelection+"nr")
     call DestroyTrigger(qF)
 endfunction
 function gBx takes nothing returns nothing
@@ -73641,7 +73674,7 @@ function gFx takes nothing returns nothing
         set I7=true
     endif
     set u4=3
-    set m4=(m4+"fh")
+    set GameModeSelection=(GameModeSelection+"fh")
 endfunction
 function ggx takes nothing returns nothing
     set dF=CreateTrigger()
@@ -73679,7 +73712,7 @@ function gkx takes nothing returns nothing
         set I7=true
     endif
     set u4=2
-    set m4=(m4+"sh")
+    set GameModeSelection=(GameModeSelection+"sh")
 endfunction
 function gKx takes nothing returns nothing
     set eF=CreateTrigger()
@@ -73718,7 +73751,7 @@ function gPx takes nothing returns nothing
         set I7=true
     endif
     set u4=1
-    set m4=(m4+"nh")
+    set GameModeSelection=(GameModeSelection+"nh")
     call RemoveLocation(j9)
     set j9=null
 endfunction
@@ -73758,7 +73791,7 @@ function gux takes nothing returns nothing
     if(gTx())then
         set I7=true
     endif
-    set m4=(m4+"sc")
+    set GameModeSelection=(GameModeSelection+"sc")
 endfunction
 function gUx takes nothing returns nothing
     set gF=CreateTrigger()
@@ -73787,9 +73820,7 @@ endfunction
 function g_x takes nothing returns nothing
     call CustomDefeatBJ(GetEnumPlayer(),"Error: 314!")
 endfunction
-function g0x takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 function g1x takes nothing returns nothing
     call DisableTrigger(GetTriggeringTrigger())
     set g4=true
@@ -73804,8 +73835,8 @@ function g1x takes nothing returns nothing
         set I7=true
     endif
     call EnableTrigger(IF)
-    set m4=(m4+"bh")
-    if(g0x())then
+    set GameModeSelection=(GameModeSelection+"bh")
+    if(MapIdentity_IsUnexpected())then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function gZx)
         call ForForce(bj_FORCE_ALL_PLAYERS,function g_x)
     endif
@@ -73851,7 +73882,7 @@ function g8x takes nothing returns nothing
     call RemoveLocation(cd)
     set cd=null
     call ShowUnitHide(mG)
-    set m4=(m4+"nf")
+    set GameModeSelection=(GameModeSelection+"nf")
 endfunction
 function g9x takes nothing returns nothing
     set iF=CreateTrigger()
@@ -73912,7 +73943,7 @@ function GEx takes nothing returns nothing
     set A7=null
     call RemoveItem(oG)
     call KillUnit(BG)
-    set m4=(m4+"nw")
+    set GameModeSelection=(GameModeSelection+"nw")
     call ForForce(M9,function GVx)
     call DestroyTrigger(wt)
     call DestroyTrigger(xt)
@@ -73992,7 +74023,7 @@ function Gbx takes nothing returns nothing
     call KillUnit(uG)
     call GroupRemoveGroup(g6('Ulic'),i4)
     call GroupRemoveGroup(g6('Udre'),i4)
-    set m4=(m4+"bo")
+    set GameModeSelection=(GameModeSelection+"bo")
 endfunction
 function GBx takes nothing returns nothing
     set kF=CreateTrigger()
@@ -74044,7 +74075,7 @@ function GFx takes nothing returns nothing
     call KillUnit(tG)
     call GroupRemoveGroup(g6('Udea'),i4)
     call GroupRemoveGroup(g6('Udre'),i4)
-    set m4=(m4+"oo")
+    set GameModeSelection=(GameModeSelection+"oo")
 endfunction
 function Ggx takes nothing returns nothing
     set mF=CreateTrigger()
@@ -74209,7 +74240,7 @@ function Gkx takes nothing returns nothing
         set I7=true
     endif
     call EnableSelect(true,false)
-    set m4=(m4+"so")
+    set GameModeSelection=(GameModeSelection+"so")
 endfunction
 function GKx takes nothing returns nothing
     set nF=CreateTrigger()
@@ -75099,9 +75130,7 @@ endfunction
 function GMx takes nothing returns nothing
     call RemoveUnit(GetEnumUnit())
 endfunction
-function Gpx takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 function GPx takes nothing returns nothing
     call DisableTrigger(GetTriggeringTrigger())
     call DisableTrigger(Q3)
@@ -75126,7 +75155,7 @@ function GPx takes nothing returns nothing
     call DisableTrigger(nF)
     call DisplayTextToForce(bj_FORCE_ALL_PLAYERS,(E[(1+GetPlayerId(GetTriggerPlayer()))]+(" has selected"+H7)))
     set N[799]=8
-    if(Gpx())then
+    if(MapIdentity_IsUnexpected())then
         call ForGroupBJ(d6(bj_mapInitialPlayableArea),function GMx)
     endif
     call DestroyTrigger(Q3)
@@ -75384,7 +75413,7 @@ function hAx takes nothing returns nothing
     set Gd=null
     call DestroyGroup(Fd)
     set Fd=null
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
     call ForForce(bj_FORCE_ALL_PLAYERS,function hIx)
     call SetPlayerUnitAvailableBJ('H01Q',false,GetTriggerPlayer())
     call SetPlayerUnitAvailableBJ('U00A',false,GetTriggerPlayer())
@@ -75906,7 +75935,7 @@ function HJx takes nothing returns nothing
                 set c8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
                 set D8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
                 set E8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                call TriggerExecute(Ct)
+                call TriggerExecute(Scoreboard_RefreshTrigger)
                 call ForForce(bj_FORCE_ALL_PLAYERS,function h4x)
             endif
         else
@@ -77070,7 +77099,7 @@ function Kex takes nothing returns nothing
         endif
         set Cj[677]=Cj[677]+1
     endloop
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
 endfunction
 function Kxx takes nothing returns nothing
     set uF=CreateTrigger()
@@ -78079,7 +78108,7 @@ function mIx takes nothing returns nothing
         endif
         set Cj[678]=Cj[678]+1
     endloop
-    call TriggerExecute(Ct)
+    call TriggerExecute(Scoreboard_RefreshTrigger)
 endfunction
 function mAx takes nothing returns nothing
     set vF=CreateTrigger()
@@ -79536,9 +79565,7 @@ endfunction
 function qIx takes nothing returns nothing
     call CustomDefeatBJ(GetEnumPlayer(),"Error; 723!!")
 endfunction
-function qAx takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
+
 function qNx takes nothing returns boolean
     return(GetPlayerController(GetFilterPlayer())==MAP_CONTROL_COMPUTER)
 endfunction
@@ -79805,7 +79832,7 @@ function QGx takes nothing returns nothing
     endif
     call DestroyGroup(jg)
     set jg=null
-    if(qAx())then
+    if(MapIdentity_IsUnexpected())then
         call ForForce(bj_FORCE_ALL_PLAYERS,function qIx)
         call DisableTrigger(GetTriggeringTrigger())
     endif
@@ -80033,15 +80060,12 @@ endfunction
 function Q_x takes nothing returns boolean
     return(IsPlayerInForce(GetTriggerPlayer(),e))
 endfunction
-function Q0x takes nothing returns boolean
-    return(SubStringBJ(MultiboardGetTitleText(X),1,17)!="BvO Another v1.1a")
-endfunction
-function Q1x takes nothing returns nothing
+
+function Match_HandlePlayerLeave takes nothing returns nothing
+    set Scoreboard_PlayerLeft[GetPlayerId(GetTriggerPlayer())+1] = true
+    call Scoreboard_UpdatePlayer(GetTriggerPlayer())
     call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,15.,(E[(1+GetPlayerId(GetTriggerPlayer()))]+" |c00ff0303has left the game|r"))
     if(Q_x())then
-        call MultiboardSetItemValueBJ(X,1,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(GetPlayerName(GetTriggerPlayer())+"|r")))
-        call MultiboardSetItemValueBJ(X,2,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
-        call MultiboardSetItemValueBJ(X,3,(2+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
         if(QKx())then
             call AddSpecialEffectLocBJ(GetUnitLoc(m[(1+GetPlayerId(GetTriggerPlayer()))]),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
@@ -80066,9 +80090,6 @@ function Q1x takes nothing returns nothing
         call SetPlayerStateBJ(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD,0)
     else
         if(QZx())then
-            call MultiboardSetItemValueBJ(X,1,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(GetPlayerName(GetTriggerPlayer())+"|r")))
-            call MultiboardSetItemValueBJ(X,2,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(d[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
-            call MultiboardSetItemValueBJ(X,3,(3+(1+GetPlayerId(GetTriggerPlayer()))),("|c00959697"+(I2S(Scoreboard_Deaths[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))
             if(QTx())then
                 call AddSpecialEffectLocBJ(GetUnitLoc(m[(1+GetPlayerId(GetTriggerPlayer()))]),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
                 call DestroyEffect(bj_lastCreatedEffect)
@@ -80091,10 +80112,10 @@ function Q1x takes nothing returns nothing
             endif
             call ForForce(t6(Condition(function Qwx)),function Qzx)
             call SetPlayerStateBJ(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD,0)
-            call TriggerExecute(Ct)
+            call TriggerExecute(Scoreboard_RefreshTrigger)
         endif
     endif
-    if(Q0x())then
+    if(MapIdentity_IsUnexpected())then
         call DisableTrigger(GetTriggeringTrigger())
     endif
 endfunction
@@ -80112,7 +80133,7 @@ function Q2x takes nothing returns nothing
     call TriggerRegisterPlayerEventLeave(TF,Player(9))
     call TriggerRegisterPlayerEventLeave(TF,Player(10))
     call TriggerRegisterPlayerEventLeave(TF,Player(11))
-    call TriggerAddAction(TF,function Q1x)
+    call TriggerAddAction(TF,function Match_HandlePlayerLeave)
 endfunction
 function Q3x takes nothing returns nothing
     call dYx()
@@ -80128,7 +80149,7 @@ function Q3x takes nothing returns nothing
     call A1()
     call c1()
     call O1()
-    call Q1()
+    call MapInfo_Init()
     call Y1()
     call eJ()
     call tJ()
@@ -80175,9 +80196,9 @@ function Q3x takes nothing returns nothing
     call rHv()
     call rlv()
     call rtv()
-    call r_v()
-    call iEv()
-    call nov()
+    call Scoreboard_Init()
+    call Scoreboard_InitRefreshTrigger()
+    call Scoreboard_InitIconTrigger()
     call nnv()
     call nOv()
     call nMv()
@@ -81505,8 +81526,8 @@ function main takes nothing returns nothing
 endfunction
 
 function config takes nothing returns nothing
-    call SetMapName("TRIGSTR_003")
-    call SetMapDescription("TRIGSTR_5692")
+    call SetMapName(MapDisplayName)
+    call SetMapDescription("Choose from 30 different heroes from anime Bleach or One Piece to join the battle arena!\n\nModes: |c0020c000-ar, -np, -hs, -ds, -nd, -n3, -n5, -ne, -ns, -nr, -fh, -sh, -nh, -sc, -bh, -nf, -nw, -bo, -oo, -so|r")
     call SetPlayers(12)
     call SetTeams(12)
     call SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)

@@ -1,6 +1,6 @@
 STRING 3
 {
-BvO Another v1.1a Rossoliny's Update
+BvO Another v1.1a Rossoliny
 }
 STRING 4
 {
@@ -156,7 +156,7 @@ STRING 3531
 }
 STRING 4654
 {
-Supported Commands in BvO Another v1.1a are:
+Supported Commands in BvO Another v1.1a Rossoliny are:
 -ms
 -ma
 -clear
@@ -198,7 +198,7 @@ Get the latest version and read the changelog from:
 }
 STRING 6891
 {
-Finally, BvO Another v1.1a is done!! Thanks to all people who helped me until this point.
+Finally, BvO Another v1.1a Rossoliny is done!! Thanks to all people who helped me until this point.
 Some pictures, icons and other texture qualities were reduced due to BvO's texture compression, I recommend you to set the Texture Quality to 'High' on Warcraft III Video Options.
 This map wasn't edited for AI, so if you found any bugs involving AI, sadly it might not change very fast, but I plan to do so in the future, however AI can never replace human.
 I would appreciate any kind of feedback about the map on my vk group: https://vk.com/acfwc3 as in the future I plan to rebalance the map, so your thoughts will be very useful.
