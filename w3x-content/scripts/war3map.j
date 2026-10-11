@@ -81746,6 +81746,44 @@ function TestCommands_EventInit takes nothing returns nothing
     set eventChatTrigger = null
 endfunction
 
+function TestCommands_RefreshChat takes nothing returns nothing
+    local player commandPlayer = GetTriggerPlayer()
+    local integer commandPlayerIndex = GetPlayerId(commandPlayer)
+    local unit commandHero = null
+
+    if not TestCommands_Access[commandPlayerIndex] then
+        call TestCommands_Message(commandPlayer,"-refresh","Отказ: доступ к читам не активирован")
+    else
+        set commandHero = TestCommands_Selected(commandPlayer)
+
+        if commandHero == null or GetUnitTypeId(commandHero) == 0 or not IsUnitType(commandHero,UNIT_TYPE_HERO) then
+            call TestCommands_Message(commandPlayer,"-refresh","Ошибка: собственный герой не найден")
+        else
+            call UnitResetCooldown(commandHero)
+            call TestCommands_Message(commandPlayer,"-refresh","КД способностей и предметов сброшены")
+        endif
+    endif
+
+    set commandHero = null
+    set commandPlayer = null
+endfunction
+
+function TestCommands_RefreshInit takes nothing returns nothing
+    local trigger refreshChatTrigger = CreateTrigger()
+    local integer playerIndex = 0
+
+    loop
+        exitwhen playerIndex >= 12
+        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            call TriggerRegisterPlayerChatEvent(refreshChatTrigger,Player(playerIndex),"-refresh",true)
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+
+    call TriggerAddAction(refreshChatTrigger,function TestCommands_RefreshChat)
+    set refreshChatTrigger = null
+endfunction
+
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
     local trigger testChat = CreateTrigger()
@@ -81771,6 +81809,7 @@ function TestCommands_Init takes nothing returns nothing
     set testMana = null
     call TestCommands_OneShotInit()
     call TestCommands_EventInit()
+    call TestCommands_RefreshInit()
 endfunction
 
 function main takes nothing returns nothing
