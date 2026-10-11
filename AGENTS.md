@@ -7,6 +7,9 @@
 ## Tests
 
 - Do not write tests unless the user explicitly requests them.
+- The repository-root `tests/` directory may contain only `.j` code fragments for testing.
+- Store rules and supporting documentation for `tests/` in this root `AGENTS.md`, outside that directory.
+- Keep temporary test diagnostics and reproduction snippets in `tests/`; do not leave them embedded in the map script after testing.
 
 ## Ability descriptions
 

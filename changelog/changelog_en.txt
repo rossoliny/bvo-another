@@ -23,6 +23,11 @@ Enel:
 Golem/Oz arena:
 - Fixed escaping through invisible waygates after the final Oz spawns. All four exit waygates are disabled until his death, then reopened.
 
+Repick:
+- Fixed all remaining heroes becoming unavailable after repick during Nami or Kuma spell cleanup.
+- Fixed some heroes randomly becoming unavailable after repick: every created selection marker is added directly to the hero pool.
+- Moved repick test diagnostics out of the map script into tests/repick-diagnostics.j.
+
 Items:
 - Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
 - Restored medal stock at Medal Exchange.
