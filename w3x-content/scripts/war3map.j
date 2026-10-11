@@ -23,6 +23,20 @@ globals
     trigger TestCommands_OneShotDamageTrigger = null
     group TestCommands_OneShotRegisteredUnits = null
     region TestCommands_OneShotWorldRegion = null
+    boolean TestCommands_IchigoInitialized = false
+    boolean TestCommands_IchigoRunning = false
+    boolean TestCommands_IchigoHollowDied = false
+    boolean TestCommands_IchigoKilledByEnel = false
+    boolean TestCommands_IchigoMamaraganStarted = false
+    boolean TestCommands_IchigoEventTimerPaused = false
+    boolean TestCommands_IchigoEnelWasPaused = false
+    integer TestCommands_IchigoSuccessfulCasts = 0
+    player TestCommands_IchigoPlayer = null
+    unit TestCommands_IchigoOriginal = null
+    unit TestCommands_IchigoEnel = null
+    unit TestCommands_IchigoHollow = null
+    item array TestCommands_IchigoItems
+    string array TestCommands_IchigoItemNames
     integer array Scoreboard_Deaths
     unit array Mihawk_T_Copies
     sound Sound_Effect_Ichigo_R_1 = null
@@ -81784,6 +81798,395 @@ function TestCommands_RefreshInit takes nothing returns nothing
     set refreshChatTrigger = null
 endfunction
 
+// This scenario uses the normal hero registration, learning and spell orders.
+// Every helper/global has the TestCommands_ prefix so release builds strip it.
+function TestCommands_IchigoLearn takes unit testHero, integer abilityId, integer maximumRank returns nothing
+    local integer learnedRank = GetUnitAbilityLevel(testHero,abilityId)
+    local integer previousRank = -1
+    if learnedRank > maximumRank then
+        call SetUnitAbilityLevel(testHero,abilityId,maximumRank)
+        set learnedRank = maximumRank
+    endif
+    loop
+        exitwhen learnedRank >= maximumRank or learnedRank == previousRank
+        set previousRank = learnedRank
+        call SelectHeroSkill(testHero,abilityId)
+        set learnedRank = GetUnitAbilityLevel(testHero,abilityId)
+    endloop
+endfunction
+
+function TestCommands_IchigoParkHero takes unit previousHero returns nothing
+    if previousHero != null and GetUnitTypeId(previousHero) != 0 then
+        call PauseUnit(previousHero,true)
+        call SetUnitInvulnerable(previousHero,true)
+        call SetUnitOwner(previousHero,Player(15),false)
+        call SetUnitPosition(previousHero,GetRectCenterX(io),GetRectCenterY(io))
+    endif
+endfunction
+
+function TestCommands_IchigoReserveHero takes integer heroTypeId, unit selectionUnit returns nothing
+    local integer playerIndex = 0
+    call RemoveUnitFromAllStock(heroTypeId)
+    call GroupRemoveUnit(i4,selectionUnit)
+    loop
+        exitwhen playerIndex >= 12
+        call SetPlayerUnitAvailableBJ(heroTypeId,false,Player(playerIndex))
+        set playerIndex = playerIndex+1
+    endloop
+endfunction
+
+function TestCommands_IchigoPrepare takes player commandPlayer returns boolean
+    local integer playerIndex = 0
+    local player enemyPlayer = null
+    local unit originalHero = hj
+    local unit enelHero = ym
+    local integer inventorySlot = 0
+    local integer freeSlots = 0
+    local integer itemIndex = 0
+    local integer itemTypeId = 0
+    if originalHero != null and GetOwningPlayer(originalHero) != commandPlayer then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: Ичиго уже выбран другим игроком; команду должен вводить его владелец")
+        return false
+    endif
+    if originalHero != null and GetUnitAbilityLevel(originalHero,'A04A') > 1 then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: для этого сценария нужен Ичиго с T не выше первого ранга")
+        return false
+    endif
+    if enelHero != null then
+        if not IsUnitEnemy(enelHero,commandPlayer) then
+            call TestCommands_Message(commandPlayer,"-testichigo","Отказ: уже выбранный Энель должен быть во вражеской команде")
+            return false
+        endif
+        set enemyPlayer = GetOwningPlayer(enelHero)
+    else
+        loop
+            exitwhen playerIndex >= 12 or enemyPlayer != null
+            if GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING and ((IsPlayerInForce(commandPlayer,e) and IsPlayerInForce(Player(playerIndex),f)) or (IsPlayerInForce(commandPlayer,f) and IsPlayerInForce(Player(playerIndex),e))) then
+                set enemyPlayer = Player(playerIndex)
+            endif
+            set playerIndex = playerIndex+1
+        endloop
+    endif
+    if enemyPlayer == null then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: нужен хотя бы один игрок или бот во вражеской команде")
+        return false
+    endif
+    if originalHero != null then
+        loop
+            exitwhen inventorySlot >= UnitInventorySize(originalHero)
+            if UnitItemInSlot(originalHero,inventorySlot) == null then
+                set freeSlots = freeSlots+1
+            endif
+            set inventorySlot = inventorySlot+1
+        endloop
+        if freeSlots < 3 then
+            call TestCommands_Message(commandPlayer,"-testichigo","Отказ: освободи три слота инвентаря Ичиго для контрольных предметов")
+            return false
+        endif
+    endif
+    if originalHero == null then
+        call TestCommands_IchigoParkHero(m[GetPlayerId(commandPlayer)+1])
+        set originalHero = CreateUnit(commandPlayer,'H003',-1024.,-6208.,0.)
+        set hj = originalHero
+        // The same registration used by Hero_HandleSelectionEntry.
+        call TriggerExecute(ka)
+        call TestCommands_IchigoReserveHero('H003',wj[5])
+    endif
+    if enelHero == null then
+        call TestCommands_IchigoParkHero(m[GetPlayerId(enemyPlayer)+1])
+        set enelHero = CreateUnit(enemyPlayer,'E002',2048.,-6208.,180.)
+        set ym = enelHero
+        call TriggerExecute(gE)
+        call TestCommands_IchigoReserveHero('E002',xj[12])
+    endif
+    set m[GetPlayerId(commandPlayer)+1] = originalHero
+    set m[GetPlayerId(enemyPlayer)+1] = enelHero
+    set TestCommands_IchigoPlayer = commandPlayer
+    set TestCommands_IchigoOriginal = originalHero
+    set TestCommands_IchigoEnel = enelHero
+    if not IsUnitAliveBJ(originalHero) then
+        call ReviveHero(originalHero,-1024.,-6208.,false)
+    endif
+    if not IsUnitAliveBJ(enelHero) then
+        call ReviveHero(enelHero,2048.,-6208.,false)
+    endif
+    if GetHeroLevel(originalHero) > 20 then
+        call UnitStripHeroLevel(originalHero,GetHeroLevel(originalHero)-20)
+    else
+        call SetHeroLevel(originalHero,20,false)
+    endif
+    if GetHeroLevel(enelHero) > 20 then
+        call UnitStripHeroLevel(enelHero,GetHeroLevel(enelHero)-20)
+    else
+        call SetHeroLevel(enelHero,20,false)
+    endif
+    // Maximum ranks permitted by the current ability data at hero level 20.
+    call TestCommands_IchigoLearn(originalHero,'A008',6)
+    call TestCommands_IchigoLearn(originalHero,'A0AQ',5)
+    call TestCommands_IchigoLearn(originalHero,'A03J',3)
+    call TestCommands_IchigoLearn(originalHero,'A00C',2)
+    call TestCommands_IchigoLearn(originalHero,'A04A',1)
+    call TestCommands_IchigoLearn(enelHero,'A0BI',6)
+    call TestCommands_IchigoLearn(enelHero,'A02X',5)
+    call TestCommands_IchigoLearn(enelHero,'A02Y',3)
+    call TestCommands_IchigoLearn(enelHero,'A02U',2)
+    call TestCommands_IchigoLearn(enelHero,'A07G',1)
+    if Ck == null or GetUnitTypeId(Ck) == 0 or GetUnitAbilityLevel(originalHero,'A04A') != 1 or GetUnitAbilityLevel(enelHero,'A02U') == 0 then
+        call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: штатное обучение не подготовило пустого или Mamaragan")
+        return false
+    endif
+    set TestCommands_Access[GetPlayerId(commandPlayer)] = true
+    set TestCommands_InfiniteMana[GetPlayerId(commandPlayer)] = true
+    set TestCommands_NoCooldown[GetPlayerId(commandPlayer)] = true
+    set inventorySlot = 0
+    loop
+        exitwhen itemIndex >= 3
+        loop
+            exitwhen inventorySlot >= UnitInventorySize(originalHero) or UnitItemInSlot(originalHero,inventorySlot) == null
+            set inventorySlot = inventorySlot+1
+        endloop
+        if itemIndex == 0 then
+            set itemTypeId = 'bspd'
+        elseif itemIndex == 1 then
+            set itemTypeId = 'ratf'
+        else
+            set itemTypeId = 'rde1'
+        endif
+        if not UnitAddItemToSlotById(originalHero,itemTypeId,inventorySlot) then
+            call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: не удалось выдать контрольный предмет")
+            return false
+        endif
+        set TestCommands_IchigoItems[itemIndex] = UnitItemInSlot(originalHero,inventorySlot)
+        set TestCommands_IchigoItemNames[itemIndex] = GetItemName(TestCommands_IchigoItems[itemIndex])
+        set itemIndex = itemIndex+1
+        set inventorySlot = inventorySlot+1
+    endloop
+    set TestCommands_IchigoInitialized = true
+    call TriggerExecute(Scoreboard_RefreshTrigger)
+    call TestCommands_Message(commandPlayer,"-testichigo","Подготовлены Ичиго и Энель, уровень 20, доступные навыки, бесконечная мана, nocd и три контрольных предмета")
+    set originalHero = null
+    set enelHero = null
+    set enemyPlayer = null
+    return true
+endfunction
+
+function TestCommands_IchigoItemLocation takes item trackedItem returns string
+    local group worldUnits = null
+    local unit itemCarrier = null
+    local string resultText = ""
+    if trackedItem == null or GetItemTypeId(trackedItem) == 0 then
+        return "удалён или не существует"
+    elseif UnitHasItem(TestCommands_IchigoOriginal,trackedItem) then
+        return "у обычного Ичиго"
+    elseif UnitHasItem(TestCommands_IchigoHollow,trackedItem) then
+        return "у пустого"
+    elseif not IsItemOwned(trackedItem) then
+        return "на земле: X="+R2S(GetItemX(trackedItem))+", Y="+R2S(GetItemY(trackedItem))
+    endif
+    set worldUnits = CreateGroup()
+    call GroupEnumUnitsInRect(worldUnits,bj_mapInitialPlayableArea,null)
+    loop
+        set itemCarrier = FirstOfGroup(worldUnits)
+        exitwhen itemCarrier == null
+        if UnitHasItem(itemCarrier,trackedItem) then
+            set resultText = "у "+GetUnitName(itemCarrier)+" ("+GetPlayerName(GetOwningPlayer(itemCarrier))+")"
+            exitwhen true
+        endif
+        call GroupRemoveUnit(worldUnits,itemCarrier)
+    endloop
+    call DestroyGroup(worldUnits)
+    set worldUnits = null
+    set itemCarrier = null
+    if resultText == "" then
+        set resultText = "в чужом инвентаре; владелец не найден в игровой области"
+    endif
+    return resultText
+endfunction
+
+function TestCommands_IchigoReportItems takes nothing returns nothing
+    local integer itemIndex = 0
+    loop
+        exitwhen itemIndex >= 3
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo",TestCommands_IchigoItemNames[itemIndex]+": "+TestCommands_IchigoItemLocation(TestCommands_IchigoItems[itemIndex]))
+        set itemIndex = itemIndex+1
+    endloop
+endfunction
+
+function TestCommands_IchigoSpell takes nothing returns nothing
+    if TestCommands_IchigoRunning then
+        if GetTriggerUnit() == TestCommands_IchigoEnel and GetSpellAbilityId() == 'A02U' then
+            set TestCommands_IchigoMamaraganStarted = true
+            // Prevent a bot from walking away or casting other damaging spells.
+            call PauseUnit(TestCommands_IchigoEnel,true)
+        elseif GetTriggerUnit() == TestCommands_IchigoHollow and (GetSpellAbilityId() == 'A0BS' or GetSpellAbilityId() == 'A0BT') then
+            set TestCommands_IchigoSuccessfulCasts = TestCommands_IchigoSuccessfulCasts+1
+        endif
+    endif
+endfunction
+
+function TestCommands_IchigoDeath takes nothing returns nothing
+    if TestCommands_IchigoRunning and GetTriggerUnit() == TestCommands_IchigoHollow then
+        set TestCommands_IchigoHollowDied = true
+        set TestCommands_IchigoKilledByEnel = GetKillingUnit() == TestCommands_IchigoEnel
+    endif
+endfunction
+
+function TestCommands_IchigoFinish takes nothing returns nothing
+    // Death does not cancel the normal sleeping T/R handlers. Do not overlap runs.
+    loop
+        exitwhen not eh and Dj != TestCommands_IchigoEnel
+        call TriggerSleepAction(1.)
+    endloop
+    call PauseUnit(TestCommands_IchigoEnel,TestCommands_IchigoEnelWasPaused)
+    if TestCommands_IchigoEventTimerPaused then
+        call ResumeTimer(q)
+        set TestCommands_IchigoEventTimerPaused = false
+    endif
+    set TestCommands_IchigoRunning = false
+    call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Цепочка завершена; можно повторить -testichigo без повторного обучения и выдачи предметов")
+endfunction
+
+function TestCommands_IchigoRun takes nothing returns nothing
+    local integer castIndex = 0
+    local integer enelIntelligence = 0
+    set TestCommands_IchigoHollowDied = false
+    set TestCommands_IchigoKilledByEnel = false
+    set TestCommands_IchigoMamaraganStarted = false
+    set TestCommands_IchigoSuccessfulCasts = 0
+    set TestCommands_IchigoHollow = Ck
+    set TestCommands_IchigoEnelWasPaused = IsUnitPaused(TestCommands_IchigoEnel)
+    if q != null and TimerGetRemaining(q) > 0. then
+        call PauseTimer(q)
+        set TestCommands_IchigoEventTimerPaused = true
+    endif
+    if not IsUnitAliveBJ(TestCommands_IchigoOriginal) then
+        call ReviveHero(TestCommands_IchigoOriginal,-1024.,-6208.,false)
+    endif
+    if not IsUnitAliveBJ(TestCommands_IchigoEnel) then
+        call ReviveHero(TestCommands_IchigoEnel,2048.,-6208.,false)
+    endif
+    call PauseUnit(TestCommands_IchigoOriginal,false)
+    call PauseUnit(TestCommands_IchigoEnel,true)
+    call SetUnitInvulnerable(TestCommands_IchigoOriginal,false)
+    call SetUnitInvulnerable(TestCommands_IchigoEnel,false)
+    call SetUnitPosition(TestCommands_IchigoOriginal,-1024.,-6208.)
+    call SetUnitPosition(TestCommands_IchigoEnel,2048.,-6208.)
+    call IssueImmediateOrder(TestCommands_IchigoOriginal,"holdposition")
+    call UnitResetCooldown(TestCommands_IchigoOriginal)
+    call UnitResetCooldown(TestCommands_IchigoEnel)
+    call SetUnitState(TestCommands_IchigoOriginal,UNIT_STATE_MANA,GetUnitState(TestCommands_IchigoOriginal,UNIT_STATE_MAX_MANA))
+    if GetUnitTypeId(TestCommands_IchigoOriginal) == 'H003' then
+        call IssueImmediateOrder(TestCommands_IchigoOriginal,"chemicalrage")
+        call TriggerSleepAction(.5)
+    endif
+    call SetUnitLifePercentBJ(TestCommands_IchigoOriginal,30.)
+    call TestCommands_IchigoReportItems()
+    call PanCameraToTimedForPlayer(TestCommands_IchigoPlayer,GetUnitX(TestCommands_IchigoOriginal),GetUnitY(TestCommands_IchigoOriginal),0.)
+    // Fixed delay requested by the scenario; no T-availability polling.
+    call TriggerSleepAction(1.)
+    call IssueImmediateOrder(TestCommands_IchigoOriginal,"battleroar")
+    call TriggerSleepAction(.25)
+    if not ck or Ck == null or GetUnitTypeId(Ck) == 0 or not IsUnitAliveBJ(Ck) then
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Ошибка: T не превратила Ичиго в живого пустого")
+        call TestCommands_IchigoReportItems()
+        call TestCommands_IchigoFinish()
+        return
+    endif
+    set TestCommands_IchigoHollow = Ck
+    call SelectUnitForPlayerSingle(TestCommands_IchigoHollow,TestCommands_IchigoPlayer)
+    call UnitResetCooldown(TestCommands_IchigoHollow)
+    call TestCommands_IchigoReportItems()
+    // Keep Mamaragan's chance and damage handler unchanged. One proc is lethal.
+    set enelIntelligence = R2I(GetUnitState(TestCommands_IchigoHollow,UNIT_STATE_MAX_LIFE)/2.5)+1
+    call SetHeroInt(TestCommands_IchigoEnel,enelIntelligence,true)
+    call SetUnitState(TestCommands_IchigoEnel,UNIT_STATE_MANA,GetUnitState(TestCommands_IchigoEnel,UNIT_STATE_MAX_MANA))
+    call PauseUnit(TestCommands_IchigoEnel,false)
+    call IssueImmediateOrder(TestCommands_IchigoEnel,"fanofknives")
+    call TriggerSleepAction(.25)
+    if not TestCommands_IchigoMamaraganStarted or Dj != TestCommands_IchigoEnel or not IsTriggerEnabled(pE) then
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Ошибка: R Энеля не запустила Mamaragan")
+        call TestCommands_IchigoFinish()
+        return
+    endif
+    call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Mamaragan активен: урон молнии "+R2S(Gj)+", максимум HP пустого "+R2S(GetUnitState(TestCommands_IchigoHollow,UNIT_STATE_MAX_LIFE)))
+    loop
+        exitwhen castIndex >= 15 or TestCommands_IchigoHollowDied or not ck or Dj != TestCommands_IchigoEnel or not IsUnitAliveBJ(TestCommands_IchigoHollow)
+        call UnitResetCooldown(TestCommands_IchigoHollow)
+        if ModuloInteger(castIndex,2) == 0 then
+            call IssuePointOrder(TestCommands_IchigoHollow,"carrionswarm",GetUnitX(TestCommands_IchigoHollow)-500.,GetUnitY(TestCommands_IchigoHollow))
+        else
+            call IssueImmediateOrder(TestCommands_IchigoHollow,"fanofknives")
+        endif
+        call TriggerSleepAction(1.)
+        set castIndex = castIndex+1
+    endloop
+    if TestCommands_IchigoHollowDied and TestCommands_IchigoKilledByEnel then
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Пустой убит Энелем при Mamaragan; успешных применений Q/W: "+I2S(TestCommands_IchigoSuccessfulCasts))
+    elseif TestCommands_IchigoHollowDied then
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Пустой погиб от другого источника; это не подтверждает убийство Mamaragan")
+    else
+        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Убийство не произошло; успешных применений Q/W: "+I2S(TestCommands_IchigoSuccessfulCasts)+". Можно повторить после завершения цепочки")
+    endif
+    // Let the normal death handler revive and park Hollow before the final report.
+    call TriggerSleepAction(2.5)
+    call TestCommands_IchigoReportItems()
+    call TestCommands_IchigoFinish()
+endfunction
+
+function TestCommands_IchigoChat takes nothing returns nothing
+    local player commandPlayer = GetTriggerPlayer()
+    if not TestCommands_Access[GetPlayerId(commandPlayer)] then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: сначала введи -cheats bvo-rossoliny")
+    elseif GetEventPlayerChatString() != "-testichigo" then
+        call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: используй -testichigo без параметров")
+    elseif TestCommands_IchigoRunning then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: предыдущая цепочка ещё выполняется")
+    elseif not IsPlayerInForce(commandPlayer,e) and not IsPlayerInForce(commandPlayer,f) then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: команда доступна игрокам двух основных команд")
+    elseif N4 or s == null then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: дождись начала игры; завершённый матч не подходит")
+    elseif w or IsTriggerEnabled(nt) or eh or Dj != null then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: дождись окончания события, текущей формы пустого и Mamaragan")
+    elseif TestCommands_IchigoInitialized and commandPlayer != TestCommands_IchigoPlayer then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: повторный запуск доступен игроку, подготовившему сценарий")
+    elseif TestCommands_IchigoInitialized and (GetUnitTypeId(TestCommands_IchigoOriginal) == 0 or GetUnitTypeId(TestCommands_IchigoEnel) == 0 or m[GetPlayerId(commandPlayer)+1] != TestCommands_IchigoOriginal or m[GetPlayerId(GetOwningPlayer(TestCommands_IchigoEnel))+1] != TestCommands_IchigoEnel or GetOwningPlayer(TestCommands_IchigoOriginal) != commandPlayer or not IsUnitEnemy(TestCommands_IchigoEnel,commandPlayer)) then
+        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: подготовленные герои удалены, заменены или больше не являются противниками")
+    else
+        set TestCommands_IchigoRunning = true
+        if not TestCommands_IchigoInitialized then
+            if not TestCommands_IchigoPrepare(commandPlayer) then
+                set TestCommands_IchigoRunning = false
+                set commandPlayer = null
+                return
+            endif
+        endif
+        call TestCommands_IchigoRun()
+    endif
+    set commandPlayer = null
+endfunction
+
+function TestCommands_IchigoInit takes nothing returns nothing
+    local trigger chatTrigger = CreateTrigger()
+    local trigger spellTrigger = CreateTrigger()
+    local trigger deathTrigger = CreateTrigger()
+    local integer playerIndex = 0
+    loop
+        exitwhen playerIndex >= 12
+        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            call TriggerRegisterPlayerChatEvent(chatTrigger,Player(playerIndex),"-testichigo",false)
+        endif
+        set playerIndex = playerIndex+1
+    endloop
+    call TriggerRegisterAnyUnitEventBJ(spellTrigger,EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
+    call TriggerAddAction(chatTrigger,function TestCommands_IchigoChat)
+    call TriggerAddAction(spellTrigger,function TestCommands_IchigoSpell)
+    call TriggerAddAction(deathTrigger,function TestCommands_IchigoDeath)
+    set chatTrigger = null
+    set spellTrigger = null
+    set deathTrigger = null
+endfunction
+
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
     local trigger testChat = CreateTrigger()
@@ -81810,6 +82213,7 @@ function TestCommands_Init takes nothing returns nothing
     call TestCommands_OneShotInit()
     call TestCommands_EventInit()
     call TestCommands_RefreshInit()
+    call TestCommands_IchigoInit()
 endfunction
 
 function main takes nothing returns nothing
