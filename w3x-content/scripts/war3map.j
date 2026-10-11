@@ -183,8 +183,9 @@ globals
     unit array x7
     integer y7=0
     integer array z7
-    unit A7=null
-    integer a7=0
+    unit ozCurrentBoss=null
+    integer ozCurrentStage=0
+    integer ozSpawnGeneration=0
     integer B7=0
     item array b7
     item array C7
@@ -772,9 +773,9 @@ globals
     group Mm=null
     integer Nm=0
     unit Om=null
-    unit Pm=null
+    unit ozFinalBoss=null
     location Qm=null
-    boolean array Rm
+    boolean array bossZoneDefeated
     unit Sm=null
     integer Tm=0
     item array Um
@@ -844,7 +845,7 @@ globals
     rect jo=null
     rect ko=null
     rect mo=null
-    rect no=null
+    rect ozSpawnRect=null
     rect oo=null
     rect po=null
     rect qo=null
@@ -1141,15 +1142,15 @@ globals
     trigger Ht=null
     trigger It=null
     trigger lt=null
-    trigger Jt=null
+    trigger ozInitialSpawnTrigger=null
     trigger Kt=null
     trigger Lt=null
     trigger Mt=null
-    trigger Nt=null
-    trigger Ot=null
+    trigger ozCreepRespawnTrigger=null
+    trigger ozStageDeathTrigger=null
     trigger Pt=null
-    trigger Qt=null
-    trigger Rt=null
+    trigger ozFinalDeathTrigger=null
+    trigger ozFinalAttackTrigger=null
     trigger St=null
     trigger Tt=null
     trigger Ut=null
@@ -3138,7 +3139,7 @@ function I6 takes nothing returns nothing
         set z7[i]=0
         set i=i+1
     endloop
-    set a7=0
+    set ozCurrentStage=0
     set B7=0
     set i=0
     loop
@@ -3806,7 +3807,7 @@ function I6 takes nothing returns nothing
     set i=0
     loop
         exitwhen(i>1)
-        set Rm[i]=false
+        set bossZoneDefeated[i]=false
         set i=i+1
     endloop
     set Tm=0
@@ -5733,7 +5734,7 @@ function X6 takes nothing returns nothing
     call WaygateActivate(u,true)
     call SetUnitColor(u,ConvertPlayerColor(0))
     set gG=CreateUnit(p,'nwgt',-4224.,-2432.,270.)
-    call WaygateSetDestination(gG,GetRectCenterX(no),GetRectCenterY(no))
+    call WaygateSetDestination(gG,GetRectCenterX(ozSpawnRect),GetRectCenterY(ozSpawnRect))
     call WaygateActivate(gG,true)
     call SetUnitColor(gG,ConvertPlayerColor(10))
     set u=CreateUnit(p,'hgtw',5760.,192.,270.)
@@ -5965,7 +5966,7 @@ function fH takes nothing returns nothing
     set jo=Rect(-5760.,288.,-4448.,896.)
     set ko=Rect(2976.,128.,4576.,896.)
     set mo=Rect(6144.,5792.,7168.,7040.)
-    set no=Rect(-3264.,5056.,64.,7232.)
+    set ozSpawnRect=Rect(-3264.,5056.,64.,7232.)
     set oo=Rect(6784.,-1696.,7936.,4320.)
     set we=AddWeatherEffect(oo,'MEds')
     call EnableWeatherEffect(we,true)
@@ -6144,7 +6145,7 @@ function Match_InitializeTeams takes nothing returns nothing
     call TriggerExecute(cs)
     call TriggerExecute(Ds)
     call TriggerExecute(Fs)
-    call TriggerExecute(Jt)
+    call TriggerExecute(ozInitialSpawnTrigger)
     call TriggerExecute(Es)
     call TriggerExecute(zs)
     call TriggerExecute(Is)
@@ -7691,7 +7692,7 @@ function s1 takes nothing returns nothing
         call WaygateSetDestinationLocBJ(gG,ue[22])
     else
         call RemoveRect(mo)
-        call RemoveRect(no)
+        call RemoveRect(ozSpawnRect)
         call RemoveRect(oo)
         call RemoveRect(po)
         call RemoveRect(zn)
@@ -7836,7 +7837,7 @@ function a1 takes nothing returns nothing
     set lm[(36+(1+GetPlayerId(GetEnumPlayer())))]=bj_lastCreatedFogModifier
     call FogModifierStart(bj_lastCreatedFogModifier)
     set vd=null
-    set vd=no
+    set vd=ozSpawnRect
     call CreateFogModifierRectBJ(true,GetEnumPlayer(),FOG_OF_WAR_VISIBLE,vd)
     set lm[(48+(1+GetPlayerId(GetEnumPlayer())))]=bj_lastCreatedFogModifier
     call FogModifierStart(bj_lastCreatedFogModifier)
@@ -7961,7 +7962,7 @@ function N1 takes nothing returns nothing
     set bj[1]=PG(xd,800.,0)
     set bj[2]=PG(xd,800.,180.)
     set yd=GetRectCenter(An)
-    set zd=GetRectCenter(no)
+    set zd=GetRectCenter(ozSpawnRect)
     set Ad=GetRectCenter(so)
     set ad=GetRectCenter(lo)
     if(((f4==1)))then
@@ -18537,24 +18538,89 @@ function Vlv takes nothing returns nothing
     call TriggerAddAction(lt,function VKv)
 endfunction
 
-function VLv takes nothing returns nothing
-    set Q8=GetRectCenter(mo)
-    call CreateNUnitsAtLoc(1,'nfgo',Player(12),PG(Q8,350.,90.),bj_UNIT_FACING)
-    call RemoveLocation(Q8)
-    set Q8=null
-    set Q8=GetRectCenter(no)
-    call CreateNUnitsAtLoc(1,'n00F',Player(12),Q8,bj_UNIT_FACING)
-    call RemoveLocation(Q8)
-    set Q8=null
-    set A7=bj_lastCreatedUnit
+function Oz_SetExitWaygatesOpen takes boolean exitsOpen returns nothing
+    call WaygateActivate(ozNorthwestExitWaygate,exitsOpen)
+    call WaygateActivate(ozSouthwestExitWaygate,exitsOpen)
+    call WaygateActivate(ozNortheastExitWaygate,exitsOpen)
+    call WaygateActivate(ozSoutheastExitWaygate,exitsOpen)
+    call ShowUnit(ozNorthwestExitWaygate,exitsOpen)
+    call ShowUnit(ozSouthwestExitWaygate,exitsOpen)
+    call ShowUnit(ozNortheastExitWaygate,exitsOpen)
+    call ShowUnit(ozSoutheastExitWaygate,exitsOpen)
+endfunction
+
+function Oz_SpawnStage takes integer requestedStage returns nothing
+    local integer previousStage = ozCurrentStage
+    local integer bossTypeId = 0
+    local location spawnLocation = null
+
+    if requestedStage == 1 then
+        set bossTypeId = 'n00F'
+    elseif requestedStage == 2 then
+        set bossTypeId = 'n00L'
+    elseif requestedStage == 3 then
+        set bossTypeId = 'n00K'
+    elseif requestedStage == 4 then
+        set bossTypeId = 'n00J'
+    elseif requestedStage == 5 then
+        set bossTypeId = 'n00I'
+    elseif requestedStage == 6 then
+        set bossTypeId = 'n00H'
+    elseif requestedStage == 7 then
+        set bossTypeId = 'n00G'
+    elseif requestedStage == 8 then
+        set bossTypeId = 'n00E'
+    elseif requestedStage == 9 then
+        set bossTypeId = 'nfgl'
+    elseif requestedStage == 10 then
+        set bossTypeId = 'n010'
+    elseif requestedStage == 11 then
+        set bossTypeId = 'n011'
+    else
+        return
+    endif
+
+    set spawnLocation = GetRectCenter(ozSpawnRect)
+    call CreateNUnitsAtLoc(1,bossTypeId,Player(12),spawnLocation,bj_UNIT_FACING)
+    call RemoveLocation(spawnLocation)
+    set spawnLocation = null
+    set ozCurrentStage = requestedStage
+
+    if requestedStage == 11 then
+        set ozFinalBoss = bj_lastCreatedUnit
+        set ozCurrentBoss = null
+        call EnableTrigger(ozFinalDeathTrigger)
+        call EnableTrigger(ozFinalAttackTrigger)
+        call DisableTrigger(ozCreepRespawnTrigger)
+        call Oz_SetExitWaygatesOpen(false)
+    else
+        set ozCurrentBoss = bj_lastCreatedUnit
+        set ozFinalBoss = null
+        if previousStage == 11 then
+            call DisableTrigger(ozFinalDeathTrigger)
+            call DisableTrigger(ozFinalAttackTrigger)
+            call EnableTrigger(ozCreepRespawnTrigger)
+            call Oz_SetExitWaygatesOpen(true)
+        endif
+        if requestedStage > 1 then
+            call DestroyEffect(AddSpecialEffectTarget("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl",ozCurrentBoss,"origin"))
+        endif
+    endif
+endfunction
+
+function Oz_InitializeBosses takes nothing returns nothing
+    local location otherBossSpawnLocation = GetRectCenter(mo)
+    call CreateNUnitsAtLoc(1,'nfgo',Player(12),PG(otherBossSpawnLocation,350.,90.),bj_UNIT_FACING)
+    call RemoveLocation(otherBossSpawnLocation)
+    set otherBossSpawnLocation = null
+    call Oz_SpawnStage(1)
     set N[799]=8
-    set a7=1
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
 function Vmv takes nothing returns nothing
-    set Jt=CreateTrigger()
-    call TriggerAddAction(Jt,function VLv)
+    set ozInitialSpawnTrigger=CreateTrigger()
+    call TriggerAddAction(ozInitialSpawnTrigger,function Oz_InitializeBosses)
 endfunction
 
 function VMv takes nothing returns boolean
@@ -18598,11 +18664,11 @@ function Vuv takes nothing returns nothing
 endfunction
 
 function VUv takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function Vwv takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
 function VWv takes nothing returns boolean
@@ -18611,7 +18677,7 @@ endfunction
 
 function Vyv takes nothing returns nothing
     if(((GetUnitTypeId(GetTriggerUnit())=='nfgo')))then
-        set Rm[3]=true
+        set bossZoneDefeated[3]=true
         call CreateItemLoc('ofro',GetUnitLoc(GetTriggerUnit()))
         set P8[9]=YG(bj_mapInitialPlayableArea,Condition(function VTv))
         call ForGroupBJ(P8[9],function Vuv)
@@ -18619,7 +18685,7 @@ function Vyv takes nothing returns nothing
         call DestroyGroup(P8[9])
         set P8[9]=null
         call TriggerExecute(Lt)
-        if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+        if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
             call TriggerExecute(pu)
         endif
     else
@@ -18668,75 +18734,75 @@ endfunction
 
 function V0v takes nothing returns nothing
     call DisableTrigger(GetTriggeringTrigger())
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
@@ -18745,7 +18811,7 @@ endfunction
 
 function V1v takes nothing returns nothing
     set Mt=CreateTrigger()
-    call TriggerRegisterEnterRectSimple(Mt,no)
+    call TriggerRegisterEnterRectSimple(Mt,ozSpawnRect)
     call TriggerAddCondition(Mt,Condition(function V_v))
     call TriggerAddAction(Mt,function V0v)
 endfunction
@@ -18756,191 +18822,128 @@ endfunction
 
 function V3v takes nothing returns nothing
     call TriggerSleepAction(10.)
-    set Q8=GetRandomLocInRect(no)
+    set Q8=GetRandomLocInRect(ozSpawnRect)
     call CreateNUnitsAtLoc(1,'ninf',Player(12),Q8,GetRandomReal(0,360))
     call RemoveLocation(Q8)
     set Q8=null
 endfunction
 
 function V4v takes nothing returns nothing
-    set Nt=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(Nt,EVENT_PLAYER_UNIT_DEATH)
-    call TriggerAddCondition(Nt,Condition(function V2v))
-    call TriggerAddAction(Nt,function V3v)
+    set ozCreepRespawnTrigger=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(ozCreepRespawnTrigger,EVENT_PLAYER_UNIT_DEATH)
+    call TriggerAddCondition(ozCreepRespawnTrigger,Condition(function V2v))
+    call TriggerAddAction(ozCreepRespawnTrigger,function V3v)
 endfunction
 
 function V5v takes nothing returns boolean
-    return(GetDyingUnit()==A7)
+    return(GetDyingUnit()==ozCurrentBoss)
 endfunction
 
 function V6v takes nothing returns boolean
-    return(a7==9)
+    return(ozCurrentStage==9)
 endfunction
 
 function V7v takes nothing returns boolean
-    return(a7==10)
+    return(ozCurrentStage==10)
 endfunction
 
 function V8v takes nothing returns boolean
-    return(a7==10)
+    return(ozCurrentStage==10)
 endfunction
 
 function V9v takes nothing returns boolean
-    return(a7==9)
+    return(ozCurrentStage==9)
 endfunction
 
 function Evv takes nothing returns boolean
-    return(a7==8)
+    return(ozCurrentStage==8)
 endfunction
 
 function Eev takes nothing returns boolean
-    return(a7==7)
+    return(ozCurrentStage==7)
 endfunction
 
 function Exv takes nothing returns boolean
-    return(a7==6)
+    return(ozCurrentStage==6)
 endfunction
 
 function Eov takes nothing returns boolean
-    return(a7==5)
+    return(ozCurrentStage==5)
 endfunction
 
 function Erv takes nothing returns boolean
-    return(a7==4)
+    return(ozCurrentStage==4)
 endfunction
 
 function Eiv takes nothing returns boolean
-    return(a7==3)
+    return(ozCurrentStage==3)
 endfunction
 
 function Eav takes nothing returns boolean
-    return(a7==2)
+    return(ozCurrentStage==2)
 endfunction
 
 function Env takes nothing returns boolean
-    return(a7==1)
+    return(ozCurrentStage==1)
 endfunction
 
-function EVv takes nothing returns nothing
-    set O4=1
+function Oz_HandleStageDeath takes nothing returns nothing
+    local integer defeatedStage = ozCurrentStage
+    local integer pendingSpawnGeneration = ozSpawnGeneration
+    local integer coinIndex = 1
+    local location coinDropLocation = GetUnitLoc(GetDyingUnit())
+
     loop
-        exitwhen O4>(4*a7)
-        call CreateItemLoc('I03G',GetUnitLoc(A7))
-        set O4=O4+1
+        exitwhen coinIndex > 4 * defeatedStage
+        call CreateItemLoc('I03G',coinDropLocation)
+        set coinIndex = coinIndex + 1
     endloop
-    set A7=null
+    call RemoveLocation(coinDropLocation)
+    set coinDropLocation = null
+    set ozCurrentBoss = null
+
     call TriggerSleepAction(60.)
-    if(((a7==9)))then
+    if defeatedStage == 9 then
         call TriggerSleepAction(45.)
     endif
-    if(((a7==10)))then
+    if defeatedStage == 10 then
         call TriggerSleepAction(100.)
     endif
-    set Q8=GetRectCenter(no)
-    if(((a7==1)))then
-        call CreateNUnitsAtLoc(1,'n00L',Player(12),Q8,bj_UNIT_FACING)
-        set A7=bj_lastCreatedUnit
-        set a7=2
-    else
-        if(((a7==2)))then
-            call CreateNUnitsAtLoc(1,'n00K',Player(12),Q8,bj_UNIT_FACING)
-            set A7=bj_lastCreatedUnit
-            set a7=3
-        else
-            if(((a7==3)))then
-                call CreateNUnitsAtLoc(1,'n00J',Player(12),Q8,bj_UNIT_FACING)
-                set A7=bj_lastCreatedUnit
-                set a7=4
-            else
-                if(((a7==4)))then
-                    call CreateNUnitsAtLoc(1,'n00I',Player(12),Q8,bj_UNIT_FACING)
-                    set A7=bj_lastCreatedUnit
-                    set a7=5
-                else
-                    if(((a7==5)))then
-                        call CreateNUnitsAtLoc(1,'n00H',Player(12),Q8,bj_UNIT_FACING)
-                        set A7=bj_lastCreatedUnit
-                        set a7=6
-                    else
-                        if(((a7==6)))then
-                            call CreateNUnitsAtLoc(1,'n00G',Player(12),Q8,bj_UNIT_FACING)
-                            set A7=bj_lastCreatedUnit
-                            set a7=7
-                        else
-                            if(((a7==7)))then
-                                call CreateNUnitsAtLoc(1,'n00E',Player(12),Q8,bj_UNIT_FACING)
-                                set A7=bj_lastCreatedUnit
-                                set a7=8
-                            else
-                                if(((a7==8)))then
-                                    call CreateNUnitsAtLoc(1,'nfgl',Player(12),Q8,bj_UNIT_FACING)
-                                    set A7=bj_lastCreatedUnit
-                                    set a7=9
-                                else
-                                    if(((a7==9)))then
-                                        call CreateNUnitsAtLoc(1,'n010',Player(12),Q8,bj_UNIT_FACING)
-                                        set A7=bj_lastCreatedUnit
-                                        set a7=10
-                                    else
-                                        if(((a7==10)))then
-                                            call CreateNUnitsAtLoc(1,'n011',Player(12),Q8,bj_UNIT_FACING)
-                                            set Pm=bj_lastCreatedUnit
-                                            set a7=11
-                                            call EnableTrigger(Qt)
-                                            call EnableTrigger(Rt)
-                                            call DisableTrigger(Nt)
-                                            call WaygateActivate(ozNorthwestExitWaygate,false)
-                                            call WaygateActivate(ozSouthwestExitWaygate,false)
-                                            call WaygateActivate(ozNortheastExitWaygate,false)
-                                            call WaygateActivate(ozSoutheastExitWaygate,false)
-                                            call ShowUnitHide(ozNorthwestExitWaygate)
-                                            call ShowUnitHide(ozSouthwestExitWaygate)
-                                            call ShowUnitHide(ozNortheastExitWaygate)
-                                            call ShowUnitHide(ozSoutheastExitWaygate)
-                                        endif
-                                    endif
-                                endif
-                            endif
-                        endif
-                    endif
-                endif
-            endif
-        endif
+
+    // Replacing Oz invalidates any transition already waiting after a death.
+    if pendingSpawnGeneration == ozSpawnGeneration and ozCurrentStage == defeatedStage then
+        call Oz_SpawnStage(defeatedStage + 1)
     endif
-    call RemoveLocation(Q8)
-    set Q8=null
-    call AddSpecialEffectTargetUnitBJ("origin",A7,"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
-    call DestroyEffect(bj_lastCreatedEffect)
 endfunction
 
 function EEv takes nothing returns nothing
-    set Ot=CreateTrigger()
-    call TriggerRegisterAnyUnitEventBJ(Ot,EVENT_PLAYER_UNIT_DEATH)
-    call TriggerAddCondition(Ot,Condition(function V5v))
-    call TriggerAddAction(Ot,function EVv)
+    set ozStageDeathTrigger=CreateTrigger()
+    call TriggerRegisterAnyUnitEventBJ(ozStageDeathTrigger,EVENT_PLAYER_UNIT_DEATH)
+    call TriggerAddCondition(ozStageDeathTrigger,Condition(function V5v))
+    call TriggerAddAction(ozStageDeathTrigger,function Oz_HandleStageDeath)
 endfunction
 
 function EXv takes nothing returns boolean
-    return(GetTriggerUnit()==A7)or(GetTriggerUnit()==Pm)
+    return(GetTriggerUnit()==ozCurrentBoss)or(GetTriggerUnit()==ozFinalBoss)
 endfunction
 
 function EOv takes nothing returns boolean
-    return(((GetTriggerUnit()==A7)or(GetTriggerUnit()==Pm)))
+    return(((GetTriggerUnit()==ozCurrentBoss)or(GetTriggerUnit()==ozFinalBoss)))
 endfunction
 
 function ERv takes nothing returns nothing
-    set Q8=GetUnitLoc(A7)
+    set Q8=GetUnitLoc(ozCurrentBoss)
     call AddSpecialEffectLocBJ(Q8,"Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     call RemoveLocation(Q8)
     set Q8=null
     set Q8=GetRectCenter(Po)
-    call SetUnitPositionLocFacingBJ(A7,Q8,270.)
+    call SetUnitPositionLocFacingBJ(ozCurrentBoss,Q8,270.)
     call RemoveLocation(Q8)
     set Q8=null
-    call AddSpecialEffectTargetUnitBJ("chest",A7,"Abilities\\Spells\\NightElf\\Blink\\BlinkTarget.mdl")
+    call AddSpecialEffectTargetUnitBJ("chest",ozCurrentBoss,"Abilities\\Spells\\NightElf\\Blink\\BlinkTarget.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
-    call AddSpecialEffectTargetUnitBJ("chest",A7,"Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl")
+    call AddSpecialEffectTargetUnitBJ("chest",ozCurrentBoss,"Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
 endfunction
 
@@ -18952,58 +18955,52 @@ function EIv takes nothing returns nothing
 endfunction
 
 function EAv takes nothing returns boolean
-    return(GetDyingUnit()==Pm)and(a7==11)
+    return(GetDyingUnit()==ozFinalBoss)and(ozCurrentStage==11)
 endfunction
 
 function ENv takes nothing returns boolean
-    return(((GetDyingUnit()==Pm)and(a7==11)))
+    return(((GetDyingUnit()==ozFinalBoss)and(ozCurrentStage==11)))
 endfunction
 
 function Ebv takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function EBv takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
-function Ecv takes nothing returns nothing
-    set Rm[1]=true
-    set Q8=GetUnitLoc(Pm)
-    call CreateItemLoc('I04N',Q8)
-    call RemoveLocation(Q8)
-    set Q8=null
-    set Pm=null
+function Oz_HandleFinalDeath takes nothing returns nothing
+    local location rewardDropLocation = GetUnitLoc(ozFinalBoss)
+    set bossZoneDefeated[1]=true
+    call CreateItemLoc('I04N',rewardDropLocation)
+    call RemoveLocation(rewardDropLocation)
+    set rewardDropLocation=null
+    set ozFinalBoss=null
     call CreateNUnitsAtLoc(1,'n00Z',Player(15),GetRectCenter(ep),bj_UNIT_FACING)
     call CreateNUnitsAtLoc(1,'n00Z',Player(15),GetRectCenter(fp),bj_UNIT_FACING)
     call AddSpecialEffectLocBJ(GetRectCenter(ep),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     call AddSpecialEffectLocBJ(GetRectCenter(fp),"Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
-    call WaygateActivate(ozNorthwestExitWaygate,true)
-    call WaygateActivate(ozSouthwestExitWaygate,true)
-    call WaygateActivate(ozNortheastExitWaygate,true)
-    call WaygateActivate(ozSoutheastExitWaygate,true)
-    call ShowUnitShow(ozNorthwestExitWaygate)
-    call ShowUnitShow(ozSouthwestExitWaygate)
-    call ShowUnitShow(ozNortheastExitWaygate)
-    call ShowUnitShow(ozSoutheastExitWaygate)
-    if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+    call Oz_SetExitWaygatesOpen(true)
+    if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
         call TriggerExecute(pu)
     endif
     call DestroyTrigger(GetTriggeringTrigger())
+    set ozFinalDeathTrigger = null
 endfunction
 
-function ECv takes nothing returns nothing
-    set Qt=CreateTrigger()
-    call DisableTrigger(Qt)
-    call TriggerRegisterAnyUnitEventBJ(Qt,EVENT_PLAYER_UNIT_DEATH)
-    call TriggerAddCondition(Qt,Condition(function ENv))
-    call TriggerAddAction(Qt,function Ecv)
+function Oz_InitializeFinalDeathTrigger takes nothing returns nothing
+    set ozFinalDeathTrigger=CreateTrigger()
+    call DisableTrigger(ozFinalDeathTrigger)
+    call TriggerRegisterAnyUnitEventBJ(ozFinalDeathTrigger,EVENT_PLAYER_UNIT_DEATH)
+    call TriggerAddCondition(ozFinalDeathTrigger,Condition(function ENv))
+    call TriggerAddAction(ozFinalDeathTrigger,function Oz_HandleFinalDeath)
 endfunction
 
 function Edv takes nothing returns boolean
-    return(GetTriggerUnit()==Pm)
+    return(GetTriggerUnit()==ozFinalBoss)
 endfunction
 
 function EDv takes nothing returns nothing
@@ -19011,11 +19008,11 @@ function EDv takes nothing returns nothing
 endfunction
 
 function Efv takes nothing returns nothing
-    set Rt=CreateTrigger()
-    call DisableTrigger(Rt)
-    call TriggerRegisterAnyUnitEventBJ(Rt,EVENT_PLAYER_UNIT_ATTACKED)
-    call TriggerAddCondition(Rt,Condition(function Edv))
-    call TriggerAddAction(Rt,function EDv)
+    set ozFinalAttackTrigger=CreateTrigger()
+    call DisableTrigger(ozFinalAttackTrigger)
+    call TriggerRegisterAnyUnitEventBJ(ozFinalAttackTrigger,EVENT_PLAYER_UNIT_ATTACKED)
+    call TriggerAddCondition(ozFinalAttackTrigger,Condition(function Edv))
+    call TriggerAddAction(ozFinalAttackTrigger,function EDv)
 endfunction
 
 function EFv takes nothing returns boolean
@@ -19386,20 +19383,20 @@ function E1v takes nothing returns boolean
 endfunction
 
 function E2v takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function E3v takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
 function E4v takes nothing returns nothing
-    set Rm[2]=true
+    set bossZoneDefeated[2]=true
     set Qm=GetUnitLoc(GetDyingUnit())
     call CreateItemLoc('I00A',Qm)
     call RemoveLocation(Qm)
     set Qm=null
-    if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+    if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
         call TriggerExecute(pu)
     endif
     call DestroyTrigger(GetTriggeringTrigger())
@@ -19714,11 +19711,11 @@ function XJv takes nothing returns boolean
 endfunction
 
 function Xkv takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function XKv takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
 function Xlv takes nothing returns boolean
@@ -19884,8 +19881,8 @@ function Xwv takes nothing returns nothing
         call DestroyEffect(bj_lastCreatedEffect)
         call TriggerExecute(iu)
     else
-        set Rm[4]=true
-        if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+        set bossZoneDefeated[4]=true
+        if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
             call TriggerExecute(pu)
         endif
         call DestroyTrigger(GetTriggeringTrigger())
@@ -19928,11 +19925,11 @@ function X1v takes nothing returns boolean
 endfunction
 
 function X2v takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function X3v takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
 function X4v takes nothing returns boolean
@@ -20089,8 +20086,8 @@ function Onv takes nothing returns nothing
         call DestroyEffect(bj_lastCreatedEffect)
         call TriggerExecute(iu)
     else
-        set Rm[5]=true
-        if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+        set bossZoneDefeated[5]=true
+        if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
             call TriggerExecute(pu)
         endif
         call DestroyTrigger(GetTriggeringTrigger())
@@ -20488,20 +20485,20 @@ function O2v takes nothing returns boolean
 endfunction
 
 function O3v takes nothing returns boolean
-    return(in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])
+    return(in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])
 endfunction
 
 function O4v takes nothing returns boolean
-    return(((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))
+    return(((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))
 endfunction
 
 function O5v takes nothing returns nothing
-    set Rm[6]=true
+    set bossZoneDefeated[6]=true
     call AddSpecialEffectLocBJ(GetUnitLoc(GetDyingUnit()),"Objects\\Spawnmodels\\Undead\\UndeadDissipate\\UndeadDissipate.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     call DisplayTimedTextToForce(bj_FORCE_ALL_PLAYERS,30,(GetHeroProperName(l4)+" (level 99) has been slain!!!"))
     set l4=null
-    if(((((in==false)and(Rm[1])and(Rm[2])and(Rm[3])and(Rm[4])and(Rm[5])and(Rm[6])))))then
+    if(((((in==false)and(bossZoneDefeated[1])and(bossZoneDefeated[2])and(bossZoneDefeated[3])and(bossZoneDefeated[4])and(bossZoneDefeated[5])and(bossZoneDefeated[6])))))then
         call TriggerExecute(pu)
     endif
     call DestroyTrigger(GetTriggeringTrigger())
@@ -20751,11 +20748,11 @@ function RMv takes nothing returns nothing
 endfunction
 
 function Rpv takes nothing returns boolean
-    return(RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(no,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))
+    return(RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(ozSpawnRect,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))
 endfunction
 
 function RPv takes nothing returns boolean
-    return(IsUnitAliveBJ(A[222]))and(((RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(no,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))))
+    return(IsUnitAliveBJ(A[222]))and(((RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(ozSpawnRect,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))))
 endfunction
 
 function Rqv takes nothing returns boolean
@@ -20836,7 +20833,7 @@ function RQv takes nothing returns nothing
         set sd[2]=null
         call DestroyEffect(ud[1])
         call RemoveUnit(A[223])
-        if(((IsUnitAliveBJ(A[222]))and(((RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(no,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))))))then
+        if(((IsUnitAliveBJ(A[222]))and(((RectContainsLoc(sn,B[222]))or(RectContainsLoc(An,B[222]))or(RectContainsLoc(jo,B[222]))or(RectContainsLoc(ko,B[222]))or(RectContainsLoc(mo,B[222]))or(RectContainsLoc(ozSpawnRect,B[222]))or(RectContainsLoc(oo,B[222]))or(RectContainsLoc(po,B[222]))or(RectContainsLoc(qo,B[222]))or(RectContainsLoc(ro,B[222]))or(RectContainsLoc(so,B[222]))or(RectContainsLoc(Ro,B[222]))or(RectContainsLoc(So,B[222]))))))then
             call UG(300.,B[222],function RMv)
             call SetUnitPositionLocFacingBJ(A[222],B[222],AngleBetweenPoints(GetUnitLoc(A[222]),GetUnitLoc(a[222])))
         else
@@ -39009,7 +39006,7 @@ function r5e takes nothing returns boolean
 endfunction
 
 function r6e takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))
 endfunction
 
 function r7e takes nothing returns boolean
@@ -39017,11 +39014,11 @@ function r7e takes nothing returns boolean
 endfunction
 
 function r8e takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))))
 endfunction
 
 function r9e takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[3]))))))))then
         set y9[1]=GetEnumUnit()
         set r9[3]=PG(GetUnitLoc(y9[1]),-100.,AngleBetweenPoints(GetUnitLoc(y9[1]),B[3]))
         call SetUnitPositionLoc(y9[1],r9[3])
@@ -41103,11 +41100,11 @@ function V1e takes nothing returns nothing
 endfunction
 
 function V2e takes nothing returns boolean
-    return(RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(no,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))
+    return(RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(ozSpawnRect,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))
 endfunction
 
 function V3e takes nothing returns boolean
-    return(((RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(no,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))))
+    return(((RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(ozSpawnRect,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))))
 endfunction
 
 function V4e takes nothing returns boolean
@@ -41122,7 +41119,7 @@ function V5e takes nothing returns nothing
     set P[400]=bj_lastCreatedEffect
     call PlaySoundAtPointBJ(vnv,100,B[401],0)
     call TriggerSleepAction(.01)
-    if(((((RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(no,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))))))then
+    if(((((RectContainsLoc(sn,B[401]))or(RectContainsLoc(An,B[401]))or(RectContainsLoc(jo,B[401]))or(RectContainsLoc(ko,B[401]))or(RectContainsLoc(mo,B[401]))or(RectContainsLoc(ozSpawnRect,B[401]))or(RectContainsLoc(oo,B[401]))or(RectContainsLoc(po,B[401]))or(RectContainsLoc(qo,B[401]))or(RectContainsLoc(ro,B[401]))or(RectContainsLoc(so,B[401]))or(RectContainsLoc(Ro,B[401]))or(RectContainsLoc(So,B[401]))))))then
         call UG(300.,B[401],function V1e)
         call SetUnitPositionLocFacingBJ(A[402],B[401],AngleBetweenPoints(GetUnitLoc(A[402]),GetUnitLoc(a[401])))
     else
@@ -41220,7 +41217,7 @@ function ERe takes nothing returns boolean
 endfunction
 
 function EIe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))
 endfunction
 
 function EAe takes nothing returns boolean
@@ -41228,11 +41225,11 @@ function EAe takes nothing returns boolean
 endfunction
 
 function ENe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))))
 endfunction
 
 function Ebe takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[402]))))))))then
         set y9[2]=GetEnumUnit()
         set v9[3]=PG(GetUnitLoc(y9[2]),-100.,AngleBetweenPoints(GetUnitLoc(y9[2]),B[402]))
         call SetUnitPositionLoc(y9[2],v9[3])
@@ -41371,19 +41368,19 @@ function Ehe takes nothing returns nothing
 endfunction
 
 function EHe takes nothing returns boolean
-    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)
+    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)
 endfunction
 
 function Eje takes nothing returns boolean
-    return(l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))
+    return(l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))
 endfunction
 
 function EJe takes nothing returns boolean
-    return(GetSpellAbilityId()=='A05X')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))))
+    return(GetSpellAbilityId()=='A05X')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))))
 endfunction
 
 function Eke takes nothing returns boolean
-    return(((GetSpellAbilityId()=='A05X')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))))))
+    return(((GetSpellAbilityId()=='A05X')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)))))))
 endfunction
 
 function EKe takes nothing returns nothing
@@ -41517,11 +41514,11 @@ function ESe takes nothing returns boolean
 endfunction
 
 function Ete takes nothing returns boolean
-    return(RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(no,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))
+    return(RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(ozSpawnRect,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))
 endfunction
 
 function ETe takes nothing returns boolean
-    return(((RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(no,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))))
+    return(((RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(ozSpawnRect,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))))
 endfunction
 
 function Eue takes nothing returns boolean
@@ -41530,7 +41527,7 @@ endfunction
 
 function EUe takes nothing returns nothing
     set N[400]=(N[400]+1)
-    if(((((RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(no,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))))))then
+    if(((((RectContainsUnit(sn,A[403]))or(RectContainsUnit(An,A[403]))or(RectContainsUnit(vo,A[403]))or(RectContainsUnit(xo,A[403]))or(RectContainsUnit(jo,A[403]))or(RectContainsUnit(ko,A[403]))or(RectContainsUnit(mo,A[403]))or(RectContainsUnit(ozSpawnRect,A[403]))or(RectContainsUnit(oo,A[403]))or(RectContainsUnit(po,A[403]))or(RectContainsUnit(qo,A[403]))or(RectContainsUnit(ro,A[403]))or(RectContainsUnit(so,A[403]))))))then
         set v9[5]=PG(GetUnitLoc(A[403]),-9.,c[401])
         call SetUnitPositionLoc(A[403],v9[5])
         call RemoveLocation(v9[5])
@@ -43353,7 +43350,7 @@ function Ile takes nothing returns boolean
 endfunction
 
 function ILe takes nothing returns boolean
-    return(RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(no,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))
+    return(RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(ozSpawnRect,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))
 endfunction
 
 function Ime takes nothing returns nothing
@@ -43365,7 +43362,7 @@ function IMe takes nothing returns boolean
 endfunction
 
 function Ipe takes nothing returns boolean
-    return(((RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(no,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))))
+    return(((RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(ozSpawnRect,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))))
 endfunction
 
 function IPe takes nothing returns boolean
@@ -43379,17 +43376,17 @@ endfunction
 
 
 function Ise takes nothing returns boolean
-    return(RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))
+    return(RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(ozSpawnRect,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))
 endfunction
 
 function ISe takes nothing returns boolean
-    return(IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))
+    return(IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(ozSpawnRect,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))
 endfunction
 
 function Hero_MoveAlongTargetDirection takes nothing returns nothing
-    if(((IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(no,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))))then
+    if(((IsUnitAliveBJ(a[16]))and(((RectContainsUnit(sn,a[16]))or(RectContainsUnit(An,a[16]))or(RectContainsUnit(jo,a[16]))or(RectContainsUnit(ko,a[16]))or(RectContainsUnit(mo,a[16]))or(RectContainsUnit(ozSpawnRect,a[16]))or(RectContainsUnit(oo,a[16]))or(RectContainsUnit(po,a[16]))or(RectContainsUnit(qo,a[16]))or(RectContainsUnit(ro,a[16]))or(RectContainsUnit(so,a[16]))or(RectContainsUnit(Ro,a[16]))or(RectContainsUnit(So,a[16]))or(RectContainsUnit(vo,a[16]))or(RectContainsUnit(xo,a[16]))))))then
         set a9[6]=PG(GetUnitLoc(a[16]),35.,AngleBetweenPoints(B[46],B[47]))
-        if(((((RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(no,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))))))then
+        if(((((RectContainsLoc(sn,a9[6]))or(RectContainsLoc(An,a9[6]))or(RectContainsLoc(jo,a9[6]))or(RectContainsLoc(ko,a9[6]))or(RectContainsLoc(mo,a9[6]))or(RectContainsLoc(ozSpawnRect,a9[6]))or(RectContainsLoc(oo,a9[6]))or(RectContainsLoc(po,a9[6]))or(RectContainsLoc(qo,a9[6]))or(RectContainsLoc(ro,a9[6]))or(RectContainsLoc(so,a9[6]))or(RectContainsLoc(Ro,a9[6]))or(RectContainsLoc(So,a9[6]))or(RectContainsLoc(vo,a9[6]))or(RectContainsLoc(xo,a9[6]))))))then
             call SetUnitPositionLoc(a[16],a9[6])
             call RemoveLocation(a9[6])
             set a9[6]=null
@@ -44987,7 +44984,7 @@ function BCe takes nothing returns boolean
 endfunction
 
 function Bde takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))
 endfunction
 
 function BDe takes nothing returns boolean
@@ -44995,11 +44992,11 @@ function BDe takes nothing returns boolean
 endfunction
 
 function Bfe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))))
 endfunction
 
 function BFe takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),E9[1327]))))))))then
         set y9[1327]=GetEnumUnit()
         set E9[1328]=PG(GetUnitLoc(y9[1327]),-100.,AngleBetweenPoints(GetUnitLoc(y9[1327]),E9[1327]))
         call SetUnitPositionLoc(y9[1327],E9[1328])
@@ -45348,7 +45345,7 @@ endfunction
 
 function RenjiRKnockbackAreaAllowsUnit takes unit target returns boolean
     // Use the same allowed map regions as Sanji's Party Table knockback.
-    return RectContainsUnit(sn,target) or RectContainsUnit(An,target) or RectContainsUnit(jo,target) or RectContainsUnit(ko,target) or RectContainsUnit(mo,target) or RectContainsUnit(no,target) or RectContainsUnit(oo,target) or RectContainsUnit(po,target) or RectContainsUnit(qo,target) or RectContainsUnit(ro,target) or RectContainsUnit(so,target) or RectContainsUnit(Ro,target) or RectContainsUnit(So,target) or RectContainsUnit(vo,target) or RectContainsUnit(xo,target)
+    return RectContainsUnit(sn,target) or RectContainsUnit(An,target) or RectContainsUnit(jo,target) or RectContainsUnit(ko,target) or RectContainsUnit(mo,target) or RectContainsUnit(ozSpawnRect,target) or RectContainsUnit(oo,target) or RectContainsUnit(po,target) or RectContainsUnit(qo,target) or RectContainsUnit(ro,target) or RectContainsUnit(so,target) or RectContainsUnit(Ro,target) or RectContainsUnit(So,target) or RectContainsUnit(vo,target) or RectContainsUnit(xo,target)
 endfunction
 
 function RenjiRDestroyKnockbackTree takes nothing returns nothing
@@ -46897,11 +46894,11 @@ function dbe takes nothing returns boolean
 endfunction
 
 function dBe takes nothing returns boolean
-    return(RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(no,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))
+    return(RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(ozSpawnRect,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))
 endfunction
 
 function dce takes nothing returns boolean
-    return(DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(no,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))
+    return(DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(ozSpawnRect,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))
 endfunction
 
 function dCe takes nothing returns boolean
@@ -46913,15 +46910,15 @@ function dde takes nothing returns boolean
 endfunction
 
 function dDe takes nothing returns boolean
-    return(RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(no,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)
+    return(RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(ozSpawnRect,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)
 endfunction
 
 function dfe takes nothing returns boolean
-    return(((RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(no,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)))
+    return(((RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(ozSpawnRect,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)))
 endfunction
 
 function dFe takes nothing returns boolean
-    return(((DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(no,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))))
+    return(((DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(ozSpawnRect,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))))
 endfunction
 
 function dge takes nothing returns boolean
@@ -47016,12 +47013,12 @@ function RenjiTUpdateMovement takes nothing returns nothing
         endif
         if(((RenjiTPhase==2)))then
             set uk[25]=GetUnitLoc(RenjiRSegments[19])
-            if(((((DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(no,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))))))then
+            if(((((DistanceBetweenPoints(RenjiTCastPosition,uk[25])<=800.)and(((RectContainsUnit(sn,RenjiTTarget))or(RectContainsUnit(An,RenjiTTarget))or(RectContainsUnit(jo,RenjiTTarget))or(RectContainsUnit(ko,RenjiTTarget))or(RectContainsUnit(mo,RenjiTTarget))or(RectContainsUnit(ozSpawnRect,RenjiTTarget))or(RectContainsUnit(oo,RenjiTTarget))or(RectContainsUnit(po,RenjiTTarget))or(RectContainsUnit(qo,RenjiTTarget))or(RectContainsUnit(ro,RenjiTTarget))or(RectContainsUnit(so,RenjiTTarget))or(RectContainsUnit(Ro,RenjiTTarget))or(RectContainsUnit(So,RenjiTTarget))or(RectContainsUnit(vo,RenjiTTarget))or(RectContainsUnit(xo,RenjiTTarget))))))))then
                 if(((((RenjiTPathIndex==120)or(RenjiTPathIndex==140)or(RenjiTPathIndex==160)))))then
                     set vk[25]=(vk[25]+GetRandomReal(-60.,60.))
                 endif
             else
-                if(((((RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(no,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)))))then
+                if(((((RectContainsUnit(sn,RenjiTTarget)==false)and(RectContainsUnit(An,RenjiTTarget)==false)and(RectContainsUnit(jo,RenjiTTarget)==false)and(RectContainsUnit(ko,RenjiTTarget)==false)and(RectContainsUnit(mo,RenjiTTarget)==false)and(RectContainsUnit(ozSpawnRect,RenjiTTarget)==false)and(RectContainsUnit(oo,RenjiTTarget)==false)and(RectContainsUnit(po,RenjiTTarget)==false)and(RectContainsUnit(qo,RenjiTTarget)==false)and(RectContainsUnit(ro,RenjiTTarget)==false)and(RectContainsUnit(so,RenjiTTarget)==false)and(RectContainsUnit(Ro,RenjiTTarget)==false)and(RectContainsUnit(So,RenjiTTarget)==false)and(RectContainsUnit(vo,RenjiTTarget)==false)and(RectContainsUnit(xo,RenjiTTarget)==false)))))then
                     set vk[25]=(AngleBetweenPoints(uk[25],RenjiTCastPosition)+GetRandomReal(-30.,30.))
                 else
                     set vk[25]=(vk[25]-15.)
@@ -48102,11 +48099,11 @@ function fje takes nothing returns nothing
 endfunction
 
 function fJe takes nothing returns boolean
-    return(RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(no,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))
+    return(RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(ozSpawnRect,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))
 endfunction
 
 function fke takes nothing returns boolean
-    return(IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(no,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))
+    return(IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(ozSpawnRect,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))
 endfunction
 
 function fKe takes nothing returns boolean
@@ -48155,11 +48152,11 @@ function fSe takes nothing returns nothing
 endfunction
 
 function fte takes nothing returns boolean
-    return(RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(no,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))
+    return(RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(ozSpawnRect,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))
 endfunction
 
 function fTe takes nothing returns boolean
-    return(((RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(no,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))))
+    return(((RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(ozSpawnRect,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))))
 endfunction
 
 function fue takes nothing returns boolean
@@ -48167,14 +48164,14 @@ function fue takes nothing returns boolean
 endfunction
 
 function fUe takes nothing returns boolean
-    return(((IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(no,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))))
+    return(((IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(ozSpawnRect,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))))
 endfunction
 
 function fwe takes nothing returns nothing
-    if(((((IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(no,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))))))then
+    if(((((IsUnitAliveBJ(Bg))and(((RectContainsUnit(sn,Bg))or(RectContainsUnit(An,Bg))or(RectContainsUnit(vo,Bg))or(RectContainsUnit(xo,Bg))or(RectContainsUnit(jo,Bg))or(RectContainsUnit(ko,Bg))or(RectContainsUnit(mo,Bg))or(RectContainsUnit(ozSpawnRect,Bg))or(RectContainsUnit(oo,Bg))or(RectContainsUnit(po,Bg))or(RectContainsUnit(qo,Bg))or(RectContainsUnit(ro,Bg))or(RectContainsUnit(so,Bg))or(RectContainsUnit(Ro,Bg))or(RectContainsUnit(So,Bg))))))))then
         set Zi[25]=(Zi[25]+1.)
         set bg[3]=PG(GetUnitLoc(Bg),40.,Cg)
-        if(((((RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(no,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))))))then
+        if(((((RectContainsLoc(sn,bg[3]))or(RectContainsLoc(An,bg[3]))or(RectContainsLoc(jo,bg[3]))or(RectContainsLoc(ko,bg[3]))or(RectContainsLoc(mo,bg[3]))or(RectContainsLoc(ozSpawnRect,bg[3]))or(RectContainsLoc(oo,bg[3]))or(RectContainsLoc(po,bg[3]))or(RectContainsLoc(qo,bg[3]))or(RectContainsLoc(ro,bg[3]))or(RectContainsLoc(so,bg[3]))or(RectContainsLoc(Ro,bg[3]))or(RectContainsLoc(So,bg[3]))or(RectContainsLoc(vo,bg[3]))or(RectContainsLoc(xo,bg[3]))))))then
             call SetUnitPositionLocFacingBJ(Bg,bg[3],Cg)
             call AddSpecialEffectLocBJ(bg[3],"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
@@ -48624,15 +48621,15 @@ function Fqe takes nothing returns boolean
 endfunction
 
 function FQe takes nothing returns boolean
-    return(((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(no,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)
+    return(((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(ozSpawnRect,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)
 endfunction
 
 function Fse takes nothing returns boolean
-    return(((((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(no,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)))
+    return(((((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(ozSpawnRect,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)))
 endfunction
 
 function FSe takes nothing returns nothing
-    if(((((((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(no,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)))))then
+    if(((((((((z==false)and(RectContainsLoc(sn,GetSpellTargetLoc())==false)))or(((z)and(RectContainsLoc(An,GetSpellTargetLoc())==false)))))and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(ozSpawnRect,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)))))then
         call IssueImmediateOrderById(GetTriggerUnit(),851972)
         call DisplayTimedTextToForce(m6(GetOwningPlayer(GetTriggerUnit())),4.,"                                                                |cffffcc00Cannot target that area|r")
     endif
@@ -49083,11 +49080,11 @@ function gUe takes nothing returns boolean
 endfunction
 
 function gwe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))
 endfunction
 
 function gWe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))))
 endfunction
 
 function gye takes nothing returns nothing
@@ -49101,7 +49098,7 @@ function gye takes nothing returns nothing
     call RemoveLocation(Y9[2])
     set Y9[2]=null
     set Z9[2]=null
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[19]))))))))then
         set Y9[2]=PG(GetUnitLoc(y9[12]),-100.,AngleBetweenPoints(GetUnitLoc(y9[12]),B[19]))
         call SetUnitPositionLoc(y9[12],Y9[2])
         call IssueImmediateOrderById(y9[12],851972)
@@ -49196,15 +49193,15 @@ function g3e takes nothing returns boolean
 endfunction
 
 function g4e takes nothing returns boolean
-    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)
+    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)
 endfunction
 
 function g5e takes nothing returns boolean
-    return(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))
+    return(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))
 endfunction
 
 function g6e takes nothing returns nothing
-    if(((((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))then
+    if(((((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))then
         call IssueImmediateOrderById(GetTriggerUnit(),851972)
         call DisplayTimedTextToForce(m6(GetOwningPlayer(GetTriggerUnit())),4.,"                                                              |cffffcc00Cannot use that ability here|r")
     endif
@@ -49297,11 +49294,11 @@ function Gie takes nothing returns nothing
 endfunction
 
 function Gae takes nothing returns boolean
-    return(RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(no,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))
+    return(RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(ozSpawnRect,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))
 endfunction
 
 function Gne takes nothing returns boolean
-    return(L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(no,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))
+    return(L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(ozSpawnRect,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))
 endfunction
 
 function GVe takes nothing returns boolean
@@ -49350,11 +49347,11 @@ function Gce takes nothing returns nothing
 endfunction
 
 function GCe takes nothing returns boolean
-    return(RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(no,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))
+    return(RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(ozSpawnRect,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))
 endfunction
 
 function Gde takes nothing returns boolean
-    return(((RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(no,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))))
+    return(((RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(ozSpawnRect,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))))
 endfunction
 
 function GDe takes nothing returns boolean
@@ -49362,14 +49359,14 @@ function GDe takes nothing returns boolean
 endfunction
 
 function Gfe takes nothing returns boolean
-    return(((L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(no,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))))
+    return(((L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(ozSpawnRect,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))))
 endfunction
 
 function GFe takes nothing returns nothing
-    if(((((L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(no,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))))))then
+    if(((((L[(1+GetPlayerId(GetOwningPlayer(A[25])))])and(IsUnitAliveBJ(A[25]))and(((RectContainsUnit(sn,A[25]))or(RectContainsUnit(An,A[25]))or(RectContainsUnit(vo,A[25]))or(RectContainsUnit(xo,A[25]))or(RectContainsUnit(jo,A[25]))or(RectContainsUnit(ko,A[25]))or(RectContainsUnit(mo,A[25]))or(RectContainsUnit(ozSpawnRect,A[25]))or(RectContainsUnit(oo,A[25]))or(RectContainsUnit(po,A[25]))or(RectContainsUnit(qo,A[25]))or(RectContainsUnit(ro,A[25]))or(RectContainsUnit(so,A[25]))or(RectContainsUnit(Ro,A[25]))or(RectContainsUnit(So,A[25]))))))))then
         set Zi[26]=(Zi[26]+1)
         set Y9[4]=PG(GetUnitLoc(A[25]),30.,c[10])
-        if(((((RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(no,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))))))then
+        if(((((RectContainsLoc(sn,Y9[4]))or(RectContainsLoc(An,Y9[4]))or(RectContainsLoc(jo,Y9[4]))or(RectContainsLoc(ko,Y9[4]))or(RectContainsLoc(mo,Y9[4]))or(RectContainsLoc(ozSpawnRect,Y9[4]))or(RectContainsLoc(oo,Y9[4]))or(RectContainsLoc(po,Y9[4]))or(RectContainsLoc(qo,Y9[4]))or(RectContainsLoc(ro,Y9[4]))or(RectContainsLoc(so,Y9[4]))or(RectContainsLoc(Ro,Y9[4]))or(RectContainsLoc(So,Y9[4]))or(RectContainsLoc(vo,Y9[4]))or(RectContainsLoc(xo,Y9[4]))))))then
             call SetUnitPositionLocFacingBJ(A[25],Y9[4],c[10])
             call SelectUnitRemove(A[25])
             call AddSpecialEffectTargetUnitBJ("origin",A[25],"Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdl")
@@ -49777,19 +49774,19 @@ function hee takes nothing returns nothing
 endfunction
 
 function hxe takes nothing returns boolean
-    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)
+    return(RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)
 endfunction
 
 function hoe takes nothing returns boolean
-    return(l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))
+    return(l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))
 endfunction
 
 function hre takes nothing returns boolean
-    return(GetSpellAbilityId()=='A003')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))
+    return(GetSpellAbilityId()=='A003')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))
 endfunction
 
 function hie takes nothing returns boolean
-    return(((GetSpellAbilityId()=='A003')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(no,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))))
+    return(((GetSpellAbilityId()=='A003')and(((l[(1+GetPlayerId(GetOwningPlayer(GetTriggerUnit())))])or(((RectContainsUnit(sn,GetTriggerUnit())==false)and(RectContainsUnit(An,GetTriggerUnit())==false)and(RectContainsUnit(jo,GetTriggerUnit())==false)and(RectContainsUnit(ko,GetTriggerUnit())==false)and(RectContainsUnit(mo,GetTriggerUnit())==false)and(RectContainsUnit(ozSpawnRect,GetTriggerUnit())==false)and(RectContainsUnit(oo,GetTriggerUnit())==false)and(RectContainsUnit(po,GetTriggerUnit())==false)and(RectContainsUnit(qo,GetTriggerUnit())==false)and(RectContainsUnit(ro,GetTriggerUnit())==false)and(RectContainsUnit(so,GetTriggerUnit())==false)and(RectContainsUnit(Ro,GetTriggerUnit())==false)and(RectContainsUnit(So,GetTriggerUnit())==false)))))))
 endfunction
 
 function hae takes nothing returns nothing
@@ -50002,19 +49999,19 @@ function hle takes nothing returns boolean
 endfunction
 
 function hLe takes nothing returns boolean
-    return(RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(no,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))
+    return(RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(ozSpawnRect,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))
 endfunction
 
 function hme takes nothing returns boolean
-    return(m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(no,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))
+    return(m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(ozSpawnRect,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))
 endfunction
 
 function hMe takes nothing returns boolean
-    return(((m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(no,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))))
+    return(((m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(ozSpawnRect,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))))
 endfunction
 
 function hpe takes nothing returns nothing
-    if(((((m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(no,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))))))then
+    if(((((m7[(1+GetPlayerId(GetOwningPlayer(A[62])))])and(((RectContainsUnit(sn,A[63]))or(RectContainsUnit(An,A[63]))or(RectContainsUnit(jo,A[63]))or(RectContainsUnit(ko,A[63]))or(RectContainsUnit(mo,A[63]))or(RectContainsUnit(ozSpawnRect,A[63]))or(RectContainsUnit(oo,A[63]))or(RectContainsUnit(po,A[63]))or(RectContainsUnit(qo,A[63]))or(RectContainsUnit(ro,A[63]))or(RectContainsUnit(so,A[63]))or(RectContainsUnit(Ro,A[63]))or(RectContainsUnit(So,A[63]))or(RectContainsUnit(vo,A[63]))or(RectContainsUnit(xo,A[63]))))))))then
         if(((th==1)))then
             set B[26]=GetUnitLoc(A[63])
             set B[27]=PG(B[26],(DistanceBetweenPoints(B[24],B[25])/ 50.),GetUnitFacing(A[63]))
@@ -50165,15 +50162,15 @@ function h4e takes nothing returns boolean
 endfunction
 
 function h5e takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))
 endfunction
 
 function h6e takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))))
 endfunction
 
 function h7e takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[18]))))))))then
         set y9[13]=GetEnumUnit()
         set ed[5]=PG(GetUnitLoc(y9[13]),-100.,AngleBetweenPoints(GetUnitLoc(y9[13]),B[18]))
         call SetUnitPositionLoc(y9[13],ed[5])
@@ -52302,25 +52299,25 @@ function Kke takes nothing returns boolean
 endfunction
 
 function KKe takes nothing returns boolean
-    return(RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(no,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))
+    return(RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(ozSpawnRect,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))
 endfunction
 
 function Kle takes nothing returns boolean
-    return(((RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(no,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))))
+    return(((RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(ozSpawnRect,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))))
 endfunction
 
 function KLe takes nothing returns boolean
-    return(RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(no,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))
+    return(RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(ozSpawnRect,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))
 endfunction
 
 function Kme takes nothing returns boolean
-    return(IsUnitAliveBJ(be))and(((RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(no,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))))
+    return(IsUnitAliveBJ(be))and(((RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(ozSpawnRect,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))))
 endfunction
 
 function KMe takes nothing returns nothing
-    if(((IsUnitAliveBJ(be))and(((RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(no,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))))))then
+    if(((IsUnitAliveBJ(be))and(((RectContainsUnit(sn,be))or(RectContainsUnit(An,be))or(RectContainsUnit(vo,be))or(RectContainsUnit(xo,be))or(RectContainsUnit(jo,be))or(RectContainsUnit(ko,be))or(RectContainsUnit(mo,be))or(RectContainsUnit(ozSpawnRect,be))or(RectContainsUnit(oo,be))or(RectContainsUnit(po,be))or(RectContainsUnit(qo,be))or(RectContainsUnit(ro,be))or(RectContainsUnit(so,be))or(RectContainsUnit(Ro,be))or(RectContainsUnit(So,be))))))then
         set Fe[2]=PG(GetUnitLoc(be),62.,ce)
-        if(((((RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(no,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))))))then
+        if(((((RectContainsLoc(sn,Fe[2]))or(RectContainsLoc(An,Fe[2]))or(RectContainsLoc(jo,Fe[2]))or(RectContainsLoc(ko,Fe[2]))or(RectContainsLoc(mo,Fe[2]))or(RectContainsLoc(ozSpawnRect,Fe[2]))or(RectContainsLoc(oo,Fe[2]))or(RectContainsLoc(po,Fe[2]))or(RectContainsLoc(qo,Fe[2]))or(RectContainsLoc(ro,Fe[2]))or(RectContainsLoc(so,Fe[2]))or(RectContainsLoc(Ro,Fe[2]))or(RectContainsLoc(So,Fe[2]))or(RectContainsLoc(vo,Fe[2]))or(RectContainsLoc(xo,Fe[2]))))))then
             call SetUnitPositionLoc(be,Fe[2])
             call RemoveLocation(Fe[2])
             set Fe[2]=null
@@ -52733,15 +52730,15 @@ function lGe takes nothing returns boolean
 endfunction
 
 function lhe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))
 endfunction
 
 function lHe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))))
 endfunction
 
 function lje takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[30]))))))))then
         set y9[15]=GetEnumUnit()
         set kd[2]=PG(GetUnitLoc(y9[15]),-100.,AngleBetweenPoints(GetUnitLoc(y9[15]),B[30]))
         call SetUnitPositionLoc(y9[15],kd[2])
@@ -53069,15 +53066,15 @@ function l3e takes nothing returns nothing
 endfunction
 
 function l4e takes nothing returns boolean
-    return(RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(no,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))
+    return(RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(ozSpawnRect,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))
 endfunction
 
 function l5e takes nothing returns boolean
-    return(IsUnitAliveBJ(a[8]))and(((RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(no,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))))
+    return(IsUnitAliveBJ(a[8]))and(((RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(ozSpawnRect,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))))
 endfunction
 
 function l6e takes nothing returns nothing
-    if(((IsUnitAliveBJ(a[8]))and(((RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(no,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))))))then
+    if(((IsUnitAliveBJ(a[8]))and(((RectContainsUnit(sn,a[8]))or(RectContainsUnit(An,a[8]))or(RectContainsUnit(vo,a[8]))or(RectContainsUnit(xo,a[8]))or(RectContainsUnit(jo,a[8]))or(RectContainsUnit(ko,a[8]))or(RectContainsUnit(mo,a[8]))or(RectContainsUnit(ozSpawnRect,a[8]))or(RectContainsUnit(oo,a[8]))or(RectContainsUnit(po,a[8]))or(RectContainsUnit(qo,a[8]))or(RectContainsUnit(ro,a[8]))or(RectContainsUnit(so,a[8]))or(RectContainsUnit(Ro,a[8]))or(RectContainsUnit(So,a[8]))))))then
         set kd[5]=PG(GetUnitLoc(a[8]),30.,AngleBetweenPoints(GetUnitLoc(A[65]),GetUnitLoc(a[8])))
         call SetUnitPositionLoc(a[8],kd[5])
         call RemoveLocation(kd[5])
@@ -53255,15 +53252,15 @@ function Lde takes nothing returns boolean
 endfunction
 
 function LDe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))
 endfunction
 
 function Lfe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))))
 endfunction
 
 function LFe takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[805]))))))))then
         set y9[16]=GetEnumUnit()
         set nd[1]=PG(GetUnitLoc(y9[16]),-100.,AngleBetweenPoints(GetUnitLoc(y9[16]),B[805]))
         call SetUnitPositionLoc(y9[16],nd[1])
@@ -53397,19 +53394,19 @@ function Lpe takes nothing returns boolean
 endfunction
 
 function LPe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))
 endfunction
 
 function Lqe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))))
 endfunction
 
 function LQe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))
 endfunction
 
 function Lse takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))))
 endfunction
 
 function LSe takes nothing returns boolean
@@ -53453,11 +53450,11 @@ function Lze takes nothing returns boolean
 endfunction
 
 function LZe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))
 endfunction
 
 function L_e takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))))
 endfunction
 
 function L0e takes nothing returns boolean
@@ -53520,13 +53517,13 @@ function mxe takes nothing returns nothing
     endif
     set q4[802]=(400.+(mg-kg))
     if(((L[(1+GetPlayerId(GetOwningPlayer(A[802])))])))then
-        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))))))then
+        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),400.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),400.,c[801])))))))then
             set B[806]=PG(GetUnitLoc(a[801]),400.,c[801])
         else
             set B[806]=PG(GetUnitLoc(a[801]),200.,c[801])
         endif
     else
-        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))))))then
+        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),175.,c[801])))))))then
             set B[806]=PG(GetUnitLoc(a[801]),175.,c[801])
         else
             set B[806]=PG(GetUnitLoc(a[801]),-100.,c[801])
@@ -53569,7 +53566,7 @@ function mxe takes nothing returns nothing
         call RemoveLocation(B[806])
         set B[806]=null
         set q4[802]=(q4[802]*.75)
-        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(no,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))))))then
+        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(An,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(po,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(so,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[801]),-175.,c[801])))or(RectContainsLoc(So,PG(GetUnitLoc(a[801]),-175.,c[801])))))))then
             set B[806]=PG(GetUnitLoc(a[801]),-175.,c[801])
         else
             set B[806]=PG(GetUnitLoc(a[801]),100.,c[801])
@@ -53647,25 +53644,25 @@ function mne takes nothing returns boolean
 endfunction
 
 function mVe takes nothing returns boolean
-    return(RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(no,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))
+    return(RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(ozSpawnRect,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))
 endfunction
 
 function mEe takes nothing returns boolean
-    return(((RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(no,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))))
+    return(((RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(ozSpawnRect,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))))
 endfunction
 
 function mXe takes nothing returns boolean
-    return(RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))
+    return(RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))
 endfunction
 
 function mOe takes nothing returns boolean
-    return(((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))
+    return(((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))
 endfunction
 
 function mRe takes nothing returns nothing
-    if(((((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))))then
+    if(((((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))))then
         set nd[2]=PG(GetUnitLoc(A[802]),62.,c[801])
-        if(((((RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(no,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))))))then
+        if(((((RectContainsLoc(sn,nd[2]))or(RectContainsLoc(An,nd[2]))or(RectContainsLoc(jo,nd[2]))or(RectContainsLoc(ko,nd[2]))or(RectContainsLoc(mo,nd[2]))or(RectContainsLoc(ozSpawnRect,nd[2]))or(RectContainsLoc(oo,nd[2]))or(RectContainsLoc(po,nd[2]))or(RectContainsLoc(qo,nd[2]))or(RectContainsLoc(ro,nd[2]))or(RectContainsLoc(so,nd[2]))or(RectContainsLoc(Ro,nd[2]))or(RectContainsLoc(So,nd[2]))or(RectContainsLoc(vo,nd[2]))or(RectContainsLoc(xo,nd[2]))))))then
             call SetUnitPositionLocFacingLocBJ(A[802],nd[2],B[806])
             call RemoveLocation(nd[2])
             set nd[2]=null
@@ -53713,25 +53710,25 @@ function mBe takes nothing returns boolean
 endfunction
 
 function mce takes nothing returns boolean
-    return(RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(no,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))
+    return(RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(ozSpawnRect,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))
 endfunction
 
 function mCe takes nothing returns boolean
-    return(((RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(no,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))))
+    return(((RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(ozSpawnRect,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))))
 endfunction
 
 function mde takes nothing returns boolean
-    return(RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))
+    return(RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))
 endfunction
 
 function mDe takes nothing returns boolean
-    return(((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))
+    return(((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))
 endfunction
 
 function mfe takes nothing returns nothing
-    if(((((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(no,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))))then
+    if(((((RectContainsUnit(sn,A[802]))or(RectContainsUnit(An,A[802]))or(RectContainsUnit(vo,A[802]))or(RectContainsUnit(xo,A[802]))or(RectContainsUnit(jo,A[802]))or(RectContainsUnit(ko,A[802]))or(RectContainsUnit(mo,A[802]))or(RectContainsUnit(ozSpawnRect,A[802]))or(RectContainsUnit(oo,A[802]))or(RectContainsUnit(po,A[802]))or(RectContainsUnit(qo,A[802]))or(RectContainsUnit(ro,A[802]))or(RectContainsUnit(so,A[802]))or(RectContainsUnit(Ro,A[802]))or(RectContainsUnit(So,A[802]))))))then
         set nd[3]=PG(GetUnitLoc(A[802]),-62.,c[801])
-        if(((((RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(no,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))))))then
+        if(((((RectContainsLoc(sn,nd[3]))or(RectContainsLoc(An,nd[3]))or(RectContainsLoc(jo,nd[3]))or(RectContainsLoc(ko,nd[3]))or(RectContainsLoc(mo,nd[3]))or(RectContainsLoc(ozSpawnRect,nd[3]))or(RectContainsLoc(oo,nd[3]))or(RectContainsLoc(po,nd[3]))or(RectContainsLoc(qo,nd[3]))or(RectContainsLoc(ro,nd[3]))or(RectContainsLoc(so,nd[3]))or(RectContainsLoc(Ro,nd[3]))or(RectContainsLoc(So,nd[3]))or(RectContainsLoc(vo,nd[3]))or(RectContainsLoc(xo,nd[3]))))))then
             call SetUnitPositionLocFacingBJ(A[802],nd[3],(c[801]+180.))
             call RemoveLocation(nd[3])
             set nd[3]=null
@@ -54218,7 +54215,7 @@ function Mhe takes nothing returns boolean
 endfunction
 
 function MHe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))
 endfunction
 
 function Mje takes nothing returns boolean
@@ -54226,11 +54223,11 @@ function Mje takes nothing returns boolean
 endfunction
 
 function MJe takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))))
 endfunction
 
 function Mke takes nothing returns nothing
-    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(no,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))))))then
+    if(((((RectContainsLoc(sn,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(An,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(jo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ko,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(mo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(oo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(po,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(qo,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(so,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(Ro,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))or(RectContainsLoc(So,PG(GetUnitLoc(GetEnumUnit()),-100.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[804]))))))))then
         set y9[17]=GetEnumUnit()
         set od[2]=PG(GetUnitLoc(y9[17]),-100.,AngleBetweenPoints(GetUnitLoc(y9[17]),B[804]))
         call SetUnitPositionLoc(y9[17],od[2])
@@ -54534,15 +54531,15 @@ function M5e takes nothing returns nothing
 endfunction
 
 function M6e takes nothing returns boolean
-    return(RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(no,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))
+    return(RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(ozSpawnRect,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))
 endfunction
 
 function M7e takes nothing returns boolean
-    return(L[(1+GetPlayerId(GetOwningPlayer(A[801])))])and(IsUnitAliveBJ(A[801]))and(((RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(no,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))))
+    return(L[(1+GetPlayerId(GetOwningPlayer(A[801])))])and(IsUnitAliveBJ(A[801]))and(((RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(ozSpawnRect,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))))
 endfunction
 
 function M8e takes nothing returns boolean
-    return(((L[(1+GetPlayerId(GetOwningPlayer(A[801])))])and(IsUnitAliveBJ(A[801]))and(((RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(no,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))))))
+    return(((L[(1+GetPlayerId(GetOwningPlayer(A[801])))])and(IsUnitAliveBJ(A[801]))and(((RectContainsUnit(sn,A[801]))or(RectContainsUnit(An,A[801]))or(RectContainsUnit(vo,A[801]))or(RectContainsUnit(xo,A[801]))or(RectContainsUnit(jo,A[801]))or(RectContainsUnit(ko,A[801]))or(RectContainsUnit(mo,A[801]))or(RectContainsUnit(ozSpawnRect,A[801]))or(RectContainsUnit(oo,A[801]))or(RectContainsUnit(po,A[801]))or(RectContainsUnit(qo,A[801]))or(RectContainsUnit(ro,A[801]))or(RectContainsUnit(so,A[801]))or(RectContainsUnit(Ro,A[801]))or(RectContainsUnit(So,A[801]))))))
 endfunction
 
 function M9e takes nothing returns boolean
@@ -54593,16 +54590,16 @@ function pEe takes nothing returns nothing
 endfunction
 
 function pXe takes nothing returns boolean
-    return(RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(no,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))
+    return(RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(ozSpawnRect,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))
 endfunction
 
 function pOe takes nothing returns boolean
-    return(((RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(no,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))))
+    return(((RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(ozSpawnRect,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))))
 endfunction
 
 function pRe takes nothing returns nothing
     set od[3]=PG(GetUnitLoc(A[801]),45.,c[800])
-    if(((((RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(no,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))))))then
+    if(((((RectContainsLoc(sn,od[3]))or(RectContainsLoc(An,od[3]))or(RectContainsLoc(jo,od[3]))or(RectContainsLoc(ko,od[3]))or(RectContainsLoc(mo,od[3]))or(RectContainsLoc(ozSpawnRect,od[3]))or(RectContainsLoc(oo,od[3]))or(RectContainsLoc(po,od[3]))or(RectContainsLoc(qo,od[3]))or(RectContainsLoc(ro,od[3]))or(RectContainsLoc(so,od[3]))or(RectContainsLoc(Ro,od[3]))or(RectContainsLoc(So,od[3]))or(RectContainsLoc(vo,od[3]))or(RectContainsLoc(xo,od[3]))))))then
         call SetUnitPositionLocFacingBJ(A[801],od[3],c[800])
         call RemoveLocation(od[3])
         set od[3]=null
@@ -56447,11 +56444,11 @@ function sqe takes nothing returns boolean
 endfunction
 
 function sQe takes nothing returns boolean
-    return(RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(no,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))
+    return(RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(ozSpawnRect,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))
 endfunction
 
 function sse takes nothing returns boolean
-    return(a[870]!=null)and(((RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(no,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))))
+    return(a[870]!=null)and(((RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(ozSpawnRect,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))))
 endfunction
 
 function sSe takes nothing returns boolean
@@ -56516,7 +56513,7 @@ function ste takes nothing returns nothing
         call RemoveLocation(B[873])
         set B[873]=null
     else
-        if(((a[870]!=null)and(((RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(no,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))))))then
+        if(((a[870]!=null)and(((RectContainsUnit(sn,a[870]))or(RectContainsUnit(An,a[870]))or(RectContainsUnit(vo,a[870]))or(RectContainsUnit(xo,a[870]))or(RectContainsUnit(jo,a[870]))or(RectContainsUnit(ko,a[870]))or(RectContainsUnit(mo,a[870]))or(RectContainsUnit(ozSpawnRect,a[870]))or(RectContainsUnit(oo,a[870]))or(RectContainsUnit(po,a[870]))or(RectContainsUnit(qo,a[870]))or(RectContainsUnit(ro,a[870]))or(RectContainsUnit(so,a[870]))or(RectContainsUnit(Ro,a[870]))or(RectContainsUnit(So,a[870]))))))then
             set B[873]=PG(GetUnitLoc(a[870]),30.,c[871])
             call SetUnitPositionLoc(a[870],B[873])
             call RemoveLocation(B[873])
@@ -57515,11 +57512,11 @@ function tGe takes nothing returns nothing
 endfunction
 
 function the takes nothing returns boolean
-    return(RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(no,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))
+    return(RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(ozSpawnRect,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))
 endfunction
 
 function tHe takes nothing returns boolean
-    return(IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(no,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))
+    return(IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(ozSpawnRect,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))
 endfunction
 
 function tje takes nothing returns boolean
@@ -57578,11 +57575,11 @@ function tqe takes nothing returns nothing
 endfunction
 
 function tQe takes nothing returns boolean
-    return(RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(no,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))
+    return(RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(ozSpawnRect,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))
 endfunction
 
 function tse takes nothing returns boolean
-    return(((RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(no,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))))
+    return(((RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(ozSpawnRect,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))))
 endfunction
 
 function tSe takes nothing returns boolean
@@ -57590,14 +57587,14 @@ function tSe takes nothing returns boolean
 endfunction
 
 function tte takes nothing returns boolean
-    return(((IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(no,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))))
+    return(((IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(ozSpawnRect,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))))
 endfunction
 
 function tTe takes nothing returns nothing
-    if(((((IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(no,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))))))then
+    if(((((IsUnitAliveBJ(Pi[5]))and(((RectContainsUnit(sn,Pi[5]))or(RectContainsUnit(An,Pi[5]))or(RectContainsUnit(vo,Pi[5]))or(RectContainsUnit(xo,Pi[5]))or(RectContainsUnit(jo,Pi[5]))or(RectContainsUnit(ko,Pi[5]))or(RectContainsUnit(mo,Pi[5]))or(RectContainsUnit(ozSpawnRect,Pi[5]))or(RectContainsUnit(oo,Pi[5]))or(RectContainsUnit(po,Pi[5]))or(RectContainsUnit(qo,Pi[5]))or(RectContainsUnit(ro,Pi[5]))or(RectContainsUnit(so,Pi[5]))or(RectContainsUnit(Ro,Pi[5]))or(RectContainsUnit(So,Pi[5]))))))))then
         set Zi[17]=(Zi[17]+1.)
         set Ui[5]=PG(GetUnitLoc(Pi[5]),40.,Zi[5])
-        if(((((RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(no,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))))))then
+        if(((((RectContainsLoc(sn,Ui[5]))or(RectContainsLoc(An,Ui[5]))or(RectContainsLoc(jo,Ui[5]))or(RectContainsLoc(ko,Ui[5]))or(RectContainsLoc(mo,Ui[5]))or(RectContainsLoc(ozSpawnRect,Ui[5]))or(RectContainsLoc(oo,Ui[5]))or(RectContainsLoc(po,Ui[5]))or(RectContainsLoc(qo,Ui[5]))or(RectContainsLoc(ro,Ui[5]))or(RectContainsLoc(so,Ui[5]))or(RectContainsLoc(Ro,Ui[5]))or(RectContainsLoc(So,Ui[5]))or(RectContainsLoc(vo,Ui[5]))or(RectContainsLoc(xo,Ui[5]))))))then
             call SetUnitPositionLocFacingBJ(Pi[5],Ui[5],Zi[5])
             call RemoveLocation(Ui[5])
             set Ui[5]=null
@@ -59348,11 +59345,11 @@ function Uwe takes nothing returns nothing
 endfunction
 
 function UWe takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))
 endfunction
 
 function Uye takes nothing returns boolean
-    return(IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))))
+    return(IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))))
 endfunction
 
 function UYe takes nothing returns boolean
@@ -59360,11 +59357,11 @@ function UYe takes nothing returns boolean
 endfunction
 
 function Uze takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))
 endfunction
 
 function UZe takes nothing returns boolean
-    return(IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))
+    return(IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))
 endfunction
 
 function U_e takes nothing returns nothing
@@ -59372,7 +59369,7 @@ function U_e takes nothing returns nothing
 endfunction
 
 function U0e takes nothing returns boolean
-    return(((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))))
+    return(((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))))
 endfunction
 
 function U1e takes nothing returns boolean
@@ -59404,7 +59401,7 @@ function U3e takes nothing returns nothing
         call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.)
         call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function UYe)))
         call UnitDamageTargetBJ(A[10],a[2],(125.+(115.*I2R(GetUnitAbilityLevelSwapped('A00O',A[10])))),ATTACK_TYPE_HERO,DAMAGE_TYPE_NORMAL)
-        if(((((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))))))then
+        if(((((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),300.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),300.,c[5])))))))))then
             set dg[3]=PG(GetUnitLoc(a[2]),300.,c[5])
             call SetUnitPositionLocFacingLocBJ(a[2],dg[3],dg[2])
             call IssueImmediateOrderById(a[2],851972)
@@ -59423,7 +59420,7 @@ function U3e takes nothing returns nothing
         call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
         call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.)
         call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function UUe)))
-        if(((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(no,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))))))then
+        if(((IsUnitPaused(a[2])==false)and(MG(a[2],UNIT_TYPE_ANCIENT)==false)and(((RectContainsLoc(sn,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(An,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(po,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(so,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[2]),200.,c[5])))or(RectContainsLoc(So,PG(GetUnitLoc(a[2]),200.,c[5])))))))then
             set dg[3]=PG(GetUnitLoc(a[2]),200.,c[5])
             call SetUnitPositionLocFacingLocBJ(a[2],dg[3],dg[2])
             call IssueImmediateOrderById(a[2],851972)
@@ -59936,20 +59933,20 @@ function wYe takes nothing returns nothing
 endfunction
 
 function wze takes nothing returns boolean
-    return(RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(no,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))
+    return(RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(ozSpawnRect,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))
 endfunction
 
 function wZe takes nothing returns boolean
-    return(IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(no,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))
+    return(IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(ozSpawnRect,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))
 endfunction
 
 function w_e takes nothing returns boolean
-    return(((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(no,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))))
+    return(((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(ozSpawnRect,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))))
 endfunction
 
 function w0e takes nothing returns nothing
     set dg[9]=PG(GetUnitLoc(GetEnumUnit()),(50.-(DistanceBetweenPoints(GetUnitLoc(GetEnumUnit()),dg[8])/ 15.)),c[7])
-    if(((((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(no,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))))))then
+    if(((((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(DistanceBetweenPoints(dg[9],dg[8])<=750.)and(((RectContainsLoc(sn,dg[9]))or(RectContainsLoc(An,dg[9]))or(RectContainsLoc(jo,dg[9]))or(RectContainsLoc(ko,dg[9]))or(RectContainsLoc(mo,dg[9]))or(RectContainsLoc(ozSpawnRect,dg[9]))or(RectContainsLoc(oo,dg[9]))or(RectContainsLoc(po,dg[9]))or(RectContainsLoc(qo,dg[9]))or(RectContainsLoc(ro,dg[9]))or(RectContainsLoc(so,dg[9]))or(RectContainsLoc(Ro,dg[9]))or(RectContainsLoc(So,dg[9]))))))))then
         call SetUnitPositionLoc(GetEnumUnit(),dg[9])
         call SetUnitFacingToFaceUnitTimed(GetEnumUnit(),A[14],0)
         call AddSpecialEffectTargetUnitBJ("origin",GetEnumUnit(),"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
@@ -60651,29 +60648,29 @@ function yOe takes nothing returns boolean
 endfunction
 
 function yRe takes nothing returns boolean
-    return(RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(no,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))
+    return(RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(ozSpawnRect,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))
 endfunction
 
 function yIe takes nothing returns boolean
-    return(((RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(no,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))))
+    return(((RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(ozSpawnRect,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))))
 endfunction
 
 function yAe takes nothing returns boolean
-    return(RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(no,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))
+    return(RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(ozSpawnRect,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))
 endfunction
 
 function yNe takes nothing returns boolean
-    return(IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(no,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))
+    return(IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(ozSpawnRect,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))
 endfunction
 
 function ybe takes nothing returns boolean
-    return(((IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(no,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))))
+    return(((IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(ozSpawnRect,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))))
 endfunction
 
 function yBe takes nothing returns nothing
-    if(((((IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(no,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))))))then
+    if(((((IsUnitAliveBJ(A[16]))and(((RectContainsUnit(sn,A[16]))or(RectContainsUnit(An,A[16]))or(RectContainsUnit(vo,A[16]))or(RectContainsUnit(xo,A[16]))or(RectContainsUnit(jo,A[16]))or(RectContainsUnit(ko,A[16]))or(RectContainsUnit(mo,A[16]))or(RectContainsUnit(ozSpawnRect,A[16]))or(RectContainsUnit(oo,A[16]))or(RectContainsUnit(po,A[16]))or(RectContainsUnit(qo,A[16]))or(RectContainsUnit(ro,A[16]))or(RectContainsUnit(so,A[16]))or(RectContainsUnit(Ro,A[16]))or(RectContainsUnit(So,A[16]))))))))then
         set dg[11]=PG(GetUnitLoc(A[16]),62.,c[8])
-        if(((((RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(no,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))))))then
+        if(((((RectContainsLoc(sn,dg[11]))or(RectContainsLoc(An,dg[11]))or(RectContainsLoc(jo,dg[11]))or(RectContainsLoc(ko,dg[11]))or(RectContainsLoc(mo,dg[11]))or(RectContainsLoc(ozSpawnRect,dg[11]))or(RectContainsLoc(oo,dg[11]))or(RectContainsLoc(po,dg[11]))or(RectContainsLoc(qo,dg[11]))or(RectContainsLoc(ro,dg[11]))or(RectContainsLoc(so,dg[11]))or(RectContainsLoc(Ro,dg[11]))or(RectContainsLoc(So,dg[11]))or(RectContainsLoc(vo,dg[11]))or(RectContainsLoc(xo,dg[11]))))))then
             if(((DistanceBetweenPoints(dg[11],B[12])<=70.)))then
                 call RemoveLocation(dg[11])
                 set dg[11]=null
@@ -60916,11 +60913,11 @@ function yye takes nothing returns nothing
 endfunction
 
 function yYe takes nothing returns boolean
-    return(RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(no,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))
+    return(RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(ozSpawnRect,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))
 endfunction
 
 function yze takes nothing returns boolean
-    return(((RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(no,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))))
+    return(((RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(ozSpawnRect,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))))
 endfunction
 
 function yZe takes nothing returns boolean
@@ -60978,7 +60975,7 @@ function y1e takes nothing returns nothing
     set c[9]=AngleBetweenPoints(GetUnitLoc(A[18]),GetUnitLoc(a[3]))
     set B[13]=PG(GetUnitLoc(a[3]),150.,c[9])
     call PauseUnit(a[3],false)
-    if(((((RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(no,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))))))then
+    if(((((RectContainsLoc(sn,B[13]))or(RectContainsLoc(An,B[13]))or(RectContainsLoc(jo,B[13]))or(RectContainsLoc(ko,B[13]))or(RectContainsLoc(mo,B[13]))or(RectContainsLoc(ozSpawnRect,B[13]))or(RectContainsLoc(oo,B[13]))or(RectContainsLoc(po,B[13]))or(RectContainsLoc(qo,B[13]))or(RectContainsLoc(ro,B[13]))or(RectContainsLoc(so,B[13]))or(RectContainsLoc(Ro,B[13]))or(RectContainsLoc(So,B[13]))))))then
         call UG(300.,B[13],function yye)
         call SetUnitPositionLocFacingBJ(A[18],B[13],c[9])
         set dg[12]=GetUnitLoc(A[18])
@@ -61246,15 +61243,15 @@ function Yge takes nothing returns nothing
 endfunction
 
 function YGe takes nothing returns boolean
-    return(RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(no,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))
+    return(RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(ozSpawnRect,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))
 endfunction
 
 function Yhe takes nothing returns boolean
-    return(((RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(no,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))))
+    return(((RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(ozSpawnRect,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))))
 endfunction
 
 function YHe takes nothing returns nothing
-    if(((((RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(no,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))))))then
+    if(((((RectContainsUnit(sn,GetEnumUnit()))or(RectContainsUnit(An,GetEnumUnit()))or(RectContainsUnit(jo,GetEnumUnit()))or(RectContainsUnit(ko,GetEnumUnit()))or(RectContainsUnit(mo,GetEnumUnit()))or(RectContainsUnit(ozSpawnRect,GetEnumUnit()))or(RectContainsUnit(oo,GetEnumUnit()))or(RectContainsUnit(po,GetEnumUnit()))or(RectContainsUnit(qo,GetEnumUnit()))or(RectContainsUnit(ro,GetEnumUnit()))or(RectContainsUnit(so,GetEnumUnit()))or(RectContainsUnit(Ro,GetEnumUnit()))or(RectContainsUnit(So,GetEnumUnit()))or(RectContainsUnit(vo,GetEnumUnit()))or(RectContainsUnit(xo,GetEnumUnit()))))))then
         set dg[13]=PG(GetUnitLoc(GetEnumUnit()),-12.,AngleBetweenPoints(GetUnitLoc(GetEnumUnit()),B[32]))
         call SetUnitPositionLoc(GetEnumUnit(),dg[13])
         call SetUnitFacingToFaceLocTimed(GetEnumUnit(),B[32],0)
@@ -61755,15 +61752,15 @@ function zDe takes nothing returns nothing
 endfunction
 
 function zfe takes nothing returns boolean
-    return(RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(no,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))
+    return(RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(ozSpawnRect,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))
 endfunction
 
 function zFe takes nothing returns boolean
-    return(IsUnitAliveBJ(a[10]))and(((RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(no,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))))
+    return(IsUnitAliveBJ(a[10]))and(((RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(ozSpawnRect,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))))
 endfunction
 
 function zge takes nothing returns nothing
-    if(((IsUnitAliveBJ(a[10]))and(((RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(no,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))))))then
+    if(((IsUnitAliveBJ(a[10]))and(((RectContainsUnit(sn,a[10]))or(RectContainsUnit(An,a[10]))or(RectContainsUnit(vo,a[10]))or(RectContainsUnit(xo,a[10]))or(RectContainsUnit(jo,a[10]))or(RectContainsUnit(ko,a[10]))or(RectContainsUnit(mo,a[10]))or(RectContainsUnit(ozSpawnRect,a[10]))or(RectContainsUnit(oo,a[10]))or(RectContainsUnit(po,a[10]))or(RectContainsUnit(qo,a[10]))or(RectContainsUnit(ro,a[10]))or(RectContainsUnit(so,a[10]))or(RectContainsUnit(Ro,a[10]))or(RectContainsUnit(So,a[10]))))))then
         set dg[18]=PG(GetUnitLoc(a[10]),35.,AngleBetweenPoints(GetUnitLoc(A[69]),GetUnitLoc(a[10])))
         call SetUnitPositionLoc(a[10],dg[18])
         call RemoveLocation(dg[18])
@@ -62462,21 +62459,21 @@ function Trig_Cyclone_move_Func002Func004Func002Func001001 takes nothing returns
 endfunction
 
 function Z_e takes nothing returns boolean
-    return(RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(no,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))
+    return(RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(ozSpawnRect,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))
 endfunction
 
 function Z0e takes nothing returns boolean
-    return(IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(no,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))
+    return(IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(ozSpawnRect,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))
 endfunction
 
 function Z1e takes nothing returns boolean
-    return(((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(no,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))))
+    return(((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(ozSpawnRect,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))))
 endfunction
 
 function Z2e takes nothing returns nothing
     call GroupAddUnit(dk,GetEnumUnit())
     call UnitDamageTargetBJ(ek,GetEnumUnit(),((6.+(2.*I2R(GetUnitAbilityLevelSwapped('A05E',ek))))*I2R(GetHeroStatBJ(2,ek,true))),ATTACK_TYPE_NORMAL,DAMAGE_TYPE_NORMAL)
-    if(((((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(no,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))))))then
+    if(((((IsUnitPaused(GetEnumUnit())==false)and(IsUnitHidden(GetEnumUnit())==false)and(((RectContainsLoc(sn,dg[5913]))or(RectContainsLoc(An,dg[5913]))or(RectContainsLoc(jo,dg[5913]))or(RectContainsLoc(ko,dg[5913]))or(RectContainsLoc(mo,dg[5913]))or(RectContainsLoc(ozSpawnRect,dg[5913]))or(RectContainsLoc(oo,dg[5913]))or(RectContainsLoc(po,dg[5913]))or(RectContainsLoc(qo,dg[5913]))or(RectContainsLoc(ro,dg[5913]))or(RectContainsLoc(so,dg[5913]))or(RectContainsLoc(Ro,dg[5913]))or(RectContainsLoc(So,dg[5913]))))))))then
         call SetUnitPositionLocFacingBJ(GetEnumUnit(),dg[5913],AngleBetweenPoints(dg[5913],GetUnitLoc(GetEnumUnit())))
     endif
 endfunction
@@ -63451,19 +63448,19 @@ function eTx takes nothing returns boolean
 endfunction
 
 function eux takes nothing returns boolean
-    return(RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(no,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))
+    return(RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(ozSpawnRect,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))
 endfunction
 
 function eUx takes nothing returns boolean
-    return(l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(no,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))
+    return(l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(ozSpawnRect,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))
 endfunction
 
 function ewx takes nothing returns boolean
-    return(((l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(no,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))))
+    return(((l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(ozSpawnRect,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))))
 endfunction
 
 function eWx takes nothing returns nothing
-    if(((((l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(no,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))))))then
+    if(((((l[(1+GetPlayerId(GetOwningPlayer(A[79])))])and(((RectContainsUnit(sn,A[80]))or(RectContainsUnit(An,A[80]))or(RectContainsUnit(jo,A[80]))or(RectContainsUnit(ko,A[80]))or(RectContainsUnit(mo,A[80]))or(RectContainsUnit(ozSpawnRect,A[80]))or(RectContainsUnit(oo,A[80]))or(RectContainsUnit(po,A[80]))or(RectContainsUnit(qo,A[80]))or(RectContainsUnit(ro,A[80]))or(RectContainsUnit(so,A[80]))or(RectContainsUnit(Ro,A[80]))or(RectContainsUnit(So,A[80]))or(RectContainsUnit(vo,A[80]))or(RectContainsUnit(xo,A[80]))))))))then
         set B[41]=GetUnitLoc(A[80])
         set B[42]=PG(B[41],(DistanceBetweenPoints(B[39],B[40])/ 50.),GetUnitFacing(A[80]))
         call RemoveLocation(B[41])
@@ -63754,11 +63751,11 @@ function xbx takes nothing returns nothing
 endfunction
 
 function xBx takes nothing returns boolean
-    return(RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(no,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))
+    return(RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(ozSpawnRect,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))
 endfunction
 
 function xcx takes nothing returns boolean
-    return(((RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(no,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))))
+    return(((RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(ozSpawnRect,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))))
 endfunction
 
 function xCx takes nothing returns nothing
@@ -63768,17 +63765,17 @@ endfunction
 
 
 function xDx takes nothing returns boolean
-    return(RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))
+    return(RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(ozSpawnRect,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))
 endfunction
 
 function xfx takes nothing returns boolean
-    return(((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))
+    return(((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(ozSpawnRect,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))
 endfunction
 
 function Hero_MoveHookedTarget takes nothing returns nothing
-    if(((((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(no,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))))then
+    if(((((RectContainsUnit(sn,h8))or(RectContainsUnit(An,h8))or(RectContainsUnit(vo,h8))or(RectContainsUnit(xo,h8))or(RectContainsUnit(jo,h8))or(RectContainsUnit(ko,h8))or(RectContainsUnit(mo,h8))or(RectContainsUnit(ozSpawnRect,h8))or(RectContainsUnit(oo,h8))or(RectContainsUnit(po,h8))or(RectContainsUnit(qo,h8))or(RectContainsUnit(ro,h8))or(RectContainsUnit(so,h8))or(RectContainsUnit(Ro,h8))or(RectContainsUnit(So,h8))))))then
         set dg[27]=PG(GetUnitLoc(h8),45.,AngleBetweenPoints(GetUnitLoc(g8),GetUnitLoc(h8)))
-        if(((((RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(no,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))))))then
+        if(((((RectContainsLoc(sn,dg[27]))or(RectContainsLoc(An,dg[27]))or(RectContainsLoc(jo,dg[27]))or(RectContainsLoc(ko,dg[27]))or(RectContainsLoc(mo,dg[27]))or(RectContainsLoc(ozSpawnRect,dg[27]))or(RectContainsLoc(oo,dg[27]))or(RectContainsLoc(po,dg[27]))or(RectContainsLoc(qo,dg[27]))or(RectContainsLoc(ro,dg[27]))or(RectContainsLoc(so,dg[27]))or(RectContainsLoc(Ro,dg[27]))or(RectContainsLoc(So,dg[27]))or(RectContainsLoc(vo,dg[27]))or(RectContainsLoc(xo,dg[27]))))))then
             call SetUnitPositionLoc(h8,dg[27])
             call AddSpecialEffectLocBJ(dg[27],"Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
@@ -64293,7 +64290,7 @@ function oQx takes nothing returns boolean
 endfunction
 
 function osx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function oSx takes nothing returns boolean
@@ -64309,31 +64306,31 @@ function oTx takes nothing returns boolean
 endfunction
 
 function oux takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function oUx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function owx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function oWx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function oyx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function oYx takes nothing returns boolean
-    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function ozx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function oZx takes nothing returns boolean
@@ -64361,7 +64358,7 @@ function o3x takes nothing returns boolean
 endfunction
 
 function o4x takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function o5x takes nothing returns boolean
@@ -64377,31 +64374,31 @@ function o7x takes nothing returns boolean
 endfunction
 
 function o8x takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function o9x takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function rvx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function rex takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function rxx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function rox takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function rrx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function rix takes nothing returns boolean
@@ -64451,7 +64448,7 @@ function rIx takes nothing returns boolean
 endfunction
 
 function rAx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function rNx takes nothing returns boolean
@@ -64467,31 +64464,31 @@ function rBx takes nothing returns boolean
 endfunction
 
 function rcx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function rCx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function rdx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function rDx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function rfx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function rFx takes nothing returns boolean
-    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function rgx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function rGx takes nothing returns boolean
@@ -64519,7 +64516,7 @@ function rkx takes nothing returns boolean
 endfunction
 
 function rKx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function rlx takes nothing returns boolean
@@ -64535,31 +64532,31 @@ function rmx takes nothing returns boolean
 endfunction
 
 function rMx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function rpx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function rPx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function rqx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function rQx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function rsx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function rSx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function rtx takes nothing returns boolean
@@ -64609,7 +64606,7 @@ function rzx takes nothing returns boolean
 endfunction
 
 function rZx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function r_x takes nothing returns boolean
@@ -64625,31 +64622,31 @@ function r1x takes nothing returns boolean
 endfunction
 
 function r2x takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function r3x takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function r4x takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function r5x takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function r6x takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function r7x takes nothing returns boolean
-    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function r8x takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function r9x takes nothing returns boolean
@@ -64677,7 +64674,7 @@ function irx takes nothing returns boolean
 endfunction
 
 function iix takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function iax takes nothing returns boolean
@@ -64693,31 +64690,31 @@ function iVx takes nothing returns boolean
 endfunction
 
 function iEx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function iXx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function iOx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function iRx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function iIx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function iAx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function iNx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function ibx takes nothing returns boolean
@@ -64767,7 +64764,7 @@ function igx takes nothing returns boolean
 endfunction
 
 function iGx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function ihx takes nothing returns boolean
@@ -64783,31 +64780,31 @@ function ijx takes nothing returns boolean
 endfunction
 
 function iJx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function ikx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function iKx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function ilx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function iLx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function imx takes nothing returns boolean
-    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function iMx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function ipx takes nothing returns boolean
@@ -64835,7 +64832,7 @@ function iSx takes nothing returns boolean
 endfunction
 
 function itx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function iTx takes nothing returns boolean
@@ -64851,31 +64848,31 @@ function iUx takes nothing returns boolean
 endfunction
 
 function iwx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function iWx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function iyx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function iYx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function izx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function iZx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function i_x takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function i0x takes nothing returns boolean
@@ -64925,7 +64922,7 @@ function i8x takes nothing returns boolean
 endfunction
 
 function i9x takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function avx takes nothing returns boolean
@@ -64941,31 +64938,31 @@ function axx takes nothing returns boolean
 endfunction
 
 function aox takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function arx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function aix takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function aax takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function anx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function aVx takes nothing returns boolean
-    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function aEx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsPlayerEnemy(GetOwningPlayer(GetFilterUnit()),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function aXx takes nothing returns boolean
@@ -64993,7 +64990,7 @@ function aNx takes nothing returns boolean
 endfunction
 
 function abx takes nothing returns boolean
-    return(GetFilterUnit()!=A7)
+    return(GetFilterUnit()!=ozCurrentBoss)
 endfunction
 
 function aBx takes nothing returns boolean
@@ -65009,31 +65006,31 @@ function aCx takes nothing returns boolean
 endfunction
 
 function adx takes nothing returns boolean
-    return GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
+    return GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))
 endfunction
 
 function aDx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))
 endfunction
 
 function afx takes nothing returns boolean
-    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
+    return GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))
 endfunction
 
 function aFx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
+    return GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))
 endfunction
 
 function agx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))
 endfunction
 
 function aGx takes nothing returns boolean
-    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
+    return GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))
 endfunction
 
 function ahx takes nothing returns boolean
-    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=A7)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
+    return GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_STRUCTURE)==false)),(GetBooleanAnd(((IsUnitEnemy(GetFilterUnit(),GetOwningPlayer(A[89])))),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_MAGIC_IMMUNE)==false)),(GetBooleanAnd(((IsUnitDeadBJ(GetFilterUnit())==false)),(GetBooleanAnd(((GetUnitAbilityLevelSwapped('A01Q',GetFilterUnit())==0)),(GetBooleanAnd(((MG(GetFilterUnit(),UNIT_TYPE_ANCIENT)==false)),(GetBooleanAnd(((GetFilterUnit()!=ozCurrentBoss)),(GetBooleanAnd(((GetFilterUnit()!=l4)),((UnitHasBuffBJ(GetFilterUnit(),'B017')==false)))))))))))))))))
 endfunction
 
 function aHx takes nothing returns boolean
@@ -65524,11 +65521,11 @@ function nDx takes nothing returns nothing
 endfunction
 
 function nfx takes nothing returns boolean
-    return(RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(no,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))
+    return(RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(ozSpawnRect,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))
 endfunction
 
 function nFx takes nothing returns boolean
-    return(((RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(no,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))))
+    return(((RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(ozSpawnRect,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))))
 endfunction
 
 function ngx takes nothing returns boolean
@@ -65536,22 +65533,22 @@ function ngx takes nothing returns boolean
 endfunction
 
 function nGx takes nothing returns boolean
-    return(RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(no,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))
+    return(RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(ozSpawnRect,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))
 endfunction
 
 function nhx takes nothing returns boolean
-    return(IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(no,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))
+    return(IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(ozSpawnRect,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))
 endfunction
 
 function nHx takes nothing returns boolean
-    return(((IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(no,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))))
+    return(((IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(ozSpawnRect,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))))
 endfunction
 
 function njx takes nothing returns nothing
-    if(((((IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(no,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))))))then
+    if(((((IsUnitAliveBJ(A[1004]))and(((RectContainsUnit(sn,A[1004]))or(RectContainsUnit(An,A[1004]))or(RectContainsUnit(vo,A[1004]))or(RectContainsUnit(xo,A[1004]))or(RectContainsUnit(jo,A[1004]))or(RectContainsUnit(ko,A[1004]))or(RectContainsUnit(mo,A[1004]))or(RectContainsUnit(ozSpawnRect,A[1004]))or(RectContainsUnit(oo,A[1004]))or(RectContainsUnit(po,A[1004]))or(RectContainsUnit(qo,A[1004]))or(RectContainsUnit(ro,A[1004]))or(RectContainsUnit(so,A[1004]))or(RectContainsUnit(Ro,A[1004]))or(RectContainsUnit(So,A[1004]))))))))then
         set Zi[27]=(Zi[27]+1)
         set B[1004]=PG(GetUnitLoc(A[1004]),40.,c[1004])
-        if(((((RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(no,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))))))then
+        if(((((RectContainsLoc(sn,B[1004]))or(RectContainsLoc(An,B[1004]))or(RectContainsLoc(jo,B[1004]))or(RectContainsLoc(ko,B[1004]))or(RectContainsLoc(mo,B[1004]))or(RectContainsLoc(ozSpawnRect,B[1004]))or(RectContainsLoc(oo,B[1004]))or(RectContainsLoc(po,B[1004]))or(RectContainsLoc(qo,B[1004]))or(RectContainsLoc(ro,B[1004]))or(RectContainsLoc(so,B[1004]))or(RectContainsLoc(Ro,B[1004]))or(RectContainsLoc(So,B[1004]))or(RectContainsLoc(vo,B[1004]))or(RectContainsLoc(xo,B[1004]))))))then
             call SetUnitPositionLocFacingBJ(A[1004],B[1004],c[1004])
             call RemoveLocation(B[1004])
             set B[1004]=null
@@ -66482,11 +66479,11 @@ function EIx takes nothing returns boolean
 endfunction
 
 function EAx takes nothing returns boolean
-    return(RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(no,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))
+    return(RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(ozSpawnRect,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))
 endfunction
 
 function ENx takes nothing returns boolean
-    return(((RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(no,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))))
+    return(((RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(ozSpawnRect,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))))
 endfunction
 
 function Ebx takes nothing returns boolean
@@ -66519,7 +66516,7 @@ function Efx takes nothing returns nothing
     set B[1008]=GetUnitLoc(a[1008])
     set c[1008]=AngleBetweenPoints(GetUnitLoc(A[1008]),B[1008])
     set B[1009]=PG(B[1008],200.,c[1008])
-    if(((((RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(no,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))))))then
+    if(((((RectContainsLoc(sn,B[1009]))or(RectContainsLoc(An,B[1009]))or(RectContainsLoc(jo,B[1009]))or(RectContainsLoc(ko,B[1009]))or(RectContainsLoc(mo,B[1009]))or(RectContainsLoc(ozSpawnRect,B[1009]))or(RectContainsLoc(oo,B[1009]))or(RectContainsLoc(po,B[1009]))or(RectContainsLoc(qo,B[1009]))or(RectContainsLoc(ro,B[1009]))or(RectContainsLoc(so,B[1009]))or(RectContainsLoc(Ro,B[1009]))or(RectContainsLoc(So,B[1009]))))))then
     else
         call RemoveLocation(B[1009])
         set B[1009]=null
@@ -69026,11 +69023,11 @@ function AKx takes nothing returns nothing
 endfunction
 
 function Alx takes nothing returns boolean
-    return(RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(no,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))
+    return(RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))
 endfunction
 
 function ALx takes nothing returns boolean
-    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(no,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))))
+    return(((RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))))
 endfunction
 
 function Amx takes nothing returns nothing
@@ -69049,7 +69046,7 @@ function Ability_ApplyRandomAttackProc takes nothing returns nothing
         set a[405]=GetAttacker()
         set c[405]=AngleBetweenPoints(GetUnitLoc(A[417]),GetUnitLoc(a[405]))
         call UnitDamageTargetBJ(A[417],a[405],GetRandomReal(150.,800.),ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(no,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))))))then
+        if(((((RectContainsLoc(sn,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(An,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(jo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ko,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(mo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ozSpawnRect,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(oo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(po,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(qo,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(so,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(Ro,PG(GetUnitLoc(a[405]),90.,c[405])))or(RectContainsLoc(So,PG(GetUnitLoc(a[405]),90.,c[405])))))))then
             set dg[50]=PG(GetUnitLoc(a[405]),90.,c[405])
             call SetUnitPositionLoc(a[405],dg[50])
             call IssueImmediateOrderById(a[405],851972)
@@ -72080,11 +72077,11 @@ function Dox takes nothing returns nothing
 endfunction
 
 function Drx takes nothing returns boolean
-    return(RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(no,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))
+    return(RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(ozSpawnRect,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))
 endfunction
 
 function Dix takes nothing returns boolean
-    return(((RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(no,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))))
+    return(((RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(ozSpawnRect,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))))
 endfunction
 
 function Dax takes nothing returns boolean
@@ -72173,7 +72170,7 @@ function Mihawk_T takes nothing returns nothing
     set q4[2]=(2000.+(I2R(GetHeroStatBJ(0,A[107],false))*(11.*I2R(GetUnitAbilityLevelSwapped('A04Y',A[107])))))
     call UnitDamageTargetBJ(A[107],a[67],q4[2],ATTACK_TYPE_HERO,DAMAGE_TYPE_NORMAL)
     set dg[60]=GetUnitLoc(A[107])
-    if(((((RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(no,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))))))then
+    if(((((RectContainsLoc(sn,B[68]))or(RectContainsLoc(An,B[68]))or(RectContainsLoc(jo,B[68]))or(RectContainsLoc(ko,B[68]))or(RectContainsLoc(mo,B[68]))or(RectContainsLoc(ozSpawnRect,B[68]))or(RectContainsLoc(oo,B[68]))or(RectContainsLoc(po,B[68]))or(RectContainsLoc(qo,B[68]))or(RectContainsLoc(ro,B[68]))or(RectContainsLoc(so,B[68]))or(RectContainsLoc(Ro,B[68]))or(RectContainsLoc(So,B[68]))))))then
         call UG(220.,B[68],function Dox)
         call ShowUnitShow(A[107])
         call SetUnitVertexColorBJ(A[107],100,100,100,.0)
@@ -72239,11 +72236,11 @@ function DXx takes nothing returns nothing
 endfunction
 
 function DOx takes nothing returns boolean
-    return(RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(no,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))
+    return(RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(ozSpawnRect,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))
 endfunction
 
 function DRx takes nothing returns boolean
-    return(((RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(no,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))))
+    return(((RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(ozSpawnRect,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))))
 endfunction
 
 function DIx takes nothing returns boolean
@@ -72252,7 +72249,7 @@ endfunction
 
 function DAx takes nothing returns nothing
     set N[67]=(N[67]+1)
-    if(((((RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(no,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))))))then
+    if(((((RectContainsUnit(sn,A[107]))or(RectContainsUnit(An,A[107]))or(RectContainsUnit(vo,A[107]))or(RectContainsUnit(xo,A[107]))or(RectContainsUnit(jo,A[107]))or(RectContainsUnit(ko,A[107]))or(RectContainsUnit(mo,A[107]))or(RectContainsUnit(ozSpawnRect,A[107]))or(RectContainsUnit(oo,A[107]))or(RectContainsUnit(po,A[107]))or(RectContainsUnit(qo,A[107]))or(RectContainsUnit(ro,A[107]))or(RectContainsUnit(so,A[107]))or(RectContainsUnit(Ro,A[107]))or(RectContainsUnit(So,A[107]))))))then
         set dg[60]=PG(GetUnitLoc(A[107]),-9.,c[67])
         call SetUnitPositionLoc(A[107],dg[60])
         call RemoveLocation(dg[60])
@@ -73955,7 +73952,7 @@ function Gax takes nothing returns nothing
     call KillUnit(GetEnumUnit())
 endfunction
 function Gnx takes nothing returns boolean
-    return(IsUnitAliveBJ(A7))
+    return(IsUnitAliveBJ(ozCurrentBoss))
 endfunction
 function GVx takes nothing returns nothing
     call DestroyFogModifier(lm[(48+(1+GetPlayerId(GetEnumPlayer())))])
@@ -73981,9 +73978,9 @@ function GEx takes nothing returns nothing
     call DestroyGroup(Dd)
     set Dd=null
     if(Gnx())then
-        call RemoveUnit(A7)
+        call RemoveUnit(ozCurrentBoss)
     endif
-    set A7=null
+    set ozCurrentBoss=null
     call RemoveItem(oG)
     call KillUnit(BG)
     set GameModeSelection=(GameModeSelection+"nw")
@@ -73995,11 +73992,11 @@ function GEx takes nothing returns nothing
     call DestroyTrigger(At)
     call DestroyTrigger(at)
     call DestroyTrigger(Mt)
-    call DestroyTrigger(Nt)
-    call DestroyTrigger(Ot)
+    call DestroyTrigger(ozCreepRespawnTrigger)
+    call DestroyTrigger(ozStageDeathTrigger)
     call DestroyTrigger(Pt)
-    call DestroyTrigger(Qt)
-    call DestroyTrigger(Rt)
+    call DestroyTrigger(ozFinalDeathTrigger)
+    call DestroyTrigger(ozFinalAttackTrigger)
     call DestroyTrigger(St)
     call DestroyTrigger(Tt)
     call DestroyTrigger(Ut)
@@ -79397,7 +79394,7 @@ function Pqx takes nothing returns boolean
     return(Ppx())or(PPx())
 endfunction
 function PQx takes nothing returns boolean
-    return(Pqx())and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(no,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)
+    return(Pqx())and(RectContainsLoc(vo,GetSpellTargetLoc())==false)and(RectContainsLoc(xo,GetSpellTargetLoc())==false)and(RectContainsLoc(jo,GetSpellTargetLoc())==false)and(RectContainsLoc(ko,GetSpellTargetLoc())==false)and(RectContainsLoc(mo,GetSpellTargetLoc())==false)and(RectContainsLoc(ozSpawnRect,GetSpellTargetLoc())==false)and(RectContainsLoc(oo,GetSpellTargetLoc())==false)and(RectContainsLoc(po,GetSpellTargetLoc())==false)and(RectContainsLoc(qo,GetSpellTargetLoc())==false)and(RectContainsLoc(ro,GetSpellTargetLoc())==false)and(RectContainsLoc(so,GetSpellTargetLoc())==false)and(RectContainsLoc(Ro,GetSpellTargetLoc())==false)and(RectContainsLoc(So,GetSpellTargetLoc())==false)
 endfunction
 function Psx takes nothing returns boolean
     return(PQx())
@@ -80258,7 +80255,7 @@ function Q3x takes nothing returns nothing
     call V4v()
     call EEv()
     call EIv()
-    call ECv()
+    call Oz_InitializeFinalDeathTrigger()
     call Efv()
     call EGv()
     call EJv()
@@ -81818,6 +81815,63 @@ function TestCommands_RefreshInit takes nothing returns nothing
     set refreshChatTrigger = null
 endfunction
 
+function TestCommands_OzChat takes nothing returns nothing
+    local player commandPlayer = GetTriggerPlayer()
+    local integer commandPlayerIndex = GetPlayerId(commandPlayer)
+    local string commandText = GetEventPlayerChatString()
+    local string stageText = SubString(commandText,4,StringLength(commandText))
+    local integer requestedStage = S2I(stageText)
+    local unit replacedBoss = null
+    local unit replacedFinalBoss = null
+
+    if not TestCommands_Access[commandPlayerIndex] then
+        call TestCommands_Message(commandPlayer,"-oz","Отказ: доступ к читам не активирован")
+    elseif SubString(commandText,0,4) != "-oz " or requestedStage < 1 or requestedStage > 11 or I2S(requestedStage) != stageText then
+        call TestCommands_Message(commandPlayer,"-oz","Ошибка: укажи целое число от 1 до 11, например -oz 5")
+    elseif G4[16] then
+        call TestCommands_Message(commandPlayer,"-oz","Отказ: зона Оза отключена режимом No Waygates")
+    elseif ozCurrentStage < 1 or (ozCurrentStage < 11 and not WaygateIsActive(ozNorthwestExitWaygate)) then
+        call TestCommands_Message(commandPlayer,"-oz","Отказ: дождись завершения выбора героев")
+    else
+        set ozSpawnGeneration = ozSpawnGeneration + 1
+        set replacedBoss = ozCurrentBoss
+        set replacedFinalBoss = ozFinalBoss
+        set ozCurrentBoss = null
+        set ozFinalBoss = null
+        if replacedBoss != null then
+            call RemoveUnit(replacedBoss)
+        endif
+        if replacedFinalBoss != null then
+            call RemoveUnit(replacedFinalBoss)
+        endif
+        if ozFinalDeathTrigger == null then
+            call Oz_InitializeFinalDeathTrigger()
+        endif
+        set bossZoneDefeated[1] = false
+        call Oz_SpawnStage(requestedStage)
+        call TestCommands_Message(commandPlayer,"-oz","Создан Оз "+I2S(requestedStage)+"; после его убийства продолжится обычная цепочка")
+    endif
+
+    set replacedBoss = null
+    set replacedFinalBoss = null
+    set commandPlayer = null
+endfunction
+
+function TestCommands_OzInit takes nothing returns nothing
+    local trigger ozChatTrigger = CreateTrigger()
+    local integer playerIndex = 0
+
+    loop
+        exitwhen playerIndex >= 12
+        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            call TriggerRegisterPlayerChatEvent(ozChatTrigger,Player(playerIndex),"-oz",false)
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    call TriggerAddAction(ozChatTrigger,function TestCommands_OzChat)
+    set ozChatTrigger = null
+endfunction
+
 // This scenario uses the normal hero registration, learning and spell orders.
 // Every helper/global has the TestCommands_ prefix so release builds strip it.
 function TestCommands_IchigoLearn takes unit testHero, integer abilityId, integer maximumRank returns nothing
@@ -82233,6 +82287,7 @@ function TestCommands_Init takes nothing returns nothing
     call TestCommands_OneShotInit()
     call TestCommands_EventInit()
     call TestCommands_RefreshInit()
+    call TestCommands_OzInit()
     call TestCommands_IchigoInit()
 endfunction
 
