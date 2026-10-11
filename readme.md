@@ -11,6 +11,16 @@ __[Main Page](https://github.com/rossoliny/bvo-another)__
   Many years ago Kuragane created the original BvO map, but then he abandoned it and Unryze continued development and we got BvO Another 1.1a that is considered to be the most balanced and bugfree version of all.  
   Unfortunately version 1.1b is probably lost and Unryze seems to lose interest to this map and is not likely to finish 1.1c so I decided to continue development.
 
+# Building the map
+
+The complete editable map contents live in `w3x-content/`, using the map's internal paths and filenames. The main script is `w3x-content/scripts/war3map.j`.
+
+From the repository root, run `bash build-w3x.sh` for a development build with cheats, or `bash build-w3x.sh --release` for a release with all cheat code removed. The outputs are `build/BvO_Another_dev.w3x` and `build/BvO_Another_release.w3x`.
+
+Builds use Bash and the bundled tools in `toolkit/`; no base map or Ladik is required. Source files stay unchanged, messages go to the console, and temporary files and the packer's report are cleaned up after each run.
+
+The release JASS is streamed without creating a separate script file. `toolkit/pack-map.lua` runs W3x2Lni's `pack` command in the console and checks the archive's files against their sources.
+
 # Contribution
 
 Rossoliny's BvO is open source.  
