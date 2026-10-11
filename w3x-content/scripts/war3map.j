@@ -46519,6 +46519,8 @@ function RenjiRDamageWaveTarget takes nothing returns nothing
 endfunction
 
 function RenjiRDestroyDestructable takes nothing returns nothing
+    // The map restores these destructables after 100 seconds; a blocker restored under a hero may trap them.
+    // This is a possible pathing issue, not a confirmed cause of the old R immobilization bug near walls.
     call KillDestructable(GetEnumDestructable())
 endfunction
 
