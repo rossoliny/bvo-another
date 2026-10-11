@@ -17,6 +17,9 @@ Renji:
 - R: on return, expiration or death, including during T, remaining segments explode with the existing damage, effect and sound. Each segment deals 7.5 x current total STR damage within 200 AoE; overlapping explosions stack. Segments disappear without explosions only after T completes normally; repeated cleanup cannot cause duplicate explosions.
 - Fixed R timers and updated Q/W/E/R and Bankai Dismissal effects, sounds and descriptions.
 
+Enel:
+- R (Mamaragan): fixed repeated lightning strikes caused by Spell Shield on Darkness Sphere and God's Sphere, including the second top boss. Shield activations no longer trigger R.
+
 Items:
 - Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
 - Restored medal stock at Medal Exchange.

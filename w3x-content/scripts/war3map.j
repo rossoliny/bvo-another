@@ -67017,7 +67017,10 @@ function XCx takes nothing returns boolean
     return(IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(Dj)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))
 endfunction
 
-function Xdx takes nothing returns boolean
+function IsMamaraganSpellEligible takes nothing returns boolean
+    if GetSpellAbilityId() == 'ANss' or GetSpellAbilityId() == 'A07Z' then
+        return false
+    endif
     return(((IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(Dj)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))))
 endfunction
 
@@ -67073,7 +67076,7 @@ function Xhx takes nothing returns nothing
     set pE=CreateTrigger()
     call DisableTrigger(pE)
     call TriggerRegisterAnyUnitEventBJ(pE,EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    call TriggerAddCondition(pE,Condition(function Xdx))
+    call TriggerAddCondition(pE,Condition(function IsMamaraganSpellEligible))
     call TriggerAddAction(pE,function XGx)
 endfunction
 
