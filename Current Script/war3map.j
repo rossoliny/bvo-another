@@ -18,6 +18,10 @@ globals
     boolean array TestCommands_Access
     boolean array TestCommands_NoCooldown
     boolean array TestCommands_InfiniteMana
+    boolean array TestCommands_OneShotEnabled
+    trigger TestCommands_OneShotDamageTrigger = null
+    group TestCommands_OneShotRegisteredUnits = null
+    region TestCommands_OneShotWorldRegion = null
     integer array Scoreboard_Deaths
     unit array Mihawk_T_Copies
     sound Sound_Effect_Ichigo_R_1 = null
@@ -81379,10 +81383,10 @@ function TestCommands_Commands takes nothing returns nothing
     local string testText = GetEventPlayerChatString()
     local boolean testIsLevel = testText == "-level" or SubString(testText,0,7) == "-level "
     local boolean testIsItem = testText == "-createitem" or SubString(testText,0,12) == "-createitem "
-    local boolean testIsCooldown = testText == "-nc" or SubString(testText,0,4) == "-nc "
+    local boolean testIsCooldown = testText == "-nocd" or SubString(testText,0,6) == "-nocd "
     local boolean testIsGold = testText == "-gold" or SubString(testText,0,6) == "-gold "
     local boolean testIsLumber = testText == "-lumber" or SubString(testText,0,8) == "-lumber "
-    local boolean testIsMana = testText == "-mana" or SubString(testText,0,6) == "-mana " or testText == "-nomana" or SubString(testText,0,8) == "-nomana "
+    local boolean testIsMana = testText == "-nomana" or SubString(testText,0,8) == "-nomana "
     local string testAmount
     local playerstate testResource
     local string testResourceName
@@ -81423,15 +81427,16 @@ function TestCommands_Commands takes nothing returns nothing
                 call TestCommands_Message(testPlayer,testText,testResourceName+": добавлено "+I2S(testValue)+", всего "+I2S(GetPlayerState(testPlayer,testResource)))
             endif
         elseif testIsMana then
-            if testText == "-mana" then
-                set TestCommands_InfiniteMana[testPlayerIndex] = true
-                call TestCommands_RefillMana(testPlayerIndex)
-                call TestCommands_Message(testPlayer,testText,"бесконечная мана включена для своего героя")
-            elseif testText == "-nomana" then
-                set TestCommands_InfiniteMana[testPlayerIndex] = false
-                call TestCommands_Message(testPlayer,testText,"бесконечная мана выключена")
+            if testText != "-nomana" then
+                call TestCommands_Message(testPlayer,testText,"ошибка: используй -nomana без параметров")
             else
-                call TestCommands_Message(testPlayer,testText,"ошибка: используй -mana или -nomana без параметров")
+                set TestCommands_InfiniteMana[testPlayerIndex] = not TestCommands_InfiniteMana[testPlayerIndex]
+                if TestCommands_InfiniteMana[testPlayerIndex] then
+                    call TestCommands_RefillMana(testPlayerIndex)
+                    call TestCommands_Message(testPlayer,testText,"бесконечная мана включена для своего героя")
+                else
+                    call TestCommands_Message(testPlayer,testText,"бесконечная мана выключена")
+                endif
             endif
         elseif testIsLevel then
             set testSelected = TestCommands_Selected(testPlayer)
@@ -81463,8 +81468,8 @@ function TestCommands_Commands takes nothing returns nothing
                     call TestCommands_Message(testPlayer,testText,"создан предмет: "+GetItemName(testItem))
                 endif
             endif
-        elseif testText != "-nc" then
-            call TestCommands_Message(testPlayer,testText,"ошибка: используй -nc без параметров")
+        elseif testText != "-nocd" then
+            call TestCommands_Message(testPlayer,testText,"ошибка: используй -nocd без параметров")
         elseif not IsUnitType(TestCommands_Selected(testPlayer),UNIT_TYPE_HERO) then
             call TestCommands_Message(testPlayer,testText,"ошибка: собственный герой не найден")
         else
@@ -81481,6 +81486,107 @@ function TestCommands_Commands takes nothing returns nothing
     set testSelected = null
     set testPlayer = null
 endfunction
+
+function TestCommands_OneShotDamage takes nothing returns nothing
+    local unit damageSource = GetEventDamageSource()
+    local unit damageTarget = GetTriggerUnit()
+    local player damageOwner = null
+    local integer damagePlayerIndex
+    if damageSource != null and GetEventDamage() > 0. then
+        set damageOwner = GetOwningPlayer(damageSource)
+        set damagePlayerIndex = GetPlayerId(damageOwner)
+        if damagePlayerIndex >= 0 and damagePlayerIndex < 12 then
+            if TestCommands_Access[damagePlayerIndex] and TestCommands_OneShotEnabled[damagePlayerIndex] and IsUnitEnemy(damageTarget,damageOwner) then
+                // Like NZCP: add 100% of the target's maximum HP.
+                // Disable only this trigger to prevent recursive bonus damage.
+                call DisableTrigger(TestCommands_OneShotDamageTrigger)
+                call UnitDamageTarget(damageSource,damageTarget,GetUnitState(damageTarget,UNIT_STATE_MAX_LIFE),true,false,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_UNIVERSAL,WEAPON_TYPE_WHOKNOWS)
+                call EnableTrigger(TestCommands_OneShotDamageTrigger)
+            endif
+        endif
+    endif
+    set damageOwner = null
+    set damageSource = null
+    set damageTarget = null
+endfunction
+
+function TestCommands_OneShotRegisterUnit takes unit damageTarget returns nothing
+    if damageTarget != null and GetUnitTypeId(damageTarget) != 0 then
+        if not IsUnitInGroup(damageTarget,TestCommands_OneShotRegisteredUnits) then
+            call GroupAddUnit(TestCommands_OneShotRegisteredUnits,damageTarget)
+            call TriggerRegisterUnitEvent(TestCommands_OneShotDamageTrigger,damageTarget,EVENT_UNIT_DAMAGED)
+        endif
+    endif
+endfunction
+
+function TestCommands_OneShotEntered takes nothing returns nothing
+    call TestCommands_OneShotRegisterUnit(GetEnteringUnit())
+endfunction
+
+function TestCommands_OneShotChat takes nothing returns nothing
+    local player commandPlayer = GetTriggerPlayer()
+    local integer commandPlayerIndex = GetPlayerId(commandPlayer)
+    if not TestCommands_Access[commandPlayerIndex] then
+        call TestCommands_Message(commandPlayer,"-oneshot","отказ: доступ к читам не активирован")
+    elseif GetEventPlayerChatString() != "-oneshot" then
+        call TestCommands_Message(commandPlayer,"-oneshot","ошибка: используй -oneshot без параметров")
+    else
+        set TestCommands_OneShotEnabled[commandPlayerIndex] = not TestCommands_OneShotEnabled[commandPlayerIndex]
+        if TestCommands_OneShotEnabled[commandPlayerIndex] then
+            call TestCommands_Message(commandPlayer,"-oneshot","ваншот включён для своих юнитов")
+        else
+            call TestCommands_Message(commandPlayer,"-oneshot","ваншот выключен")
+        endif
+    endif
+    set commandPlayer = null
+endfunction
+
+function TestCommands_OneShotInit takes nothing returns nothing
+    local trigger oneShotChatTrigger = null
+    local trigger oneShotEnterTrigger = null
+    local group initialUnits = null
+    local rect worldBounds = null
+    local unit registeredUnit = null
+    local integer playerIndex = 0
+    if TestCommands_OneShotDamageTrigger != null then
+        return
+    endif
+    set TestCommands_OneShotDamageTrigger = CreateTrigger()
+    set TestCommands_OneShotRegisteredUnits = CreateGroup()
+    set TestCommands_OneShotWorldRegion = CreateRegion()
+    set oneShotChatTrigger = CreateTrigger()
+    set oneShotEnterTrigger = CreateTrigger()
+    set worldBounds = GetWorldBounds()
+    set initialUnits = CreateGroup()
+    call RegionAddRect(TestCommands_OneShotWorldRegion,worldBounds)
+    call TriggerRegisterEnterRegion(oneShotEnterTrigger,TestCommands_OneShotWorldRegion,null)
+    call TriggerAddAction(oneShotEnterTrigger,function TestCommands_OneShotEntered)
+    call TriggerAddAction(TestCommands_OneShotDamageTrigger,function TestCommands_OneShotDamage)
+    call GroupEnumUnitsInRect(initialUnits,worldBounds,null)
+    loop
+        set registeredUnit = FirstOfGroup(initialUnits)
+        exitwhen registeredUnit == null
+        call GroupRemoveUnit(initialUnits,registeredUnit)
+        call TestCommands_OneShotRegisterUnit(registeredUnit)
+    endloop
+    loop
+        exitwhen playerIndex >= 12
+        set TestCommands_OneShotEnabled[playerIndex] = false
+        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
+            call TriggerRegisterPlayerChatEvent(oneShotChatTrigger,Player(playerIndex),"-oneshot",false)
+        endif
+        set playerIndex = playerIndex+1
+    endloop
+    call TriggerAddAction(oneShotChatTrigger,function TestCommands_OneShotChat)
+    call DestroyGroup(initialUnits)
+    call RemoveRect(worldBounds)
+    set oneShotChatTrigger = null
+    set oneShotEnterTrigger = null
+    set initialUnits = null
+    set worldBounds = null
+    set registeredUnit = null
+endfunction
+
 
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
@@ -81505,6 +81611,7 @@ function TestCommands_Init takes nothing returns nothing
     set testChat = null
     set testSpells = null
     set testMana = null
+    call TestCommands_OneShotInit()
 endfunction
 
 function main takes nothing returns nothing
