@@ -46719,7 +46719,6 @@ function RenjiTStartBlast takes nothing returns nothing
 endfunction
 
 function RenjiTCast takes nothing returns nothing
-    local boolean completedNormally=false
     set RenjiTCaster=GetTriggerUnit()
     set RenjiTTarget=GetSpellTargetUnit()
     set RenjiTCastPosition=GetUnitLoc(RenjiTCaster)
@@ -46802,7 +46801,6 @@ function RenjiTCast takes nothing returns nothing
             exitwhen(((IsTriggerEnabled(RenjiTBlastTrigger)==false)))
             call TriggerSleepAction(RMaxBJ(bj_WAIT_FOR_COND_MIN_INTERVAL,.1))
         endloop
-        set completedNormally=RenjiTPathIndex>=180 and IsUnitAliveBJ(RenjiTCaster) and IsUnitAliveBJ(RenjiTBlastProjectile)
         if RenjiTBlastProjectile!=null then
             call KillUnit(RenjiTBlastProjectile)
         endif
@@ -46831,7 +46829,8 @@ function RenjiTCast takes nothing returns nothing
         set RenjiTMoveIndex=RenjiTMoveIndex+1
     endloop
     set RenjiTPathIndex=0
-    call RenjiRFinish(RenjiRCaster,true,not completedNormally)
+    // Using T consumes this snake; its cleanup never explodes the segments.
+    call RenjiRFinish(RenjiRCaster,true,false)
 endfunction
 
 function InitRenjiTCastTrigger takes nothing returns nothing
