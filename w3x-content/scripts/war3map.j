@@ -2134,7 +2134,242 @@ globals
     group lG=null
     force JG=null
     boolexpr KG=null
+    timer TestCommands_RepickLogClock = null
+    integer TestCommands_RepickLogLineCount = 0
+    integer TestCommands_RepickLogDroppedLines = 0
+    integer TestCommands_RepickLogLastSnapshotStart = 0
+    string array TestCommands_RepickLogLines
+    boolean array TestCommands_RepickLogHeroDetailLines
+    integer array TestCommands_RepickLogHeroTypes
+    boolean array TestCommands_RepickLogInitialMembership
+    player TestCommands_RepickPlayerOverride = null
+    boolean array TestCommands_RepickAutoArmed
 endglobals
+
+function TestCommands_RepickLogBoolean takes boolean value returns string
+    if value then
+        return "1"
+    endif
+    return "0"
+endfunction
+
+function TestCommands_RepickLogAdd takes string message returns nothing
+    if TestCommands_RepickLogLineCount < 2048 then
+        set TestCommands_RepickLogLines[TestCommands_RepickLogLineCount] = "[RP2 t=" + R2S(TimerGetElapsed(TestCommands_RepickLogClock)) + "] " + message
+        set TestCommands_RepickLogHeroDetailLines[TestCommands_RepickLogLineCount] = SubString(message, 0, 5) == "HERO "
+        set TestCommands_RepickLogLineCount = TestCommands_RepickLogLineCount + 1
+    else
+        set TestCommands_RepickLogDroppedLines = TestCommands_RepickLogDroppedLines + 1
+    endif
+endfunction
+
+function TestCommands_RepickLogHeroName takes integer heroType returns string
+    if heroType == 0 then
+        return "none"
+    endif
+    return GetObjectName(heroType) + "(id=" + I2S(heroType) + ")"
+endfunction
+
+function TestCommands_RepickLogMarker takes integer heroIndex returns unit
+    if heroIndex <= 15 then
+        return wj[heroIndex]
+    endif
+    return xj[heroIndex - 15]
+endfunction
+
+// Use only native membership queries. BJ group helpers can consume the bug's flag.
+function TestCommands_RepickLogSnapshot takes string eventName, player focusPlayer returns nothing
+    local integer heroIndex = 1
+    local integer normalMembers = 0
+    local integer secretMembers = 0
+    local integer focusPlayerId = -1
+    local unit heroMarker = null
+    local boolean inPool = false
+    local string availability = ""
+    set TestCommands_RepickLogLastSnapshotStart = TestCommands_RepickLogLineCount
+    if focusPlayer != null then
+        set focusPlayerId = GetPlayerId(focusPlayer)
+    endif
+    call TestCommands_RepickLogAdd("BEGIN " + eventName + " player=" + I2S(focusPlayerId + 1) + " destroyFlag=" + TestCommands_RepickLogBoolean(bj_wantDestroyGroup) + " poolHandle=" + I2S(GetHandleId(i4)))
+    if focusPlayer != null then
+        call TestCommands_RepickLogAdd("PLAYER hero=" + TestCommands_RepickLogHeroName(GetUnitTypeId(m[focusPlayerId + 1])) + " gold=" + I2S(GetPlayerState(focusPlayer, PLAYER_STATE_RESOURCE_GOLD)) + " repicked=" + TestCommands_RepickLogBoolean(y4[focusPlayerId + 1]) + " repickEnabled=" + TestCommands_RepickLogBoolean(IsTriggerEnabled(qF)))
+    endif
+    loop
+        exitwhen heroIndex > 30
+        set heroMarker = TestCommands_RepickLogMarker(heroIndex)
+        set inPool = IsUnitInGroup(heroMarker, i4)
+        if eventName == "POOL_ENUMERATED" then
+            set TestCommands_RepickLogInitialMembership[heroIndex] = inPool
+        endif
+        if inPool then
+            set normalMembers = normalMembers + 1
+        endif
+        set availability = ""
+        if focusPlayer != null then
+            set availability = " buyCap=" + I2S(GetPlayerTechMaxAllowed(focusPlayer, TestCommands_RepickLogHeroTypes[heroIndex]))
+        endif
+        call TestCommands_RepickLogAdd("HERO " + TestCommands_RepickLogHeroName(TestCommands_RepickLogHeroTypes[heroIndex]) + " initial=" + TestCommands_RepickLogBoolean(TestCommands_RepickLogInitialMembership[heroIndex]) + " inPool=" + TestCommands_RepickLogBoolean(inPool) + " markerType=" + I2S(GetUnitTypeId(heroMarker)) + " x=" + R2S(GetUnitX(heroMarker)) + " y=" + R2S(GetUnitY(heroMarker)) + availability)
+        set heroIndex = heroIndex + 1
+    endloop
+    set heroIndex = 1
+    loop
+        exitwhen heroIndex > 2
+        if yj[heroIndex] != null and IsUnitInGroup(yj[heroIndex], i4) then
+            set secretMembers = secretMembers + 1
+        endif
+        set heroIndex = heroIndex + 1
+    endloop
+    call TestCommands_RepickLogAdd("END " + eventName + " normalMembers=" + I2S(normalMembers) + "/30 secretMembers=" + I2S(secretMembers) + " destroyFlag=" + TestCommands_RepickLogBoolean(bj_wantDestroyGroup))
+    set heroMarker = null
+endfunction
+
+function TestCommands_RepickLogCommand takes nothing returns nothing
+    local player requestingPlayer = GetTriggerPlayer()
+    local string command = GetEventPlayerChatString()
+    local string logPath = "Logs\\BvO_repick_RP2_P" + I2S(GetPlayerId(requestingPlayer) + 1) + ".pld"
+    local integer lineIndex = 0
+    if command == "-repickauto" then
+        if not TestCommands_Access[GetPlayerId(requestingPlayer)] then
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 20, "[RP2] First enter -cheats bvo-rossoliny.")
+        elseif not IsTriggerEnabled(qF) then
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 20, "[RP2] Repick is closed. Start a new match and use this before 60 seconds.")
+        elseif m[GetPlayerId(requestingPlayer) + 1] == null or y4[GetPlayerId(requestingPlayer) + 1] then
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 20, "[RP2] Pick a hero first; repick can be used only once per player.")
+        elseif GetUnitTypeId(m[GetPlayerId(requestingPlayer) + 1]) != 'E001' and GetUnitTypeId(m[GetPlayerId(requestingPlayer) + 1]) != 'N00X' then
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 20, "[RP2] This scenario requires Nami or Kuma.")
+        elseif GetPlayerState(requestingPlayer, PLAYER_STATE_RESOURCE_GOLD) < 300 then
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 20, "[RP2] Repick requires at least 300 gold.")
+        else
+            set TestCommands_RepickAutoArmed[GetPlayerId(requestingPlayer)] = true
+            call TestCommands_RepickLogAdd("AUTO_ARMED player=" + I2S(GetPlayerId(requestingPlayer) + 1))
+            call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 30, "[RP2] Armed once. Cast Nami V Thunder Ball or Kuma Q Laser Beam before 60 seconds, then enter -repicklog.")
+        endif
+    elseif command == "-repicklog" then
+        call TestCommands_RepickLogSnapshot("MANUAL_EXPORT", requestingPlayer)
+        if GetLocalPlayer() == requestingPlayer then
+            call PreloadGenClear()
+            call PreloadGenStart()
+            loop
+                exitwhen lineIndex >= TestCommands_RepickLogLineCount
+                call Preload("// " + TestCommands_RepickLogLines[lineIndex])
+                set lineIndex = lineIndex + 1
+            endloop
+            call Preload("// RP2 droppedLines=" + I2S(TestCommands_RepickLogDroppedLines))
+            call PreloadGenEnd(logPath)
+            call PreloadGenClear()
+        endif
+        call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 30, "[RP2] Export requested: " + logPath + " (" + I2S(TestCommands_RepickLogLineCount) + " lines). If missing, use -repickscreen.")
+    elseif command == "-repickscreen" then
+        call TestCommands_RepickLogSnapshot("MANUAL_SCREEN", requestingPlayer)
+        loop
+            exitwhen lineIndex >= TestCommands_RepickLogLineCount
+            if not TestCommands_RepickLogHeroDetailLines[lineIndex] or lineIndex >= TestCommands_RepickLogLastSnapshotStart then
+                call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 60, TestCommands_RepickLogLines[lineIndex])
+            endif
+            set lineIndex = lineIndex + 1
+        endloop
+        call DisplayTimedTextToPlayer(requestingPlayer, 0, 0, 60, "[RP2] droppedLines=" + I2S(TestCommands_RepickLogDroppedLines))
+    endif
+    set requestingPlayer = null
+endfunction
+
+function TestCommands_RepickLogInitialize takes nothing returns nothing
+    local trigger logCommandTrigger = CreateTrigger()
+    local integer playerIndex = 0
+    set TestCommands_RepickLogClock = CreateTimer()
+    call TimerStart(TestCommands_RepickLogClock, 3600, false, null)
+    set TestCommands_RepickLogHeroTypes[1] = 'EC08'
+    set TestCommands_RepickLogHeroTypes[2] = 'EC12'
+    set TestCommands_RepickLogHeroTypes[3] = 'H00I'
+    set TestCommands_RepickLogHeroTypes[4] = 'H004'
+    set TestCommands_RepickLogHeroTypes[5] = 'H003'
+    set TestCommands_RepickLogHeroTypes[6] = 'O002'
+    set TestCommands_RepickLogHeroTypes[7] = 'O001'
+    set TestCommands_RepickLogHeroTypes[8] = 'OC10'
+    set TestCommands_RepickLogHeroTypes[9] = 'UC13'
+    set TestCommands_RepickLogHeroTypes[10] = 'U00S'
+    set TestCommands_RepickLogHeroTypes[11] = 'U004'
+    set TestCommands_RepickLogHeroTypes[12] = 'UC11'
+    set TestCommands_RepickLogHeroTypes[13] = 'E004'
+    set TestCommands_RepickLogHeroTypes[14] = 'H01Q'
+    set TestCommands_RepickLogHeroTypes[15] = 'U00A'
+    set TestCommands_RepickLogHeroTypes[16] = 'N009'
+    set TestCommands_RepickLogHeroTypes[17] = 'N002'
+    set TestCommands_RepickLogHeroTypes[18] = 'N006'
+    set TestCommands_RepickLogHeroTypes[19] = 'N00T'
+    set TestCommands_RepickLogHeroTypes[20] = 'N003'
+    set TestCommands_RepickLogHeroTypes[21] = 'N00S'
+    set TestCommands_RepickLogHeroTypes[22] = 'N007'
+    set TestCommands_RepickLogHeroTypes[23] = 'N004'
+    set TestCommands_RepickLogHeroTypes[24] = 'N005'
+    set TestCommands_RepickLogHeroTypes[25] = 'N008'
+    set TestCommands_RepickLogHeroTypes[26] = 'E000'
+    set TestCommands_RepickLogHeroTypes[27] = 'E002'
+    set TestCommands_RepickLogHeroTypes[28] = 'E001'
+    set TestCommands_RepickLogHeroTypes[29] = 'N00U'
+    set TestCommands_RepickLogHeroTypes[30] = 'N00X'
+    call TestCommands_RepickLogAdd("Current map; repick fix OFF; automatic repick after natural spell cleanup; pool membership observed with native IsUnitInGroup; buyCap is the player's type limit, not a stock query.")
+    loop
+        exitwhen playerIndex >= 12
+        call TriggerRegisterPlayerChatEvent(logCommandTrigger, Player(playerIndex), "-repickauto", true)
+        call TriggerRegisterPlayerChatEvent(logCommandTrigger, Player(playerIndex), "-repicklog", true)
+        call TriggerRegisterPlayerChatEvent(logCommandTrigger, Player(playerIndex), "-repickscreen", true)
+        if GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING and GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER then
+            call DisplayTimedTextToPlayer(Player(playerIndex), 0, 0, 60, "[RP2] Repick diagnostics: -cheats bvo-rossoliny, -repickauto, Nami V or Kuma Q, then -repicklog. Screen: -repickscreen. Export overwrites this player's RP2 file.")
+        endif
+        set playerIndex = playerIndex + 1
+    endloop
+    call TriggerAddAction(logCommandTrigger, function TestCommands_RepickLogCommand)
+    set logCommandTrigger = null
+endfunction
+
+function TestCommands_RepickLogMaintenance takes nothing returns nothing
+    if bj_wantDestroyGroup then
+        call TestCommands_RepickLogAdd("MAINTENANCE_CONSUMES destroyFlag=1")
+    endif
+endfunction
+
+// Specific-unit spell events do not supply the chat trigger's player context.
+function TestCommands_RepickResolvePlayer takes player eventPlayer returns player
+    if TestCommands_RepickPlayerOverride != null then
+        return TestCommands_RepickPlayerOverride
+    endif
+    return eventPlayer
+endfunction
+
+// Called synchronously after the spell's original flag write and GroupClear.
+function TestCommands_RepickAutoCleanup takes player castingPlayer returns nothing
+    local player previousOverride = TestCommands_RepickPlayerOverride
+    local integer playerIndex = GetPlayerId(castingPlayer)
+    if castingPlayer != null and TestCommands_RepickAutoArmed[playerIndex] then
+        set TestCommands_RepickAutoArmed[playerIndex] = false
+        if not TestCommands_Access[playerIndex] or not IsTriggerEnabled(qF) then
+            call TestCommands_RepickLogAdd("AUTO_SKIPPED player=" + I2S(playerIndex + 1) + " reason=access_or_selection_closed")
+            call DisplayTimedTextToPlayer(castingPlayer, 0, 0, 20, "[RP2] Automatic repick skipped: access or selection is closed. Start a new match.")
+        elseif not bj_wantDestroyGroup then
+            call TestCommands_RepickLogAdd("AUTO_SKIPPED player=" + I2S(playerIndex + 1) + " reason=no_cleanup_flag")
+        else
+            set TestCommands_RepickPlayerOverride = castingPlayer
+            call TestCommands_RepickLogAdd("AUTO_BEGIN player=" + I2S(playerIndex + 1) + " destroyFlag=1")
+            if TriggerEvaluate(qF) then
+                call TriggerExecute(qF)
+                call DisplayTimedTextToPlayer(castingPlayer, 0, 0, 30, "[RP2] Repick handler executed. Check taverns, then enter -repicklog.")
+            else
+                call TestCommands_RepickLogAdd("AUTO_SKIPPED player=" + I2S(playerIndex + 1) + " reason=repick_condition")
+                call DisplayTimedTextToPlayer(castingPlayer, 0, 0, 20, "[RP2] Automatic repick skipped: the normal repick condition failed. Enter -repicklog.")
+            endif
+            set TestCommands_RepickPlayerOverride = previousOverride
+        endif
+    endif
+    set previousOverride = null
+endfunction
+
+function RepickGetPlayer takes nothing returns player
+    local player requestingPlayer = GetTriggerPlayer()
+    set requestingPlayer = TestCommands_RepickResolvePlayer(requestingPlayer)
+    return requestingPlayer
+endfunction
+
 
 // The visible multiboard title changes every second; map identity must not depend on it.
 function MapIdentity_IsUnexpected takes nothing returns boolean
@@ -7640,6 +7875,7 @@ function r1 takes nothing returns boolean
 endfunction
 
 function s1 takes nothing returns nothing
+    call TestCommands_RepickLogSnapshot("SELECTION_CLOSE_BEFORE",null)
     call DisableTrigger(qF)
     call DisableTrigger(sF)
     if(((G4[7])))then
@@ -7721,6 +7957,7 @@ function s1 takes nothing returns nothing
     call DestroyTrigger(qF)
     call DestroyTrigger(sF)
     call DestroyTrigger(GetTriggeringTrigger())
+    call TestCommands_RepickLogSnapshot("SELECTION_CLOSED",null)
 endfunction
 
 function trig_ShowMyInfo_Action takes nothing returns nothing
@@ -8203,7 +8440,10 @@ function X1 takes nothing returns nothing
         set Q8=null
     endif
     set i4=YG(Qo,Condition(function V1))
+    call TestCommands_RepickLogAdd("SCAN_RECT minX="+R2S(GetRectMinX(Qo))+" minY="+R2S(GetRectMinY(Qo))+" maxX="+R2S(GetRectMaxX(Qo))+" maxY="+R2S(GetRectMaxY(Qo)))
+    call TestCommands_RepickLogSnapshot("POOL_ENUMERATED",null)
     call ForGroupBJ(i4,function W1)
+    call TestCommands_RepickLogSnapshot("POOL_INITIALIZED",null)
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
@@ -9958,6 +10198,8 @@ function jO takes nothing returns boolean
 endfunction
 
 function kO takes nothing returns nothing
+    call TestCommands_RepickLogAdd("HERO_PURCHASE player="+I2S(GetPlayerId(GetOwningPlayer(GetSoldUnit()))+1)+" hero="+TestCommands_RepickLogHeroName(GetUnitTypeId(GetSoldUnit())))
+    call TestCommands_RepickLogSnapshot("PURCHASE_BEFORE",GetOwningPlayer(GetSoldUnit()))
     call ForForce(bj_FORCE_ALL_PLAYERS,function CN)
     call RemoveUnitFromAllStock(GetUnitTypeId(GetSoldUnit()))
     if(((y4[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))])))then
@@ -10103,6 +10345,7 @@ function kO takes nothing returns nothing
     set D8[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))]='moon'
     set E8[(1+GetPlayerId(GetOwningPlayer(GetSoldUnit())))]='moon'
     call TriggerExecute(Scoreboard_RefreshTrigger)
+    call TestCommands_RepickLogSnapshot("PURCHASE_AFTER",GetOwningPlayer(GetSoldUnit()))
 endfunction
 
 function mO takes nothing returns nothing
@@ -61880,6 +62123,8 @@ function zMe takes nothing returns boolean
 endfunction
 
 function zpe takes nothing returns nothing
+    local player TestCommands_RepickCastingPlayer=GetOwningPlayer(GetTriggerUnit())
+    call TestCommands_RepickLogSnapshot("NAMI_THUNDER_BALL_START",TestCommands_RepickCastingPlayer)
     set Zf[11]=GetTriggerUnit()
     set dg[90]=GetSpellTargetLoc()
     set c[5911]=AngleBetweenPoints(GetUnitLoc(Zf[11]),dg[90])
@@ -61911,6 +62156,9 @@ function zpe takes nothing returns nothing
     set c[5911]=.0
     set bj_wantDestroyGroup=true
     call GroupClear(Yj)
+    call TestCommands_RepickLogSnapshot("NAMI_THUNDER_BALL_CLEANUP",TestCommands_RepickCastingPlayer)
+    call TestCommands_RepickAutoCleanup(TestCommands_RepickCastingPlayer)
+    set TestCommands_RepickCastingPlayer=null
 endfunction
 
 function zPe takes nothing returns nothing
@@ -70865,6 +71113,8 @@ function cmx takes nothing returns boolean
 endfunction
 
 function cMx takes nothing returns nothing
+    local player TestCommands_RepickCastingPlayer=GetOwningPlayer(GetTriggerUnit())
+    call TestCommands_RepickLogSnapshot("KUMA_Q_START",TestCommands_RepickCastingPlayer)
     set Hk[0]=GetTriggerUnit()
     set Jk[0]=GetSpellTargetLoc()
     set Ik[0]=AngleBetweenPoints(GetUnitLoc(Hk[0]),Jk[0])
@@ -70894,6 +71144,9 @@ function cMx takes nothing returns nothing
     set Jk[1]=null
     set bj_wantDestroyGroup=true
     call GroupClear(Kk)
+    call TestCommands_RepickLogSnapshot("KUMA_Q_CLEANUP",TestCommands_RepickCastingPlayer)
+    call TestCommands_RepickAutoCleanup(TestCommands_RepickCastingPlayer)
+    set TestCommands_RepickCastingPlayer=null
 endfunction
 
 function cpx takes nothing returns nothing
@@ -75500,23 +75753,27 @@ function hNx takes nothing returns nothing
     call TriggerAddCondition(pF,Condition(function Gsx))
     call TriggerAddAction(pF,function hAx)
 endfunction
-function hbx takes nothing returns boolean
-    return(m[(1+GetPlayerId(GetTriggerPlayer()))]!=null)and(y4[(1+GetPlayerId(GetTriggerPlayer()))]==false)
+function RepickHasHeroAndUnused takes nothing returns boolean
+    return(m[(1+GetPlayerId(RepickGetPlayer()))]!=null)and(y4[(1+GetPlayerId(RepickGetPlayer()))]==false)
 endfunction
-function hBx takes nothing returns boolean
-    return(hbx())
+function RepickCondition takes nothing returns boolean
+    local boolean repickAllowed
+    call TestCommands_RepickLogSnapshot("REPICK_CONDITION",RepickGetPlayer())
+    set repickAllowed=RepickHasHeroAndUnused()
+    call TestCommands_RepickLogAdd("REPICK_CONDITION allowed="+TestCommands_RepickLogBoolean(repickAllowed))
+    return repickAllowed
 endfunction
-function hcx takes nothing returns boolean
-    return(F4[(1+GetPlayerId(GetTriggerPlayer()))]==false)
+function RepickNeedsNormalRefund takes nothing returns boolean
+    return(F4[(1+GetPlayerId(RepickGetPlayer()))]==false)
 endfunction
-function hCx takes nothing returns boolean
-    return(F4[(1+GetPlayerId(GetTriggerPlayer()))])
+function RepickHasSpecialGoldMode takes nothing returns boolean
+    return(F4[(1+GetPlayerId(RepickGetPlayer()))])
 endfunction
-function hdx takes nothing returns boolean
-    return(GetPlayerState(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD)<500)
+function RepickGoldBelowMinimum takes nothing returns boolean
+    return(GetPlayerState(RepickGetPlayer(),PLAYER_STATE_RESOURCE_GOLD)<500)
 endfunction
-function hDx takes nothing returns boolean
-    return GetBooleanAnd(hCx(),hdx())
+function RepickNeedsMinimumGold takes nothing returns boolean
+    return GetBooleanAnd(RepickHasSpecialGoldMode(),RepickGoldBelowMinimum())
 endfunction
 function hfx takes nothing returns boolean
     return(GetEnumUnit()==wj[1])
@@ -75614,121 +75871,121 @@ endfunction
 function h0x takes nothing returns boolean
     return(GetEnumUnit()==yj[2])
 endfunction
-function h1x takes nothing returns boolean
-    return(GetUnitTypeId(m[(1+GetPlayerId(GetTriggerPlayer()))])=='O004')or(GetUnitTypeId(m[(1+GetPlayerId(GetTriggerPlayer()))])=='U009')
+function RepickHasSecretHero takes nothing returns boolean
+    return(GetUnitTypeId(m[(1+GetPlayerId(RepickGetPlayer()))])=='O004')or(GetUnitTypeId(m[(1+GetPlayerId(RepickGetPlayer()))])=='U009')
 endfunction
-function h2x takes nothing returns boolean
-    return(h1x())
+function RepickSecretHeroCondition takes nothing returns boolean
+    return(RepickHasSecretHero())
 endfunction
-function h3x takes nothing returns nothing
+function RepickCreateRandomHero takes nothing returns nothing
     call GroupRemoveUnit(i4,GetEnumUnit())
     if(hfx())then
-        call CreateNUnitsAtLoc(1,'EC08',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'EC08',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hFx())then
-        call CreateNUnitsAtLoc(1,'EC12',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'EC12',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hgx())then
-        call CreateNUnitsAtLoc(1,'H00I',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'H00I',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hGx())then
-        call CreateNUnitsAtLoc(1,'H004',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'H004',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hhx())then
-        call CreateNUnitsAtLoc(1,'H003',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'H003',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hHx())then
-        call CreateNUnitsAtLoc(1,'O002',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'O002',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hjx())then
-        call CreateNUnitsAtLoc(1,'O001',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'O001',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hJx())then
-        call CreateNUnitsAtLoc(1,'OC10',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'OC10',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hkx())then
-        call CreateNUnitsAtLoc(1,'UC13',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'UC13',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hKx())then
-        call CreateNUnitsAtLoc(1,'U00S',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'U00S',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hlx())then
-        call CreateNUnitsAtLoc(1,'U004',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'U004',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hLx())then
-        call CreateNUnitsAtLoc(1,'UC11',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'UC11',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hmx())then
-        call CreateNUnitsAtLoc(1,'E004',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'E004',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hMx())then
-        call CreateNUnitsAtLoc(1,'H01Q',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'H01Q',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hpx())then
-        call CreateNUnitsAtLoc(1,'U00A',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'U00A',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hPx())then
-        call CreateNUnitsAtLoc(1,'N009',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N009',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hqx())then
-        call CreateNUnitsAtLoc(1,'N002',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N002',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hQx())then
-        call CreateNUnitsAtLoc(1,'N006',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N006',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hsx())then
-        call CreateNUnitsAtLoc(1,'N00T',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N00T',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hSx())then
-        call CreateNUnitsAtLoc(1,'N003',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N003',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(htx())then
-        call CreateNUnitsAtLoc(1,'N00S',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N00S',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hTx())then
-        call CreateNUnitsAtLoc(1,'N007',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N007',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hux())then
-        call CreateNUnitsAtLoc(1,'N004',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N004',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hUx())then
-        call CreateNUnitsAtLoc(1,'N005',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N005',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hwx())then
-        call CreateNUnitsAtLoc(1,'N008',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N008',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hWx())then
-        call CreateNUnitsAtLoc(1,'E000',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'E000',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hyx())then
-        call CreateNUnitsAtLoc(1,'E002',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'E002',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hYx())then
-        call CreateNUnitsAtLoc(1,'E001',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'E001',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hzx())then
-        call CreateNUnitsAtLoc(1,'N00U',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N00U',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(hZx())then
-        call CreateNUnitsAtLoc(1,'N00X',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'N00X',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(h_x())then
-        call CreateNUnitsAtLoc(1,'O004',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'O004',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
     if(h0x())then
-        call CreateNUnitsAtLoc(1,'U009',GetTriggerPlayer(),Id,bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'U009',RepickGetPlayer(),Id,bj_UNIT_FACING)
     endif
-    set m[(1+GetPlayerId(GetTriggerPlayer()))]=bj_lastCreatedUnit
+    set m[(1+GetPlayerId(RepickGetPlayer()))]=bj_lastCreatedUnit
     call RemoveUnit(GetEnumUnit())
-    call RemoveUnitFromAllStock(GetUnitTypeId(m[(1+GetPlayerId(GetTriggerPlayer()))]))
-    if(h2x())then
-        call DisplayTimedTextToForce(s6(GetTriggerPlayer()),12.,(E[(1+GetPlayerId(GetTriggerPlayer()))]+(" has repicked into "+("|c0015B9F7"+(GetHeroProperName(m[(1+GetPlayerId(GetTriggerPlayer()))])+"|r")))))
+    call RemoveUnitFromAllStock(GetUnitTypeId(m[(1+GetPlayerId(RepickGetPlayer()))]))
+    if(RepickSecretHeroCondition())then
+        call DisplayTimedTextToForce(s6(RepickGetPlayer()),12.,(E[(1+GetPlayerId(RepickGetPlayer()))]+(" has repicked into "+("|c0015B9F7"+(GetHeroProperName(m[(1+GetPlayerId(RepickGetPlayer()))])+"|r")))))
     else
-        call DisplayTimedTextToForce(s6(GetTriggerPlayer()),12.,(E[(1+GetPlayerId(GetTriggerPlayer()))]+(" has repicked into "+GetHeroProperName(m[(1+GetPlayerId(GetTriggerPlayer()))]))))
+        call DisplayTimedTextToForce(s6(RepickGetPlayer()),12.,(E[(1+GetPlayerId(RepickGetPlayer()))]+(" has repicked into "+GetHeroProperName(m[(1+GetPlayerId(RepickGetPlayer()))]))))
     endif
 endfunction
-function h4x takes nothing returns nothing
-    call SetPlayerUnitAvailableBJ(GetUnitTypeId(m[(1+GetPlayerId(GetTriggerPlayer()))]),false,GetEnumPlayer())
+function RepickDisableRandomHero takes nothing returns nothing
+    call SetPlayerUnitAvailableBJ(GetUnitTypeId(m[(1+GetPlayerId(RepickGetPlayer()))]),false,GetEnumPlayer())
 endfunction
 function h5x takes nothing returns boolean
     return(GetEnumUnit()==wj[1])
@@ -75820,165 +76077,171 @@ endfunction
 function Hgx takes nothing returns boolean
     return(GetEnumUnit()==xj[15])
 endfunction
-function HGx takes nothing returns nothing
+function RepickEnableAvailableHero takes nothing returns nothing
     if(h5x())then
-        call SetPlayerUnitAvailableBJ('EC08',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('EC08',true,RepickGetPlayer())
     endif
     if(h6x())then
-        call SetPlayerUnitAvailableBJ('EC12',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('EC12',true,RepickGetPlayer())
     endif
     if(h7x())then
-        call SetPlayerUnitAvailableBJ('H00I',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('H00I',true,RepickGetPlayer())
     endif
     if(h8x())then
-        call SetPlayerUnitAvailableBJ('H004',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('H004',true,RepickGetPlayer())
     endif
     if(h9x())then
-        call SetPlayerUnitAvailableBJ('H003',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('H003',true,RepickGetPlayer())
     endif
     if(Hvx())then
-        call SetPlayerUnitAvailableBJ('O002',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('O002',true,RepickGetPlayer())
     endif
     if(Hex())then
-        call SetPlayerUnitAvailableBJ('O001',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('O001',true,RepickGetPlayer())
     endif
     if(Hxx())then
-        call SetPlayerUnitAvailableBJ('OC10',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('OC10',true,RepickGetPlayer())
     endif
     if(Hox())then
-        call SetPlayerUnitAvailableBJ('UC13',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('UC13',true,RepickGetPlayer())
     endif
     if(Hrx())then
-        call SetPlayerUnitAvailableBJ('U00S',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('U00S',true,RepickGetPlayer())
     endif
     if(Hix())then
-        call SetPlayerUnitAvailableBJ('U004',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('U004',true,RepickGetPlayer())
     endif
     if(Hax())then
-        call SetPlayerUnitAvailableBJ('UC11',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('UC11',true,RepickGetPlayer())
     endif
     if(Hnx())then
-        call SetPlayerUnitAvailableBJ('E004',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('E004',true,RepickGetPlayer())
     endif
     if(HVx())then
-        call SetPlayerUnitAvailableBJ('H01Q',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('H01Q',true,RepickGetPlayer())
     endif
     if(HEx())then
-        call SetPlayerUnitAvailableBJ('U00A',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('U00A',true,RepickGetPlayer())
     endif
     if(HXx())then
-        call SetPlayerUnitAvailableBJ('N009',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N009',true,RepickGetPlayer())
     endif
     if(HOx())then
-        call SetPlayerUnitAvailableBJ('N002',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N002',true,RepickGetPlayer())
     endif
     if(HRx())then
-        call SetPlayerUnitAvailableBJ('N006',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N006',true,RepickGetPlayer())
     endif
     if(HIx())then
-        call SetPlayerUnitAvailableBJ('N00T',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N00T',true,RepickGetPlayer())
     endif
     if(HAx())then
-        call SetPlayerUnitAvailableBJ('N003',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N003',true,RepickGetPlayer())
     endif
     if(HNx())then
-        call SetPlayerUnitAvailableBJ('N00S',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N00S',true,RepickGetPlayer())
     endif
     if(Hbx())then
-        call SetPlayerUnitAvailableBJ('N007',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N007',true,RepickGetPlayer())
     endif
     if(HBx())then
-        call SetPlayerUnitAvailableBJ('N004',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N004',true,RepickGetPlayer())
     endif
     if(Hcx())then
-        call SetPlayerUnitAvailableBJ('N005',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N005',true,RepickGetPlayer())
     endif
     if(HCx())then
-        call SetPlayerUnitAvailableBJ('N008',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N008',true,RepickGetPlayer())
     endif
     if(Hdx())then
-        call SetPlayerUnitAvailableBJ('E000',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('E000',true,RepickGetPlayer())
     endif
     if(HDx())then
-        call SetPlayerUnitAvailableBJ('E002',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('E002',true,RepickGetPlayer())
     endif
     if(Hfx())then
-        call SetPlayerUnitAvailableBJ('E001',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('E001',true,RepickGetPlayer())
     endif
     if(HFx())then
-        call SetPlayerUnitAvailableBJ('N00U',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N00U',true,RepickGetPlayer())
     endif
     if(Hgx())then
-        call SetPlayerUnitAvailableBJ('N00X',true,GetTriggerPlayer())
+        call SetPlayerUnitAvailableBJ('N00X',true,RepickGetPlayer())
     endif
 endfunction
 function Hhx takes nothing returns boolean
     return(k4==false)
 endfunction
-function HHx takes nothing returns boolean
-    return(IsUnitGroupEmptyBJ(i4)==false)
+function RepickPoolHasHeroes takes nothing returns boolean
+    local boolean poolHasHeroes
+    call TestCommands_RepickLogSnapshot("REPICK_POOL_BEFORE",RepickGetPlayer())
+    set poolHasHeroes=(IsUnitGroupEmptyBJ(i4)==false)
+    call TestCommands_RepickLogSnapshot("REPICK_POOL_AFTER",RepickGetPlayer())
+    call TestCommands_RepickLogAdd("REPICK_POOL_CHECK returned="+TestCommands_RepickLogBoolean(poolHasHeroes))
+    return poolHasHeroes
 endfunction
-function Hjx takes nothing returns boolean
-    return(GetPlayerState(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD)>=300)
+function RepickHasEnoughGold takes nothing returns boolean
+    return(GetPlayerState(RepickGetPlayer(),PLAYER_STATE_RESOURCE_GOLD)>=300)
 endfunction
-function HJx takes nothing returns nothing
-    if(Hjx())then
-        if(HHx())then
-            set B8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],1))
-            set b8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],2))
-            set C8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],3))
-            set c8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],4))
-            set D8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],5))
-            set E8[(1+GetPlayerId(GetTriggerPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],6))
+function RepickAction takes nothing returns nothing
+    if(RepickHasEnoughGold())then
+        if(RepickPoolHasHeroes())then
+            set B8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],1))
+            set b8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],2))
+            set C8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],3))
+            set c8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],4))
+            set D8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],5))
+            set E8[(1+GetPlayerId(RepickGetPlayer()))]=GetItemTypeId(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],6))
             set z4=1
             loop
                 exitwhen z4>6
-                call RemoveItem(UnitItemInSlotBJ(m[(1+GetPlayerId(GetTriggerPlayer()))],z4))
+                call RemoveItem(UnitItemInSlotBJ(m[(1+GetPlayerId(RepickGetPlayer()))],z4))
                 set z4=z4+1
             endloop
-            call RemoveUnit(m[(1+GetPlayerId(GetTriggerPlayer()))])
-            set y4[(1+GetPlayerId(GetTriggerPlayer()))]=true
-            set m[(1+GetPlayerId(GetTriggerPlayer()))]=null
+            call RemoveUnit(m[(1+GetPlayerId(RepickGetPlayer()))])
+            set y4[(1+GetPlayerId(RepickGetPlayer()))]=true
+            set m[(1+GetPlayerId(RepickGetPlayer()))]=null
             if(Hhx())then
-                if(hcx())then
-                    call AdjustPlayerStateBJ(500,GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD)
+                if(RepickNeedsNormalRefund())then
+                    call AdjustPlayerStateBJ(500,RepickGetPlayer(),PLAYER_STATE_RESOURCE_GOLD)
                 else
-                    if(hDx())then
-                        call SetPlayerStateBJ(GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD,500)
+                    if(RepickNeedsMinimumGold())then
+                        call SetPlayerStateBJ(RepickGetPlayer(),PLAYER_STATE_RESOURCE_GOLD,500)
                     endif
                 endif
-                call PanCameraToTimedLocForPlayer(GetTriggerPlayer(),GetRectCenter(to),0)
-                call ForGroupBJ(i4,function HGx)
+                call PanCameraToTimedLocForPlayer(RepickGetPlayer(),GetRectCenter(to),0)
+                call ForGroupBJ(i4,function RepickEnableAvailableHero)
             else
-                call AdjustPlayerStateBJ(-300,GetTriggerPlayer(),PLAYER_STATE_RESOURCE_GOLD)
+                call AdjustPlayerStateBJ(-300,RepickGetPlayer(),PLAYER_STATE_RESOURCE_GOLD)
                 set Id=GetRectCenter(to)
                 set Hd=u6(1,i4)
-                call ForGroupBJ(Hd,function h3x)
+                call ForGroupBJ(Hd,function RepickCreateRandomHero)
                 call RemoveLocation(Id)
                 set Id=null
                 call DestroyGroup(Hd)
                 set Hd=null
-                call UnitAddItemByIdSwapped(B8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                call UnitAddItemByIdSwapped(b8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                call UnitAddItemByIdSwapped(C8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                call UnitAddItemByIdSwapped(c8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                call UnitAddItemByIdSwapped(D8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                call UnitAddItemByIdSwapped(E8[(1+GetPlayerId(GetTriggerPlayer()))],m[(1+GetPlayerId(GetTriggerPlayer()))])
-                set B8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                set b8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                set C8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                set c8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                set D8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
-                set E8[(1+GetPlayerId(GetTriggerPlayer()))]='moon'
+                call UnitAddItemByIdSwapped(B8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                call UnitAddItemByIdSwapped(b8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                call UnitAddItemByIdSwapped(C8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                call UnitAddItemByIdSwapped(c8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                call UnitAddItemByIdSwapped(D8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                call UnitAddItemByIdSwapped(E8[(1+GetPlayerId(RepickGetPlayer()))],m[(1+GetPlayerId(RepickGetPlayer()))])
+                set B8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
+                set b8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
+                set C8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
+                set c8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
+                set D8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
+                set E8[(1+GetPlayerId(RepickGetPlayer()))]='moon'
                 call TriggerExecute(Scoreboard_RefreshTrigger)
-                call ForForce(bj_FORCE_ALL_PLAYERS,function h4x)
+                call ForForce(bj_FORCE_ALL_PLAYERS,function RepickDisableRandomHero)
             endif
         else
-            call DisplayTimedTextToForce(m6(GetTriggerPlayer()),5.,"There are no hero left to pick")
+            call DisplayTimedTextToForce(m6(RepickGetPlayer()),5.,"There are no hero left to pick")
         endif
     else
-        call DisplayTimedTextToForce(m6(GetTriggerPlayer()),5.,"Not enough gold to repick")
+        call DisplayTimedTextToForce(m6(RepickGetPlayer()),5.,"Not enough gold to repick")
     endif
+    call TestCommands_RepickLogSnapshot("REPICK_COMPLETE",RepickGetPlayer())
 endfunction
 function Hkx takes nothing returns nothing
     set qF=CreateTrigger()
@@ -75994,8 +76257,8 @@ function Hkx takes nothing returns nothing
     call TriggerRegisterPlayerChatEvent(qF,Player(9),"-repick",true)
     call TriggerRegisterPlayerChatEvent(qF,Player(10),"-repick",true)
     call TriggerRegisterPlayerChatEvent(qF,Player(11),"-repick",true)
-    call TriggerAddCondition(qF,Condition(function hBx))
-    call TriggerAddAction(qF,function HJx)
+    call TriggerAddCondition(qF,Condition(function RepickCondition))
+    call TriggerAddAction(qF,function RepickAction)
 endfunction
 function HKx takes nothing returns boolean
     return(m[(1+GetPlayerId(GetTriggerPlayer()))]!=null)and(y4[(1+GetPlayerId(GetTriggerPlayer()))]==false)
@@ -79543,6 +79806,7 @@ function qrx takes nothing returns nothing
     set O9=null
 endfunction
 function qix takes nothing returns boolean
+    call TestCommands_RepickLogMaintenance()
     return(IsUnitGroupEmptyBJ(jg)==false)
 endfunction
 function qax takes nothing returns boolean
@@ -82240,6 +82504,7 @@ function main takes nothing returns nothing
     call H6()
     call I6()
     call Q3x()
+    call TestCommands_RepickLogInitialize()
     call Q4x()
     call TestCommands_Init()
 endfunction
