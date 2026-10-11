@@ -45554,7 +45554,7 @@ function RenjiHandleDeath takes nothing returns nothing
         set RenjiWSelfDamageSource=null
     endif
     if GetDyingUnit()==RenjiRCaster and not RenjiTActive then
-        call RenjiRFinish(RenjiRCaster,true,false)
+        call RenjiRFinish(RenjiRCaster,true,true)
     endif
 endfunction
 
@@ -46717,6 +46717,7 @@ function RenjiTStartBlast takes nothing returns nothing
 endfunction
 
 function RenjiTCast takes nothing returns nothing
+    local boolean completedNormally=false
     set RenjiTCaster=GetTriggerUnit()
     set RenjiTTarget=GetSpellTargetUnit()
     set RenjiTCastPosition=GetUnitLoc(RenjiTCaster)
@@ -46799,6 +46800,7 @@ function RenjiTCast takes nothing returns nothing
             exitwhen(((IsTriggerEnabled(RenjiTBlastTrigger)==false)))
             call TriggerSleepAction(RMaxBJ(bj_WAIT_FOR_COND_MIN_INTERVAL,.1))
         endloop
+        set completedNormally=RenjiTPathIndex>=180 and IsUnitAliveBJ(RenjiTCaster) and IsUnitAliveBJ(RenjiTBlastProjectile)
         if RenjiTBlastProjectile!=null then
             call KillUnit(RenjiTBlastProjectile)
         endif
@@ -46827,7 +46829,7 @@ function RenjiTCast takes nothing returns nothing
         set RenjiTMoveIndex=RenjiTMoveIndex+1
     endloop
     set RenjiTPathIndex=0
-    call RenjiRFinish(RenjiRCaster,true,false)
+    call RenjiRFinish(RenjiRCaster,true,not completedNormally)
 endfunction
 
 function InitRenjiTCastTrigger takes nothing returns nothing
@@ -75885,6 +75887,7 @@ function Hhx takes nothing returns boolean
     return(k4==false)
 endfunction
 function HHx takes nothing returns boolean
+    set bj_wantDestroyGroup=false
     return(IsUnitGroupEmptyBJ(i4)==false)
 endfunction
 function Hjx takes nothing returns boolean
@@ -81317,6 +81320,29 @@ function TestCommands_Selected takes player testPlayer returns unit
     return testResult
 endfunction
 
+function TestCommands_ScoreboardHero takes integer heroNumber returns unit
+    local integer teamIndex = 1
+    local integer playerIndex = 1
+    local integer heroIndex = 0
+    // Match Scoreboard_Create: team 1 first, then team 2, in player slot order.
+    loop
+        exitwhen teamIndex > 2
+        set playerIndex = 1
+        loop
+            exitwhen playerIndex > 12
+            if Scoreboard_PlayerRows[playerIndex] != 0 and Scoreboard_PlayerTeams[playerIndex] == teamIndex then
+                set heroIndex = heroIndex + 1
+                if heroIndex == heroNumber then
+                    return m[playerIndex]
+                endif
+            endif
+            set playerIndex = playerIndex + 1
+        endloop
+        set teamIndex = teamIndex + 1
+    endloop
+    return null
+endfunction
+
 function TestCommands_C2Id takes string testInput returns integer
     local integer testPos = 0
     local string testChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -81382,7 +81408,7 @@ function TestCommands_Commands takes nothing returns nothing
     local integer testPlayerIndex = GetPlayerId(testPlayer)
     local string testText = GetEventPlayerChatString()
     local boolean testIsLevel = testText == "-level" or SubString(testText,0,7) == "-level "
-    local boolean testIsItem = testText == "-createitem" or SubString(testText,0,12) == "-createitem "
+    local boolean testIsItem = testText == "-giveitem" or SubString(testText,0,10) == "-giveitem "
     local boolean testIsCooldown = testText == "-nocd" or SubString(testText,0,6) == "-nocd "
     local boolean testIsGold = testText == "-gold" or SubString(testText,0,6) == "-gold "
     local boolean testIsLumber = testText == "-lumber" or SubString(testText,0,8) == "-lumber "
@@ -81391,7 +81417,9 @@ function TestCommands_Commands takes nothing returns nothing
     local playerstate testResource
     local string testResourceName
     local unit testSelected = null
-    local item testItem = null
+    local string itemRawcode
+    local integer targetHeroNumber = 0
+    local integer inventorySlot = 0
     local integer testValue
     if testText == "-cheats" or SubString(testText,0,8) == "-cheats " then
         if testText == "-cheats bvo-rossoliny" then
@@ -81454,18 +81482,40 @@ function TestCommands_Commands takes nothing returns nothing
                 call TestCommands_Message(testPlayer,testText,"уровень героя: "+I2S(GetHeroLevel(testSelected)))
             endif
         elseif testIsItem then
-            set testSelected = TestCommands_Selected(testPlayer)
-            if StringLength(testText) != 16 then
-                call TestCommands_Message(testPlayer,testText,"ошибка: укажи четырёхсимвольный код предмета")
-            elseif testSelected == null then
-                call TestCommands_Message(testPlayer,testText,"ошибка: юнит не найден")
+            if (StringLength(testText) != 14 and StringLength(testText) != 16 and StringLength(testText) != 17) or SubString(testText,9,10) != " " or (StringLength(testText) > 14 and SubString(testText,14,15) != " ") then
+                call TestCommands_Message(testPlayer,testText,"ошибка: используй -giveitem <rawcode> [номер 1–10]")
             else
-                set testValue = TestCommands_S2Id(SubString(testText,12,16))
-                set testItem = CreateItem(testValue,GetUnitX(testSelected),GetUnitY(testSelected))
-                if testItem == null then
-                    call TestCommands_Message(testPlayer,testText,"ошибка: неизвестный код предмета")
+                set itemRawcode = SubString(testText,10,14)
+                set testAmount = ""
+                if StringLength(testText) > 14 then
+                    set testAmount = SubString(testText,15,StringLength(testText))
+                    set targetHeroNumber = S2I(testAmount)
+                endif
+                if StringLength(testText) > 14 and (targetHeroNumber < 1 or targetHeroNumber > 10 or I2S(targetHeroNumber) != testAmount) then
+                    call TestCommands_Message(testPlayer,testText,"ошибка: укажи номер героя в скорборде от 1 до 10")
+                elseif TestCommands_C2Id(SubString(itemRawcode,0,1)) == 0 or TestCommands_C2Id(SubString(itemRawcode,1,2)) == 0 or TestCommands_C2Id(SubString(itemRawcode,2,3)) == 0 or TestCommands_C2Id(SubString(itemRawcode,3,4)) == 0 then
+                    call TestCommands_Message(testPlayer,testText,"ошибка: неверный код предмета")
                 else
-                    call TestCommands_Message(testPlayer,testText,"создан предмет: "+GetItemName(testItem))
+                    if StringLength(testText) == 14 then
+                        set testSelected = TestCommands_Selected(testPlayer)
+                    else
+                        set testSelected = TestCommands_ScoreboardHero(targetHeroNumber)
+                    endif
+                    if testSelected == null or GetUnitTypeId(testSelected) == 0 or not IsUnitType(testSelected,UNIT_TYPE_HERO) then
+                        call TestCommands_Message(testPlayer,testText,"ошибка: герой не найден")
+                    else
+                        loop
+                            exitwhen inventorySlot >= UnitInventorySize(testSelected) or UnitItemInSlot(testSelected,inventorySlot) == null
+                            set inventorySlot = inventorySlot + 1
+                        endloop
+                        if inventorySlot >= UnitInventorySize(testSelected) then
+                            call TestCommands_Message(testPlayer,testText,"ошибка: инвентарь заполнен")
+                        elseif not UnitAddItemToSlotById(testSelected,TestCommands_S2Id(itemRawcode),inventorySlot) then
+                            call TestCommands_Message(testPlayer,testText,"ошибка: неизвестный код предмета")
+                        else
+                            call TestCommands_Message(testPlayer,testText,"предмет "+itemRawcode+" выдан герою "+GetUnitName(testSelected))
+                        endif
+                    endif
                 endif
             endif
         elseif testText != "-nocd" then
@@ -81482,7 +81532,6 @@ function TestCommands_Commands takes nothing returns nothing
         endif
     endif
     set testResource = null
-    set testItem = null
     set testSelected = null
     set testPlayer = null
 endfunction

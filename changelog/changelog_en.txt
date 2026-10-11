@@ -11,13 +11,19 @@ Renji:
 - R: a full 360-degree rotation following 1.1c, a 1-second stun and knockback along the swing. Queued movement is cleared after the rotation.
 - R: segments scatter in 1 second across a 1500-wide area in front of the cast position and slow enemies by 50% within 200 AoE.
 - R: added free manual return through Bankai Dismissal after the rotation, including during scattering. Return restores attacks, Q and E and preserves current actions; unavailable during T.
-- R: on return or expiration, each segment deals 7.5 x current total STR damage within 200 AoE. Explosion damage stacks. Segments disappear without explosions after T or on death.
+- R: on return, expiration or death, including during T, remaining segments explode with the existing damage, effect and sound. Each segment deals 7.5 x current total STR damage within 200 AoE; overlapping explosions stack. Segments disappear without explosions only after T completes normally; repeated cleanup cannot cause duplicate explosions.
 - Fixed R timers and updated Q/W/E/R and Bankai Dismissal effects, sounds and descriptions.
 
 Items:
 - Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
 - Restored medal stock at Medal Exchange.
 - Fixed the disabled Demonic Armor icon.
+
+Repick:
+- Fixed the shared hero pool being destroyed by the group-removal flag left after Nami's V. Hero replacement and subsequent repicks by other players preserve the pool; cost, the 60-second window and one repick per player are unchanged.
+
+Development cheats:
+- Replaced -createitem with -giveitem <rawcode> [number 1–10]. Adds an item directly to the inventory of your own hero or the hero at the specified position in the scoreboard, including enemy bots. Cheat activation is required; invalid codes or numbers, missing heroes and full inventories produce an error without creating an item.
 
 Scoreboard and INFO:
 - Ported the 1.1c scoreboard with colored K/D/L/GPM, hero icons, team totals, game mode and elapsed time.
@@ -89,7 +95,7 @@ Renji
 		Initial sweep hits use the WarStomp effect and sound from Ikkaku's Final Madness, including lethal hits. The shared Stampede hit effect is silent for this sweep; its visuals are preserved.
 		Enemies hit by the initial rotation are now stunned for 1 second and pushed along the counterclockwise sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
 		After scattering, segments slow enemy movement by 50% within 200 AoE. Overlapping segment auras do not stack, and the aura is disabled during T.
-		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments removed after T or on Renji's death do not explode. Uses a red ChaosExplosion effect per segment and the explosion sound from Renji's Higa Zekko once for the whole return.
+		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Segments disappear without explosions only after T completes normally. Renji's death, including during T, or interrupted T makes remaining segments explode. Uses a red ChaosExplosion effect per segment and the explosion sound from Renji's Higa Zekko once for the whole cleanup. Repeated cleanup cannot cause duplicate explosions.
 
 	[Descriptions]
 		W: original 1.1c learn and normal descriptions are restored on all levels, with the project signature appended.
@@ -149,7 +155,8 @@ TEST COMMANDS
 -------------
 
 All cheats require personal activation, including single-player games. Only the activating player receives access.
-The -level N and -createitem XXXX commands use only the command author's own hero.
+The -level N command uses only the command author's own hero.
+The -giveitem XXXX [1–10] command replaces -createitem and adds an item directly to your own hero's inventory when no number is provided, or to the hero at the specified position in the scoreboard, including enemy bots. Invalid codes or numbers, missing heroes and full inventories do not create an item.
 Added -gold N and -lumber N to add the specified amount of gold or medals only to the player who entered the command.
 Added -mana and -nomana to enable or disable infinite mana only for the player's own hero; the setting persists through transformations.
 The -nc command resets cooldowns only for the enabling player's own hero.
