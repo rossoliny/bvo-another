@@ -19,6 +19,7 @@ globals
     boolean array TestCommands_NoCooldown
     boolean array TestCommands_InfiniteMana
     boolean array TestCommands_OneShotEnabled
+    integer TestCommands_RequestedEventSize = 0
     trigger TestCommands_OneShotDamageTrigger = null
     group TestCommands_OneShotRegisteredUnits = null
     region TestCommands_OneShotWorldRegion = null
@@ -81640,6 +81641,34 @@ function TestCommands_OneShotInit takes nothing returns nothing
 endfunction
 
 
+function TestCommands_EventSelectionCondition takes nothing returns boolean
+    local integer requestedEventSize = TestCommands_RequestedEventSize
+    set TestCommands_RequestedEventSize = 0
+    if requestedEventSize == 0 then
+        return true
+    endif
+    // Match the normal selector's setup before dispatching a fixed format.
+    set a[1006] = null
+    set fj = false
+    if Ni == 0 then
+        set Ni = 1
+        call CreateTimerDialogBJ(Li,"Time Limit")
+        set Mi = bj_lastCreatedTimerDialog
+        call TimerDialogSetTitleColorBJ(Mi,80.,.0,.0,0)
+        call TimerDialogSetTimeColorBJ(Mi,80.,.0,.0,0)
+        call TimerDialogDisplay(Mi,false)
+    endif
+    if requestedEventSize == 1 then
+        call TriggerExecute(Ys)
+    elseif requestedEventSize == 3 then
+        call TriggerExecute(Zs)
+    elseif requestedEventSize == 5 then
+        call TriggerExecute(dt)
+    endif
+    // The selected event already runs; skip the random selector's action.
+    return false
+endfunction
+
 function TestCommands_EventChat takes nothing returns nothing
     local player commandPlayer = GetTriggerPlayer()
     local integer commandPlayerIndex = GetPlayerId(commandPlayer)
@@ -81647,11 +81676,19 @@ function TestCommands_EventChat takes nothing returns nothing
     local integer playerIndex = 0
     local integer firstTeamPlayers = 0
     local integer secondTeamPlayers = 0
+    local integer requestedEventSize = 0
     local boolean heroesReady = true
+    if commandText == "-event1" then
+        set requestedEventSize = 1
+    elseif commandText == "-event3" then
+        set requestedEventSize = 3
+    elseif commandText == "-event5" then
+        set requestedEventSize = 5
+    endif
     if not TestCommands_Access[commandPlayerIndex] then
         call TestCommands_Message(commandPlayer,commandText,"Отказ: доступ к читам не активирован")
-    elseif commandText != "-event" then
-        call TestCommands_Message(commandPlayer,commandText,"Ошибка: используйте -event без аргументов")
+    elseif commandText != "-event" and requestedEventSize == 0 then
+        call TestCommands_Message(commandPlayer,commandText,"Ошибка: используйте -event, -event1, -event3 или -event5 без аргументов")
     elseif N4 or q == null or s == null or Xs == null or not IsTriggerEnabled(Xs) then
         call TestCommands_Message(commandPlayer,commandText,"Отказ: игра ещё не началась, завершена или события отключены")
     elseif w or IsTriggerEnabled(nt) or TimerGetRemaining(q) <= 0. then
@@ -81677,11 +81714,16 @@ function TestCommands_EventChat takes nothing returns nothing
             call TestCommands_Message(commandPlayer,commandText,"Отказ: нужны игроки в обеих командах")
         elseif not heroesReady then
             call TestCommands_Message(commandPlayer,commandText,"Отказ: дождитесь выбора героев всеми игроками")
+        elseif requestedEventSize > 0 and T7[requestedEventSize] then
+            call TestCommands_Message(commandPlayer,commandText,"Отказ: выбранный формат события отключён режимом игры")
+        elseif requestedEventSize > 0 and (firstTeamPlayers < requestedEventSize or secondTeamPlayers < requestedEventSize) then
+            call TestCommands_Message(commandPlayer,commandText,"Отказ: для этого формата нужно минимум по "+I2S(requestedEventSize)+" игрока в каждой команде")
         elseif T7[1] and (T7[3] or firstTeamPlayers < 3 or secondTeamPlayers < 3) and (T7[5] or firstTeamPlayers < 5 or secondTeamPlayers < 5) then
             call TestCommands_Message(commandPlayer,commandText,"Отказ: нет доступного формата события для текущих команд")
         else
-            // Expire the existing wait timer so the normal selector and countdown run.
+            // Expire the existing wait timer; its condition selects the requested format.
             // A zero remaining time also blocks another command before expiration fires.
+            set TestCommands_RequestedEventSize = requestedEventSize
             call TimerStart(q,0.,false,null)
             call TestCommands_Message(commandPlayer,commandText,"Запущена подготовка следующего события")
         endif
@@ -81700,6 +81742,7 @@ function TestCommands_EventInit takes nothing returns nothing
         set playerIndex = playerIndex+1
     endloop
     call TriggerAddAction(eventChatTrigger,function TestCommands_EventChat)
+    call TriggerAddCondition(Xs,Condition(function TestCommands_EventSelectionCondition))
     set eventChatTrigger = null
 endfunction
 
