@@ -5,8 +5,9 @@
 # File000... имеют искусственные имена: их содержимое сравнивается отдельно.
 set -euo pipefail
 
+repository_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 original_directory=$(realpath -- "${1:?Usage: $0 extracted-original [current-directory]}")
-current_directory=$(realpath -- "${2:-$(dirname -- "${BASH_SOURCE[0]}")/w3x-content}")
+current_directory=$(realpath -- "${2:-$repository_root/w3x-content}")
 [[ -d "$original_directory" && -d "$current_directory" ]]
 
 declare -A current_paths current_hashes

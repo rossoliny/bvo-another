@@ -35,15 +35,15 @@ def without_cheats(script):
 
 
 def main():
-    repository = Path(__file__).resolve().parents[2]
+    repository = Path(__file__).resolve().parents[3]
     build_directory = (repository / 'build').resolve()
     build_directory.mkdir(exist_ok=True)
     converter_directory = repository / 'toolkit/W3x2Lni v2.7.2'
     lua_runtime = str(converter_directory / 'bin/w3x2lni-lua.exe')
-    pack_script = str(repository / 'toolkit/pack-map.lua')
+    pack_script = str(repository / 'toolkit/build-w3x/pack-map.lua')
     for arguments in (['--lang'], ['--lang', 'de'], ['--lang', 'en,'],
                       ['--lang', 'en,en'], ['--lang', 'en', '--lang', 'ru']):
-        completed = subprocess.run(['bash', str(repository / 'build-w3x.sh'), *arguments],
+        completed = subprocess.run(['bash', str(repository / 'toolkit/build-w3x/build-w3x.sh'), *arguments],
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         assert completed.returncode != 0 and b'pjass attempt' not in completed.stdout
     print('PASS: invalid and repeated language flags fail before build work')
@@ -73,7 +73,7 @@ def main():
                             cwd=converter_directory / 'script')
                 assert output_map.read_bytes()[:4] == b'HM3W'
                 maps.append(output_map)
-            verification = run_checked([lua_runtime, str(repository / 'toolkit/tests/check-localized-maps.lua'),
+            verification = run_checked([lua_runtime, str(repository / 'toolkit/build-w3x/tests/check-localized-maps.lua'),
                                         *map(str, maps), str(script_file), str(source_directory / 'units/itemstrings.txt')],
                                        cwd=converter_directory / 'script')
             print(build_mode + ': ' + verification.decode('utf-8').strip())

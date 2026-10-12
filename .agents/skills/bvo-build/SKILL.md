@@ -9,11 +9,11 @@ description: Use when building a development or release .w3x map in the BvO Anot
 
 | Режим | Команда | Результат |
 | --- | --- | --- |
-| С читами, EN по умолчанию | `bash build-w3x.sh` | `build/BvO_Another_dev_en.w3x` |
-| С читами, RU | `bash build-w3x.sh --lang ru` | `build/BvO_Another_dev_ru.w3x` |
-| Без читов, EN | `bash build-w3x.sh --release --lang en` | `build/BvO_Another_release_en.w3x` |
-| Без читов, RU | `bash build-w3x.sh --release --lang ru` | `build/BvO_Another_release_ru.w3x` |
-| Без читов, оба языка | `bash build-w3x.sh --release --lang en,ru` | Обе карты `build/BvO_Another_release_{en,ru}.w3x` |
+| С читами, EN по умолчанию | `bash toolkit/build-w3x/build-w3x.sh` | `build/BvO_Another_dev_en.w3x` |
+| С читами, RU | `bash toolkit/build-w3x/build-w3x.sh --lang ru` | `build/BvO_Another_dev_ru.w3x` |
+| Без читов, EN | `bash toolkit/build-w3x/build-w3x.sh --release --lang en` | `build/BvO_Another_release_en.w3x` |
+| Без читов, RU | `bash toolkit/build-w3x/build-w3x.sh --release --lang ru` | `build/BvO_Another_release_ru.w3x` |
+| Без читов, оба языка | `bash toolkit/build-w3x/build-w3x.sh --release --lang en,ru` | Обе карты `build/BvO_Another_release_{en,ru}.w3x` |
 
 - `w3x-content/` — общая основа карты и исходные EN-тексты; карта-основа не нужна.
 - `--lang` принимает `en`, `ru`, `en,ru` (также `ru,en`), независимо от `--release`. Передавай выбранные пользователем языки; если они не заданы, обычная сборка использует EN, полный релиз — оба языка по `bvo-release`.
@@ -22,6 +22,6 @@ description: Use when building a development or release .w3x map in the BvO Anot
 - Основной JASS: `w3x-content/scripts/war3map.j`.
 - Релиз полностью исключает читовый код из упакованного JASS без изменения исходника.
 - Билд готовит один временный JASS в `build/`, проверяет его из файла и использует одинаковое содержимое для всех выбранных языков. После завершения временный JASS удаляется. Учитывай фактический итог pjass: существующий порог — не меньше 4 успешных проверок из 10, меньше 10 сопровождается предупреждением.
-- Используй существующий `build-w3x.sh`; исходники и ресурсы не копируй и не изменяй при сборке.
+- Используй существующий `toolkit/build-w3x/build-w3x.sh`; исходники и ресурсы не копируй и не изменяй при сборке.
 - Сообщения идут в консоль. Скрипт удаляет временные файлы и отчёт тулкита; результат сохраняет только в `build/`. При нескольких языках итоговые файлы заменяются после успешной упаковки всех выбранных вариантов. Не используй старые карты без языкового суффикса как результат нового запуска.
 - Перед сборкой запомни хэш и сообщение текущего коммита (`git log -1 --format='%H%n%B'`). После успешной сборки перезапиши ими `build/last-build.txt`; при ошибке файл не обновляй. В файле сохраняй только полный хэш первой строкой и сообщение коммита ниже.

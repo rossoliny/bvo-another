@@ -15,13 +15,13 @@ __[Main Page](https://github.com/rossoliny/bvo-another)__
 
 The complete editable map contents live in `w3x-content/`, using the map's internal paths and filenames. The main script is `w3x-content/scripts/war3map.j`.
 
-From the repository root, run `bash build-w3x.sh` for a development build with cheats, or `bash build-w3x.sh --release` for a release with all cheat code removed. Add `--lang en`, `--lang ru`, or `--lang en,ru` to choose languages; the default is EN. Outputs include the language suffix, for example `build/BvO_Another_release_en.w3x` and `build/BvO_Another_release_ru.w3x`.
+From the repository root, run `bash toolkit/build-w3x/build-w3x.sh` for a development build with cheats, or `bash toolkit/build-w3x/build-w3x.sh --release` for a release with all cheat code removed. Add `--lang en`, `--lang ru`, or `--lang en,ru` to choose languages; the default is EN. Outputs include the language suffix, for example `build/BvO_Another_release_en.w3x` and `build/BvO_Another_release_ru.w3x`.
 
 RU builds merge ready text fields from `w3x-content-ru/` into the base profiles in memory, retaining the original filenames inside the map. Missing translations use the base text. See [the translation format](w3x-content-ru/README.md); gameplay fields, scripts and binary objects cannot be supplied as translations.
 
 Builds use Bash and the bundled tools in `toolkit/`; no base map or Ladik is required. Source files stay unchanged, messages go to the console, and temporary files and the packer's report are cleaned up after each run.
 
-The selected JASS is prepared once in a temporary file inside `build/` for checking and shared use across languages, then removed. `toolkit/pack-map.lua` runs W3x2Lni's `pack` command in the console and checks the archive's files against their sources and expected text substitutions.
+The selected JASS is prepared once in a temporary file inside `build/` for checking and shared use across languages, then removed. `toolkit/build-w3x/pack-map.lua` runs W3x2Lni's `pack` command in the console and checks the archive's files against their sources and expected text substitutions.
 
 # Contribution
 

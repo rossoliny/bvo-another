@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.."
 repository_root=$PWD
 build_mode=dev
 selected_languages=en
@@ -102,7 +102,7 @@ for build_language in "${build_languages[@]}"; do
     temporary_map=$(mktemp "build/.BvO_Another_${build_mode}_${build_language}.XXXXXX.w3x")
     temporary_maps+=("$temporary_map")
     (cd -- "$converter_directory/script"
-        "$converter" "$repository_root/toolkit/pack-map.lua" \
+        "$converter" "$repository_root/toolkit/build-w3x/pack-map.lua" \
             "$repository_root/w3x-content" "$repository_root/$temporary_map" \
             "$build_mode" "$build_language" "$repository_root/$temporary_script")
     grep -q '^Result: 0 errors, 0 warnings' "$report" || { cat "$report" >&2; exit 1; }
