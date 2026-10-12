@@ -33,15 +33,19 @@ end
 
 function metadata.map_info(content, string_table, identity)
     assert(string.unpack('<I4', content) == 25, 'Unsupported W3I version; expected this map\'s format 25')
-    local name, author, description, players, next_position = string.unpack('zzzz', content, 13)
-    name = resolve_string(name, string_table)
-    description = resolve_string(description, string_table)
-    assert(name:match('^BvO Another'), 'Unexpected map identity')
-    local display_name = name:gsub(' #%d+[%d%.]*$', '') .. ' ' .. identity.tag
-    assert(not description:find('Release #%d'), 'Use a fresh bvo-build output, not an already stamped map')
-    description = description .. '\r\n\r\nRelease ' .. identity.tag .. ' — ' .. identity.date .. '\r\n' .. identity.url
-    return content:sub(1, 12) .. string.pack('zzzz', display_name, author, description, players)
-        .. content:sub(next_position), display_name
+    local map_name, map_author, map_description, recommended_players, fields_end_position = string.unpack('zzzz', content, 13)
+    map_name = resolve_string(map_name, string_table)
+    map_description = resolve_string(map_description, string_table)
+    local plain_map_name = map_name:gsub('|[cC]%x%x%x%x%x%x%x%x', ''):gsub('|[rR]', '')
+    assert(plain_map_name:match('^BvO Another'), 'Unexpected map identity')
+    local display_name = map_name
+    if not plain_map_name:match('Rossoliny ' .. identity.tag:sub(2):gsub('%.', '%%.') .. '$') then
+        display_name = map_name:gsub(' #%d+[%d%.]*$', '') .. ' ' .. identity.tag
+    end
+    assert(not map_description:find('Release #%d'), 'Use a fresh bvo-build output, not an already stamped map')
+    map_description = map_description .. '\r\n\r\nRelease ' .. identity.tag .. ' — ' .. identity.date .. '\r\n' .. identity.url
+    return content:sub(1, 12) .. string.pack('zzzz', display_name, map_author, map_description, recommended_players)
+        .. content:sub(fields_end_position), display_name
 end
 
 function metadata.script(content, display_name, identity)

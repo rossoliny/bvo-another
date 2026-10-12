@@ -41,7 +41,7 @@ You can directly contact me in Discord if you want:
 * *[Rossoliny#0686](https://discord.com/users/0686)*
 
 # Releases
-#### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231.4)*
+#### *[Latest release](https://github.com/rossoliny/bvo-another/releases/tag/%231.0)*
 #### *[All releases](https://github.com/rossoliny/bvo-another/releases)*
 
 #### Game does not see the map?

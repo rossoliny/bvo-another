@@ -1,279 +1,78 @@
-UNRELEASED CHANGES
-------------------
+RELEASE 1.0 — 12.10.2026
+========================================
 
-Enel:
-- R (Mamaragan): deals 2.5 × INT pure damage through the engine instead of direct HP removal; lethal hits use the same damage instead of a 99,999-damage hit. Shields, blocks and damage reflection react to lightning.
+Consolidated changes compared with original Unryze 1.1a (Map/unryze/BvO_Another_v1_1a.w3x).
+Combines all five previous GitHub release changelogs (#1 through #1.4), the latest EN/RU commit notes and verified current behavior. Superseded changes and repeated entries are omitted.
 
-REBUILD #1.4 — 12.10.2026
------------------------
-Changes compared with the #1.4 maps published on 11.10.2026:
+## Abarai Renji
 
-- Restored missing hero/form, ability, buff and item definitions, including Ichigo's Hollow forms for T levels 2–5 and their descriptions.
-- Restored the missing texture and references to three unnamed resources from original Unryze 1.1a.
-- Corrected the scoreboard icon mapping for Ichigo's Hollow forms.
-- Rebuilt cheat-free EN/RU maps from commit 78c5f28, excluding uncommitted changes. RU still uses the original text.
-- Embedded the updated build date 12.10.2026. The release number and URL remain #1.4; the published tag was not moved.
+- Normal ability cast point reduced from 0.4 to 0.1 seconds.
+- Q — Howl Zabimaru: maximum weapon length increased from 720 to 800; the outer hit boundary reaches 900 instead of 820. Swing direction is fixed at cast time, and visual segments match hit detection. Damage, mana cost and cooldown are preserved.
+- W — Hado #31: Shakkaho: ported the 1.1c mechanics. After 0.4 seconds, an uncancelled preparation order causes one physical hit for 500 + 100 × ability level + 20 × hero level within 300 AoE. Stun increased from 0.1 to 0.5 seconds; self damage and stun apply only when Renji is inside the blast. Changing the preparation order cancels the explosion without a scripted mana refund or cooldown reset. Cost: 175 mana; cooldown: 15 seconds; range: 750.
+- E — Higa Zekko: attacks and abilities recover 1 second after casting instead of 2 seconds after the flight ends. E no longer blocks R, and recovery preserves active R/T restrictions.
+- E projectiles last up to 20 seconds instead of 10 and gain 5% of their initial speed each second. Each flight keeps its own target and projectiles; old flights cannot interfere with later E/Q/R casts. Removed or hidden targets, destroyed projectiles and timeout are cleaned up correctly. Renji or target death alone no longer cancels the flight; projectiles can reach an existing corpse.
+- R — Bankai: Hihio Zabimaru: the extended snake performs a full 360° sweep following 1.1c. Each enemy is hit once, stunned for 1 second and knocked back along the counterclockwise swing. Queued movement is cleared after the sweep.
+- R segments scatter in 1 second instead of 1.8 across a 1500-unit-wide area in front of the cast position, up to 1605.5 units forward. Landing points stay inside the playable map. Segments slow nearby enemies by 50% within 200 AoE; overlapping slows do not stack, and the aura is disabled during T.
+- After the R sweep, free Bankai Dismissal returns the segments and restores attacks, Q and E. It is available during scattering, preserves current actions and is unavailable during T. Its cooldown is 75 seconds. Main R retains 350 mana and a 75-second cooldown; without return, segments expire 6 seconds after scattering.
+- Return, expiration or Renji death before T explodes every remaining segment for 7.5 × current total STR within 200 AoE; overlapping explosion damage stacks. Once T consumes the snake, all subsequent cleanup removes it without explosions, including death or early T completion. Timers and repeated cleanup cannot cause duplicate explosions or affect a later R cast.
+- Updated sweep/explosion effects and sounds and Q/W/E/R/Bankai Dismissal descriptions. T retains the original 1.1a mechanics and descriptions.
 
-UPDATE #1.4 — 11.10.2026, COMPARED WITH RELEASE #1.3
-----------------------------------------------------
+## Kurosaki Ichigo
 
-Ichigo:
-- Hollow Form expiration now preserves the Hollow's paused state. Returning Ichigo can no longer move during a duel, 3v3 or 5v5; external pauses are preserved as well.
-
-Renji:
-- Dying before using T now explodes the remaining R segments instead of removing them without damage. A snake consumed by T still disappears without explosions.
-
-Enel:
-- Mamaragan no longer reacts to the Spell Shield procs used by Darkness Sphere and God's Sphere, preventing repeated lightning from these defensive abilities, including the second upper boss.
-
-Repick:
-- Every created selection marker is added directly to the available hero pool, preventing heroes from randomly becoming unavailable.
-- Fixed hero pool corruption when Nami and Kuma abilities finish. Repick diagnostics are no longer embedded in the map.
-
-Oz arena:
-- All four exits close when the final Oz appears and reopen after his death.
-
-Items and shops:
-- Medals, gold exchange, attribute/health/level books and the +100 bonus are awarded directly and work when purchased during Hex.
-- Purchase and pickup cannot award the same reward twice. Prices and level/+100 restrictions are preserved; medals are refunded when a bonus cannot be granted.
-
-Map:
-- Added #1.4, 11.10.2026 and the release URL to INFO → Latest Version and the map description. The map and lobby names also include the release number.
-- Separate EN and RU assets are provided. No RU translations are available yet, so both maps use the original text.
-- Gameplay cheats and diagnostic commands are excluded from both maps.
-
-CUMULATIVE #1.4 CHANGES COMPARED WITH ORIGINAL UNRYZE 1.1a
-----------------------------------------------------------
-
-Renji:
-- Normal spell cast point reduced from 0.4 to 0.1 seconds.
-- Q: weapon length increased from 720 to 800, with the outer hit boundary increased from 820 to 900. Swing direction is fixed at cast time and visuals match hit detection; damage, mana and cooldown are preserved.
-- W ported from 1.1c: cancellable explosion after 0.4 seconds, one physical hit for 500 + 100 × ability level + 20 × hero level within 300 AoE. Stun increased from 0.1 to 0.5 seconds; self damage only applies inside the blast. Preserves 175 mana, 15-second cooldown and 750 range.
-- E restores attacks and abilities 1 second after casting instead of 2 seconds after the flight ends, and no longer blocks R. Flight lifetime increased from 10 to 20 seconds; speed gains 5% of its initial value each second. Recasts and cleanup are fixed; Renji or target death alone no longer cancels the flight.
-- R performs a 360° sweep using the 1.1c rotation. The sweep stuns for 1 second and knocks enemies back, hitting each enemy once per rotation.
-- Segments scatter in 1 second instead of 1.8, into a 1500-unit-wide area in front of the cast location. They slow enemies by 50% within 200 AoE; overlapping auras do not stack and are disabled during T.
-- Free Bankai Dismissal becomes available after the sweep, including during scattering. It restores attacks, Q and E while preserving current actions, has a 75-second cooldown and is unavailable during T.
-- Return, expiration or death before T explodes each remaining segment for 7.5 × current total STR within 200 AoE; overlapping damage stacks. A snake consumed by T disappears without explosions. Timers, effects, sounds and Q/W/E/R/return descriptions are updated.
-
-Ichigo:
-- Updated Vastolorde descriptions and bonuses and added magic resistance. The base Hollow form has 500 more HP and MP regeneration increased from 50 to 60 per second.
-- Fixed T availability after cooldown, item transfer during transformations and item retention on Hollow death; item cooldowns are no longer reset. Returning to normal form preserves external pauses.
+- T — Vastolorde: keeps the original activation requirement of Bankai and 40% HP or less. Transforming preserves current HP instead of setting Hollow HP to 40% of its maximum. Level 1 bonuses match original 1.1a; levels 2–5 now increase bonuses and add magic resistance. Duration and cooldown remain 16/17/18/19/20 seconds and 150/140/130/120/110 seconds. Descriptions cover all five levels.
+- Fixed T becoming available late after its cooldown. Transformations transfer existing inventory items without resetting their cooldowns; items are retained on Hollow death. Entry and return share safe timer handling, including death during a transition and references to the active hero.
+- Returning from Hollow Form preserves the actual pause and invulnerability state. Ichigo cannot move on the main map while a duel, 3v3, 5v5 or another external pause is active.
 - Added T/R sounds and Hollow Q/W sounds.
 
-Other heroes and audio:
-- Fixed Nami and her cloud being removed by W during Mihawk's T.
-- Added Mihawk and Zangetsu T/R sounds, restored kill streak sounds and concurrent ability audio.
-- Enel's Mamaragan ignores Spell Shield procs from Darkness Sphere and God's Sphere.
+Hollow Form bonuses relative to normal form:
 
-Items:
-- Added Demonic Boots and Moon Armor to Recipe Shop 3 and Demonic Armor to Recipe Shop 5.
-- Fixed Demonic Boots/Armor crafting with a full inventory: only required components are consumed, incomplete recipes are retained and duplicate rewards are prevented. Fixed Demonic Armor's disabled icon.
-- Fixed Zaraki's purchase and receipt of Kuma's Unique Book.
-- Shop rewards work during Hex and are granted once. Prices and restrictions are preserved; rejected bonuses refund medals.
+| Bonus | T1 | T2 | T3 | T4 | T5 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Damage | +300 | +350 | +400 | +450 | +500 |
+| Armor | +30 | +32 | +35 | +37 | +40 |
+| Strength and Agility | +50 | +60 | +70 | +80 | +90 |
+| HP | +500 | +750 | +1000 | +1250 | +1500 |
+| HP regeneration/sec | +75 | +82 | +90 | +97 | +105 |
+| MP regeneration/sec | +50 | +55 | +60 | +65 | +70 |
+| Magic resistance | 0% | 2% | 5% | 7% | 10% |
 
-Hero selection and Oz:
-- Fixed repick hero pool initialization and interaction with Nami and Kuma abilities.
-- The four final-Oz arena exits remain closed until the boss dies.
+## Enel
 
-Scoreboard and INFO:
-- Ported the 1.1c scoreboard: colored K/D/L/GPM, hero icons, team totals, game mode and elapsed time.
-- Deaths count real heroes only, including Ichigo's Hollow once. Statistics stop at victory; fixed startup, empty slots, departed players and Hollow Form display.
-- Purchases do not count as income and enemy GPM is hidden.
-- Restored INFO, added Rossoliny and current release metadata.
+- R — Mamaragan: each lightning strike deals 2.5 × INT pure damage through the engine instead of directly removing HP. Lethal hits use the same damage instead of a 99,999-damage finishing hit. Lightning now generates normal damage events for shields, blocks and damage reflection. This includes the latest source commit eb368c35a72e105b5f1f2aa3944ea8b1aa3ad5b6.
+- Mamaragan ignores Spell Shield procs from Darkness Sphere and God's Sphere, preventing recursive lightning, including on the second upper boss.
 
-Distribution:
-- EN/RU maps are built from common sources without cheats. RU currently uses the original text because translations are not yet available.
+## Other heroes and audio
 
-DEVELOPMENT HISTORY (PRESERVED PREVIOUS UPDATE TEXT)
-----------------------------------------------------
+- Fixed Nami and her cloud being removed by W during Mihawk's T, including after E creates illusions. Removed the debug message when Mihawk's T ends.
+- Added Mihawk and Zangetsu T/R sounds. Restored kill streak sounds and concurrent playback of ability sounds so one effect no longer interrupts another.
 
--------------------------------------------
-UPDATE #1.3 — 11.10.2026, SINCE RELEASE #1.2
--------------------------------------------
+## Items and shops
 
-Ichigo:
-- When Hollow Form expires, Ichigo preserves the Hollow unit's paused state. Ichigo left on the main map can no longer move during a duel, 3v3 or 5v5; pauses from immobilizing abilities are also preserved.
+- Added Demonic Boots and Moon Armor to Recipe Shop 3 and Demonic Armor to Recipe Shop 5. Medal Exchange on the base now also sells medals.
+- Fixed Demonic Boots/Armor crafting with a full inventory: only required components are consumed, incomplete recipes are retained for later assembly, and duplicate rewards are prevented. Fixed the disabled Demonic Armor icon.
+- Zaraki is refunded when attempting to buy Kuma's Unique Book and cannot receive it by pickup or transfer.
+- Medals, gold exchange, attribute/health/level books and the +100 bonus are granted directly and work during Hex. Purchase and pickup cannot grant the same reward twice. Prices and level/+100 restrictions are preserved; medals are refunded when a bonus cannot be granted.
 
-Renji:
-- Normal ability cast point reduced from 0.4 to 0.1 seconds.
-- Q: weapon length increased from 720 to 800, with the outer hit boundary reaching 900. Swing direction is fixed when cast; visual segments match damage checks.
-- W: ported the 1.1c mechanics. The explosion occurs after 0.4 seconds and can be cancelled by changing the preparation order. Damage is a single physical hit; stun lasts 0.5 seconds, and self damage applies only inside the blast radius.
-- E: attacks and abilities recover 1 second after casting. E no longer blocks R. Projectiles last up to 20 seconds and gain 5% of their initial speed every second.
-- E: fixed repeated casts and flight cleanup. Renji's or the target's death alone no longer cancels the flight.
-- R: a full 360-degree rotation following 1.1c, a 1-second stun and knockback along the swing. Queued movement is cleared after the rotation.
-- R: segments scatter in 1 second across a 1500-wide area in front of the cast position and slow enemies by 50% within 200 AoE.
-- R: added free manual return through Bankai Dismissal after the rotation, including during scattering. Return restores attacks, Q and E and preserves current actions; unavailable during T.
-- R: if T has not been used, remaining segments explode on return, expiration or death with the existing damage, effect and sound. Each segment deals 7.5 x current total STR damage within 200 AoE; overlapping explosions stack. Using T prevents this snake's explosions, including target or Renji death and early T completion; repeated cleanup cannot cause duplicate explosions.
-- Fixed R timers and updated Q/W/E/R and Bankai Dismissal effects, sounds and descriptions.
+## Hero selection and Oz arena
 
-Enel:
-- R (Mamaragan): fixed repeated lightning strikes caused by Spell Shield on Darkness Sphere and God's Sphere, including the second top boss. Shield activations no longer trigger R.
+- Fixed repick pool initialization: every selection marker is added directly to the available hero pool. Nami and Kuma ability cleanup no longer corrupts that pool or makes remaining heroes disappear. Repick diagnostics are excluded from the release script.
+- All four Oz arena exits close when the final Oz appears and reopen only after his death, preventing escape through invisible waygates.
 
-Golem/Oz arena:
-- Fixed escaping through invisible waygates after the final Oz spawns. All four exit waygates are disabled until his death, then reopened.
+## Scoreboard and map information
 
-Repick:
-- Fixed all remaining heroes becoming unavailable after repick during Nami or Kuma spell cleanup.
-- Fixed some heroes randomly becoming unavailable after repick: every created selection marker is added directly to the hero pool.
-- Moved repick test diagnostics out of the map script into tests/repick-diagnostics.j.
+- Ported the 1.1c scoreboard with colored K/D/L/GPM columns, hero icons, team totals, game mode and elapsed time. Adjusted column widths to use the available space.
+- Deaths count real heroes only, including Ichigo's Hollow once; illusions and dummy units are excluded. Statistics freeze when the winner is determined, excluding the ending cinematic. Fixed startup, empty slots, departed players and Hollow icons/display.
+- Purchases do not count as income; enemy GPM is hidden.
+- Restored INFO entries and added Rossoliny contacts, GitHub links and release 1.0/date information. Preserved Unryze's credits and contacts. Map/lobby/loading/help/upkeep titles include Rossoliny 1.0, with a green map title and recommended player counts of 4–10 for teams and 3–10 for Selection Off.
+- Added English/Russian startup notices with the changelog link at 30 seconds and the development contact at 50 seconds.
 
-Items:
-- Fixed Demonic Armor and Demonic Boots recipe purchases with a full inventory, duplicate crafting, and preservation of incomplete recipes and components.
-- Restored medal stock at Medal Exchange.
-- Fixed the disabled Demonic Armor icon.
-- Medals, gold exchange, attribute, health and level books, and the +100 bonus are now awarded directly, including purchases under Hex. Purchasing and picking up the same item cannot award its reward twice.
-- Preserved prices and restrictions for the level book and +100 bonus; spent medals are refunded when the bonus cannot be applied.
+## Release distribution
 
-Development cheats:
-- Gameplay cheats require personal activation with -cheats bvo-rossoliny, including single-player games. Only the player who enters the command receives access; gameplay cheats are excluded from release maps.
-- Added -oz <1..11>: removes the current Oz without rewards and spawns the requested stage through the normal spawn logic. Killing it continues the normal sequence with unchanged delays and rewards; the final Oz closes the exits until his death. Replacement cancels the previous pending stage spawn, and invalid input reports an error without changing state. Cheat activation is required; the command is excluded from release maps.
-- Replaced -createitem with -giveitem <rawcode> [number 1–10]. Adds an item directly to the inventory of your own hero or the hero at the specified position in the scoreboard, including enemy bots. Cheat activation is required; invalid codes or numbers, missing heroes and full inventories produce an error without creating an item.
-- Replaced -mana/-nomana with a single -nomana command without arguments: repeated use toggles infinite mana for your own main hero. The setting persists through transformations.
-- Renamed -nc to -nocd. Without arguments, it toggles cooldown resets for your own main hero after casting an ability.
-- Added -oneshot without arguments: toggles the mode for all your units. Positive damage dealt to an enemy triggers bonus damage equal to 100% of the target's maximum HP.
-- Added -event, -event1, -event3 and -event5 without arguments: start normal event preparation without waiting for the timer. -event selects a random available format; the other commands request 1v1, 3v3 and 5v5. Game modes, hero selection and player counts, including bots, are checked; another request during preparation or combat is rejected.
-- Added -refresh without arguments: resets ability and item cooldowns for your own main hero once per command.
+- Fresh EN/RU maps are built from common sources with gameplay cheats, debug commands, cheat globals, timers and damage hooks removed. Restored original definitions and resources, including Hollow forms for T levels 2–5, the missing texture and references to three unnamed original resources.
+- RU uses the base text wherever a translation is missing. No RU profile translations are available yet, so both release maps currently contain the same original texts. Version, date and the exact GitHub release URL are embedded in each map.
 
-Scoreboard and INFO:
-- Ported the 1.1c scoreboard with colored K/D/L/GPM, hero icons, team totals, game mode and elapsed time.
-- Fixed startup display, empty slots, departed players and Ichigo's Hollow Form. Purchases do not count as income; enemy GPM is hidden.
-- Restored INFO text and added Rossoliny to map and interface names.
+## Development tools (excluded from release maps)
 
-Release map:
-- Completely removed the test cheat system from the release script copy, including activation, currency, levels, items, mana, cooldown resets and -oneshot.
-- Built from the current gameplay sources; SLK packaging completed without errors or warnings.
-- File: BvO_Rossoliny1.1a_11.10.2026.w3x.
-
-The cumulative development changes below include test features that are absent from the release map.
-
-----
-BUGS
-----
-Fixed: Ichigo's T forcing to wait extra time even after cooldown is finished. Now Activates properly.
-Fixed: Kill streak sound effects now play.
-Fixed: Zaraki no longer spents gold when tries to buy Kuma's Unique Book.
-Fixed: Now it is not possible to put/drop Kuma's Unique Book into Zaraki.
-Fixed: Ability sound effects are now multi channel so no longer one sound effect interrupts others.
-Fixed: Ichigo's True Hollow Form no longer resreshes item cooldowns.
-Fixed: Ichigo's items no longer disappear when he dies in Hollow Form.
-Fixed: Nami and her cloud are no longer removed when W is used during Mihawk's T.
-
-------------
-HERO CHANGES
-------------
-
-_____
-Renji
-	[General]
-		Changes relative to the original Unryze 1.1a:
-		Spell cast point reduced from 0.4 to 0.1 seconds, 25% of the original value. Normal abilities begin taking effect sooner.
-
-	[Q]
-		Changes relative to the original Unryze 1.1a:
-		Maximum weapon length increased from 720 to 800. The hit radius around each segment remains 100; at full extension the outer hit boundary reaches 900 instead of 820, providing a 100-range margin beyond the farthest selected point.
-		The swing direction is fixed toward the selected point when cast. Visual segments and damage checks use the same coordinates. Damage, mana cost and cooldown are preserved.
-
-	[W]
-		Changes relative to the original Unryze 1.1a:
-		Hado #31: Shakkaho is ported from Unryze 1.1c: Channel replaces Flame Strike; a per-cast timer explodes after 0.4 seconds only if the preparation order is still active.
-		Damage is one physical hit instead of the original War Stomp and separate hero-level hit. The formula remains (500 + 100 x ability level + 20 x hero level), radius 300, mana cost 175, cooldown 15 seconds and cast range 750.
-		Stun increases from 0.1 to 0.5 seconds. Self damage and stun apply only when Renji himself is within the explosion radius; another friendly hero near the blast no longer causes remote self damage.
-		Cancellation follows 1.1c: changing the preparation order prevents the explosion, without a scripted cooldown reset or mana refund. The old projectile/finish handlers are removed and the bot order is updated.
-
-	[E]
-		Changes relative to the original Unryze 1.1a:
-		E restrictions on attacks and abilities end 1 second after casting, regardless of a hit or flight cancellation. In the original, recovery occurred 2 seconds after E ended.
-		Maximum projectile lifetime increased from 10 to 20 seconds.
-		Instead of constant pursuit speed, projectiles gain 5% of their initial speed every second: +50% after 10 seconds, +100% after 20 seconds.
-		Each E flight stores its own target and projectiles. An old flight does not affect subsequent E, Q or R casts; an unreachable target ends the flight at the time limit, while removed or hidden targets and dead or removed projectiles trigger cleanup.
-		Unlike the original, target death alone no longer cancels E: projectiles can reach an existing corpse and play the normal impact effect.
-
-		Renji's death no longer cancels E: projectiles keep pursuing the target until impact or the 20-second limit. Fully removing the hero still ends the flight.
-		Unlike the original, E does not block R, including the first second after casting. E recovery does not cancel active R/T restrictions.
-
-	[R]
-		Changes relative to the original Unryze 1.1a:
-		Rotation follows 1.1c: the fully extended snake starts in front of Renji, turns 360 degrees in 10-degree steps every 0.03 seconds, and finishes at the original facing. The current 19 segments and tapered tail are retained for compatibility with T.
-		Queued movement is cleared once immediately before control returns after the rotation; manual Bankai Dismissal continues preserving current actions.
-		Segments then land across a 1500-unit-wide area in front of the cast position, up to 1.3 snake lengths (1605.5 units) forward. Shuffled width slots and depth variation prevent a straight-line layout. Airborne scatter is shortened from the original 1.8 seconds to 1 second; landing points are clipped at the playable map border.
-		As soon as the initial rotation ends and Renji can move again, pressing R returns the segments for free, including during their flight, and ends R restrictions on attacks, Q and E. Bankai Dismissal has a 75-second cooldown, matching the main R, with no initial delay before it becomes available.
-		Manual return does not stop movement or interrupt the hero's current actions.
-		The main R retains its 350 mana cost and 75-second cooldown from the first cast. Without manual return, segments disappear 6 seconds after scattering, as in the original.
-		Manual return is unavailable during T; segments are removed normally after T. Returning, dying or starting T cancels the old R timer, preventing it from affecting a new R after a cooldown reset.
-
-		Initial sweep hits use the WarStomp effect and sound from Ikkaku's Final Madness, including lethal hits. The shared Stampede hit effect is silent for this sweep; its visuals are preserved.
-		Enemies hit by the initial rotation are now stunned for 1 second and pushed along the counterclockwise sweep. Knockback uses Sanji Q settings: 12 units every 0.03 seconds, two 0.2-second waits, the same allowed map regions, pathing and tree-clearing behavior. Each enemy is hit once per rotation.
-		After scattering, segments slow enemy movement by 50% within 200 AoE. Overlapping segment auras do not stack, and the aura is disabled during T.
-		On manual return or automatic expiration, every segment explodes within 200 AoE for 7.5 x current total STR damage. Overlapping explosions stack. Renji's death also explodes remaining segments if T has not been used. After T is used, segments always disappear without explosions, including target or Renji death and early T completion, as in the original. Uses a red ChaosExplosion effect per exploding segment and the explosion sound from Renji's Higa Zekko once for the whole cleanup. Repeated cleanup cannot cause duplicate explosions.
-
-	[Descriptions]
-		W: original 1.1c learn and normal descriptions are restored on all levels, with the project signature appended.
-		Q: original 1.1a text with range 800; cast timing is omitted from the tooltip.
-		E: shortened original text with correct Strength scaling, 250 mana and recovery after 1 second; flight details are omitted.
-		R: original 1.1a text with a 1-second stun, knockback and 50% slow near the segments. The return button is named Bankai Dismissal and lists damage per segment, radius and a 75-second cooldown.
-		References to other abilities use their names: Howl Zabimaru, Higa Zekko and Hikotsu Taiho.
-		T: mechanics and descriptions match the original 1.1a; the signature is removed.
-
-_______________
-Kurosaki Ichigo
-	[T]
-		Requires 40% HP or less. Transforming preserves Ichigo's current HP. Level 1 Hollow Form bonuses match the original; bonus growth per level is halved, with fractional values rounded down. Added magic resistance bonus.
-
-		New bonuses:
-		+300/350/400/450/500 damage.
-		+30/32/35/37/40 armor.
-		+50/60/70/80/90 Strength and Agility.
-		+500/750/1000/1250/1500 HP.
-		+75/82/90/97/105 HP/sec regen.
-		+50/55/60/65/70 MP/sec regen.
-		+0/2/5/7/10% magic resistance.
-		Grants maximum movement speed.
-
-	Added sound effects for T and R.
-	Added sound effects for Hollow Form's Q and W. 
-
-_________________
-Juraquille Mihawk
-
-	Added sound effects for T and R.
-
-________
-Zangetsu
-
-	Added sound effects for T and R.
-
-------------
-ITEM CHANGES
-------------
-
-Medal Exchange now sells medals.
-Added new item Demonic Boots to Recipe Shop 3.
-Added new item Demonic Armor to Recipe Shop 5.
-Added new item Moon Armor to Recipe Shop 3.
-
-----------
-SCOREBOARD
-----------
-
-Added a death counter to the player scoreboard. Kill and death columns are labeled K and D.
-Only real hero deaths count, including Ichigo's Hollow Form death once. Illusion and dummy unit deaths are excluded.
-Statistics stop changing when the winner is determined; deaths during the ending cinematic do not affect match results.
-
--------------
-TEST COMMANDS
--------------
-
-Gameplay cheats require personal activation with -cheats bvo-rossoliny, including single-player games. Only the activating player receives access. These commands are excluded from release maps.
--level <1..99> sets your own main hero's level, including lowering it. Example: -level 25.
--giveitem <rawcode> [number 1–10] adds an item directly to your own hero's inventory when no number is provided, or to the hero at the specified position in the scoreboard, including enemy bots. Examples: -giveitem bspd, -giveitem bspd 6. Invalid codes or numbers, missing heroes and full inventories do not create an item.
--gold <1..100000000> and -lumber <1..100000000> add gold or medals only to the player who entered the command. Examples: -gold 10000, -lumber 1000. Number format and overflow are checked.
--nomana without arguments toggles mana restoration for your own main hero every 0.1 seconds and after casting an ability. The setting persists through transformations. -mana is no longer used.
--nocd without arguments toggles cooldown resets for your own main hero after casting an ability. This replaces the former -nc command.
--oneshot without arguments toggles the mode for all your units: positive damage dealt to an enemy triggers bonus damage equal to 100% of the target's maximum HP.
-For -nomana, -nocd and -oneshot, the first use enables the mode and the next use disables it.
--refresh without arguments resets ability and item cooldowns for your own main hero once per command.
--event without arguments starts preparation for a random available event without waiting for the timer. -event1, -event3 and -event5 request 1v1, 3v3 and 5v5. Fixed formats require at least 1, 3 or 5 players per team; bots count. Requests are rejected before the game starts, while hero selection is incomplete, when the format is disabled, when there are too few players, or during preparation or combat.
--oz <1..11> replaces the current Oz with the requested stage without rewards for the removed unit. Killing it continues the normal sequence; the final Oz closes the exits until his death. Example: -oz 11. The command is unavailable before hero selection ends and in No Waygates mode.
-Every cheat use displays a map system notification to all players for 10 seconds: a colored [ЧИТЫ] prefix, player name, command, parameters and result. Activation is also announced, with the activation code hidden from the notification.
-Separate diagnostic commands and their launch conditions are documented in cheats/README.md.
+- Development gameplay cheats require personal activation, including single-player games, and announce use to all players for 10 seconds while hiding the activation code. Current commands: -level (1–99), -giveitem (rawcode and optional scoreboard hero number 1–10), -gold/-lumber (1–100000000), -nomana, -nocd, -oneshot, -refresh, -event/-event1/-event3/-event5 and -oz (1–11).
+- Mana/cooldown/one-shot modes toggle on repeated use; mana settings survive transformations. Item and currency inputs are validated. Event commands enforce normal game mode, hero selection, player count and event state checks; Oz replacement preserves the normal boss sequence and removes the replaced boss without rewards. Diagnostics are kept outside the release script.
 
