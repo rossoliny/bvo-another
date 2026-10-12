@@ -21,6 +21,8 @@
 - When writing new code, use clear, descriptive, human-readable names for variables, functions, parameters, and other identifiers.
 - When editing existing code with unclear names, rename the identifiers in the code being edited to make their purpose understandable, and update every affected reference.
 - Do not rename identifiers when only reading, studying, or analyzing code.
+- Treat naming as a mandatory acceptance criterion for every code change, including small fixes and diagnostic code. Apply these rules without a separate user reminder; keeping the diff small is not an exception.
+- Before reporting a code change complete, review the task-owned diff for unclear identifiers in the code being edited, and verify that every required rename updates all affected references. Resolve naming omissions before reporting completion.
 
 ## Code explanations
 
