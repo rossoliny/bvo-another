@@ -1,0 +1,36 @@
+
+
+[TALT]
+Name=An Altar
+DependencyOr=halt,oalt,eate,uaod
+
+[TWN1]
+Name=Town Hall or Great Hall or Tree of Life or Necropolis
+DependencyOr=htow,ogre,etol,unpl
+XPFactor=0
+
+[TWN2]
+Name=Keep or Stronghold or Tree of Ages or Halls of the Dead
+DependencyOr=hkee,ostr,etoa,unp1
+XPFactor=0
+
+[TWN3]
+Name=Castle or Fortress or Tree of Eternity or Black Citadel
+DependencyOr=hcas,ofrt,etoe,unp2
+XPFactor=0
+
+[pinv]
+Name=Potion of Invisibility
+Hotkey=I
+Tip=Purchase Potion of |cffffcc00I|rnvisibility
+Ubertip="|cff87ceebNon-Combat Consumable|r|nRenders the Hero invisible for <AIv1,Dur1> seconds when used. An invisible Hero is untargetable by the enemy unless detected. If the Hero attacks, uses an ability, or casts a spell, the invisibility effect is lost."
+Description=Renders Hero temporarily invisible.
+Art=ReplaceableTextures\CommandButtons\BTNLesserInvisibility.blp
+
+[spro]
+Name=Scroll of Protection
+Hotkey=R
+Tip=Purchase Scroll of P|cffffcc00r|rotection
+Ubertip="Increases the armor of all friendly units in an area around your Hero by <AIda,DataA1> for <AIda,Dur1> seconds."
+Description=Temporarily increases the armor of nearby units.
+Art=ReplaceableTextures\CommandButtons\BTNScroll.blp

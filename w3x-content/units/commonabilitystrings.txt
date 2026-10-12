@@ -54,7 +54,7 @@ Spelldetail=2
 [B007]
 Buffart=ReplaceableTextures\CommandButtons\BTNRobinQ.blp
 Bufftip=Robin cast
-Buffubertip= 
+Buffubertip=
 
 [B009]
 Buffart=ReplaceableTextures\CommandButtons\BTNFrost.blp
@@ -65,7 +65,7 @@ TargetArt=Abilities\Spells\Other\FrostDamage\FrostDamage.mdl
 [B00A]
 Buffart=ReplaceableTextures\CommandButtons\BTNRegeneration.blp
 Bufftip=Restore Aura
-Buffubertip= 
+Buffubertip=
 TargetArt=Abilities\Spells\NightElf\Rejuvenation\RejuvenationTarget.mdl
 Targetattach=chest
 
@@ -280,7 +280,7 @@ Targetattachcount=2
 [B018]
 Buffart=ReplaceableTextures\CommandButtons\BTNUsoppVFirst.blp
 Bufftip=Absorb Damage
-Buffubertip= 
+Buffubertip=
 
 [B019]
 Buffart=ReplaceableTextures\CommandButtons\BTNPurge.blp
@@ -386,7 +386,7 @@ Spelldetail=2
 [B01Q]
 Buffart=ReplaceableTextures\PassiveButtons\PASBTNMoriasive.blp
 Bufftip=AS and MS bonus
-Buffubertip= 
+Buffubertip=
 TargetArt=Abilities\Weapons\AvengerMissile\AvengerMissile.mdl
 Targetattach=hand,right
 Targetattach1=hand,left
@@ -495,7 +495,7 @@ TargetArt=Abilities\Spells\Other\Tornado\Tornado_Target.mdl
 [B026]
 Buffart=ReplaceableTextures\CommandButtons\BTNMoriaT.blp
 Bufftip=Damage Bonus
-Buffubertip= 
+Buffubertip=
 Spelldetail=2
 
 [B027]
@@ -506,7 +506,7 @@ Buffubertip=This unit is under the effects of Senkei; it has an increased moveme
 [B028]
 Buffart=ReplaceableTextures\CommandButtons\BTNByakuyaW.blp
 Bufftip=Rikujo Koro
-Buffubertip= 
+Buffubertip=
 Spelldetail=2
 
 [B029]
@@ -1784,3 +1784,83 @@ Bufftip=Hihio Zabimaru
 Buffubertip=This unit is near a scattered Hihio Zabimaru segment; its movement speed is reduced by 50%.
 TargetArt=
 Spelldetail=0
+
+[B013]
+Spelldetail=2
+Buffart=ReplaceableTextures\PassiveButtons\PASBTNSlowPoison.blp
+Targetart=Abilities\Spells\Human\slow\slowtarget.mdl
+Bufftip=Slick Bullet
+Buffubertip=This unit was hit by Slick Bullet; its movement speed and attack rate have been reduced.
+EditorSuffix= (Stacking)
+
+[B005]
+Spelldetail=2
+Buffart=ReplaceableTextures\CommandButtons\BTNSlowPoison.blp
+Targetart=Abilities\Spells\Human\slow\slowtarget.mdl
+Bufftip=Slick Bullet
+Buffubertip=This unit was hit by Slick Bullet; its movement speed and attack rate have been reduced.
+EditorSuffix= (Non-stacking)
+
+[B008]
+Buffart=ReplaceableTextures\CommandButtons\BTNSlow.blp
+Targetart=Abilities\Spells\Human\slow\slowtarget.mdl
+Targetattach=origin
+Bufftip=Hissatsu - Tokuyou-abura boshi
+Buffubertip=This unit was hit by a Tokuyou-abura boshi; it has reduced movement speed and a chance to miss on attacks.
+
+[B00E]
+Spelldetail=2
+Buffart=ReplaceableTextures\CommandButtons\BTNIchigoW.blp
+Targetart=
+Targetattach=
+Bufftip=Reiatsu Overflow
+Buffubertip=Ichigo has a monstrous reiatsu.
+
+[B00I]
+Spelldetail=2
+Buffart=ReplaceableTextures\CommandButtons\BTNManaFlare.blp
+Targetart=
+Targetattach=
+Bufftip=Thunder Shock
+Buffubertip=Nami has 10% chance on an attack to purge the enemy.
+
+[B01K]
+Targetart=
+Specialart=Environment\LargeBuildingFire\LargeBuildingFire1.mdl
+Specialattach=origin
+EditorName=Fire Radiance
+EditorSuffix= (Neutral Hostile 1)
+
+[B02L]
+Spelldetail=2
+Buffart=ReplaceableTextures\CommandButtons\BTNGuldanSkull.blp
+Targetart=
+Targetattach=origin
+Bufftip=Siphon Mana
+Buffubertip=Removes mana regeneration from a hero.
+
+[B02M]
+Buffart=ReplaceableTextures\CommandButtons\BTNSilence.blp
+Targetart=Abilities\Spells\Other\Silence\SilenceTarget.mdl
+Targetattach=overhead
+Bufftip=Silence
+Buffubertip=This target is silenced, unable to cast spells.
+
+[B01Y]
+Spelldetail=2
+Buffart=ReplaceableTextures\CommandButtons\BTNDoom.blp
+Targetart=
+Targetattachcount=0
+Targetattach=
+Targetattach1=
+Bufftip=Armor and HP regen bonus
+Buffubertip=
+
+[B00Z]
+Spelldetail=0
+Buffart=ReplaceableTextures\CommandButtons\BTNSlow.blp
+Targetart=Abilities\Spells\Orc\StasisTrap\StasisTotemTarget.mdl
+Bufftip=Slowed
+Buffubertip="This unit is slowed; its movement speed and attack rate are reduced."
+Targetattach=overhead
+Targetattachcount=1

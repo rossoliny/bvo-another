@@ -2198,7 +2198,7 @@ function Scoreboard_SetStyle takes integer column, integer row, boolean showValu
 endfunction
 
 function Scoreboard_GetHeroIcon takes integer heroTypeId returns string
-    if heroTypeId == 'H01F' or heroTypeId == 'H01G' or heroTypeId == 'H01H' or heroTypeId == 'H01I' or heroTypeId == 'H01J' then
+    if heroTypeId == 'H01F' or heroTypeId == 'H02A' or heroTypeId == 'H02B' or heroTypeId == 'H02C' or heroTypeId == 'H02D' then
         return "ReplaceableTextures\\CommandButtons\\BTNichi.blp"
     endif
     if(((heroTypeId=='U009')))then

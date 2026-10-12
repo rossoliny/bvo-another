@@ -1,0 +1,73 @@
+
+
+[Aimp]
+Name=Vorpal Blades
+Tip=Vorpal Blades
+Ubertip="Permits the glaives launched by the Glaive Thrower to strike through initial ground targets and damage those behind. Also allows the Glaive Thrower to attack trees."
+Requires=Repb
+Art=ReplaceableTextures\PassiveButtons\PASBTNVorpalBlades.blp
+Buttonpos=0,2
+
+[HERO]
+Name=A Hero
+DependencyOr=Hamg,Hblm,Hmkg,Hpal,Obla,Ofar,Oshd,Otch,Edem,Ekee,Emoo,Ewar,Ucrl,Udea,Udre,Ulic,Npbm,Nbrn,Nngs,Nplh,Nbst
+
+[nmdm]
+Name=Medivh
+EditorSuffix= (Raven Form)
+Art=ReplaceableTextures\CommandButtons\BTNRavenForm.blp
+Missileart=Abilities\Weapons\DruidoftheTalonMissile\DruidoftheTalonMissile.mdl
+Missilearc=0.15
+Missilespeed=900
+MissileHoming=1
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+Attachmentlinkprops=alternate
+Animprops=alternateex
+Boneprops=alternate
+
+[nmed]
+Name=Medivh
+Art=ReplaceableTextures\CommandButtons\BTNMedivh.blp
+Missileart=Abilities\Weapons\DruidoftheTalonMissile\DruidoftheTalonMissile.mdl
+Missilearc=0.15
+Missilespeed=900
+MissileHoming=1
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+
+[nws2]
+Art=ReplaceableTextures\CommandButtons\BTNDragonHawk.blp
+Buttonpos=1,0
+Missileart=Abilities\Weapons\DragonHawkMissile\DragonHawkMissile.mdl
+Missilearc=0.15
+Missilespeed=1100
+MissileHoming=1
+Attachmentanimprops=medium
+
+[oang]
+Name=Ancestral Guardian
+Art=ReplaceableTextures\CommandButtons\BTNGuardianWard.blp
+Missileart=Abilities\Weapons\AncestralGuardianMissile\AncestralGuardianMissile.mdl
+Missilearc=0.15
+Missilespeed=1200
+MissileHoming=1
+
+[orbr]
+Name=Reinforced Orc Burrow
+Hotkey=O
+Tip=Build Reinforced |cffffcc00O|rrc Burrow
+Ubertip="Provides food, which increases the maximum number of units that can be trained. Peons can garrison inside to attack enemy units. |n|n|cffffcc00Attacks land and air units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNReinforcedBurrows.blp
+Buttonpos=0,1
+Missileart=abilities\weapons\huntermissile\huntermissile.mdl
+Missilearc=0.15
+Missilespeed=1200
+Specialart=Objects\Spawnmodels\Human\HCancelDeath\HCancelDeath.mdl
+
+[uskm]
+Name=Skeletal Mage
+Tip=Summon Skeletal Mage
+Art=ReplaceableTextures\CommandButtons\BTNSkeletonMage.blp
+Missileart=Abilities\Weapons\SkeletalMageMissile\SkeletalMageMissile.mdl
+Missilearc=0.00
+Missilespeed=900
+MissileHoming=1

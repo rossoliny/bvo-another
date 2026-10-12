@@ -60,6 +60,9 @@ table.insert(arg, 1, 'pack')
 local succeeded, failure = xpcall(function()
     require('backend.cli.pack')()
     if build_failed then return end
+    local preserve_original_hashes = assert(loadfile(
+        (filesystem.path(arg[0]):parent_path() / 'preserve-original-hashes.lua'):string()))()
+    preserve_original_hashes(output_map_path)
     local archive = assert(require('ffi.stormlib').open(output_map_path, true))
     for filename, expected_content in pairs(file_overrides) do
         assert(archive:load_file(filename:gsub('/', '\\')) == expected_content,

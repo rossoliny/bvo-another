@@ -5144,3 +5144,150 @@ Specialart=Objects\Spawnmodels\Undead\UCancelDeath\UCancelDeath.mdl
 Tip=Summon |cffffcc00Z|riggurat
 Ubertip="Provides food, which increases the maximum number of units that can be trained. Can be upgraded to a defensive structure that attacks land and air units."
 Upgrade=uzg1,uzg2
+
+[nC04]
+Name=Item Shop
+Tip=Build Goblin Merchant
+Description=Sells various magic items.
+Art=ReplaceableTextures\CommandButtons\BTNMerchant.blp
+Sellitems=shea,spro,pinv,texp
+
+[h01G]
+Name=Ice Nova
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNFootman.blp
+Buttonpos=0,0
+Specialart=
+
+[h01H]
+Name=Kenpachi Kendo Dummy
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNFootman.blp
+Buttonpos=0,0
+Specialart=Abilities\Spells\Orc\MirrorImage\MirrorImageCaster.mdl
+
+[h01I]
+Name=Licht Missile
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNFootman.blp
+Buttonpos=0,0
+Specialart=
+
+[h01J]
+Name=Flash Arrow Missile
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNFootman.blp
+Buttonpos=0,0
+Specialart=
+Missilearc=0.15
+Missileart=abilities\weapons\DemolisherMissile\DemolisherMissile.mdl
+Missilespeed=1200
+
+[N00N]
+Name=6th Espada
+Hotkey=G
+Propernames=Grimmjow Jaguarjack
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+Ubertip="......i am the king!"|n|n|c00ff0303Strength|r - 30 + 3.25|n|c000042ffAgility|r - 40 + 3.25|n|c000042ffIntelligence|r - 20 + 2.5|n|n|cffffcc00Learns:|r|nCero|nWild Strikes|nResurreccion - Pantera|nSonic Roar|nDesgarron|n|n|cffffcc00Default Ability:|r|nSonido|n|nAttack range of 100 (melee).|nMovement speed of 290.
+Art=ReplaceableTextures\CommandButtons\BTNgrimmjow.blp
+Specialart=Objects\Spawnmodels\Undead\UndeadLargeDeathExplode\UndeadLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNgrimmjow.blp
+Tip=|cffffcc00G|rrimmjow Jaguarjack
+Buttonpos=2
+
+[N00P]
+Name=6th Espada
+Hotkey=G
+Propernames=Grimmjow Jaguarjack
+Revivetip=Revive |cffffcc00B|rlademaster
+Awakentip=Revive |cffffcc00B|rlademaster
+Ubertip="......i am the king!"|n|n|c00ff0303Strength|r - 30 + 3.25|n|c000042ffAgility|r - 40 + 3.25|n|c000042ffIntelligence|r - 20 + 2.5|n|n|cffffcc00Learns:|r|nCero|nWild Strikes|nResurreccion - Pantera|nSonic Roar|nDesgarron|n|n|cffffcc00Default Ability:|r|nSonido|n|nAttack range of 100 (melee).|nMovement speed of 290.
+Art=ReplaceableTextures\CommandButtons\BTNgrimmjow.blp
+Specialart=Objects\Spawnmodels\Undead\UndeadLargeDeathExplode\UndeadLargeDeathExplode.mdl
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNgrimmjow.blp
+Tip=|cffffcc00G|rrimmjow Jaguarjack
+Buttonpos=2,2
+
+[h01Z]
+Name=Sand Tornado
+Hotkey=F
+Tip=Train |cffffcc00F|rootman
+Ubertip="Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r"
+Art=ReplaceableTextures\CommandButtons\BTNFootman.blp
+Buttonpos=0,0
+Specialart=
+
+[H02A]
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Awakentip=Revive Pa|cffffcc00l|radin
+Hotkey=L
+Missilespeed=1500,1500
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Revivetip=Revive Pa|cffffcc00l|radin
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+
+[H02B]
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Awakentip=Revive Pa|cffffcc00l|radin
+Hotkey=L
+Missilespeed=1500,1500
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Revivetip=Revive Pa|cffffcc00l|radin
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl,Abilities\Spells\Orc\MirrorImage\MirrorImageCaster.mdl
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+
+[H02C]
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Awakentip=Revive Pa|cffffcc00l|radin
+Hotkey=L
+Missilespeed=1500,1500
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Revivetip=Revive Pa|cffffcc00l|radin
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"
+
+[H02D]
+Art=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Awakentip=Revive Pa|cffffcc00l|radin
+Hotkey=L
+Missilearc=0.15
+Missileart=abilities\weapons\DemolisherMissile\DemolisherMissile.mdl
+Missilespeed=1200
+Name=Substitute Shinigami
+Propernames=Kurosaki Ichigo
+Requires1=hkee
+Requires2=hcas
+Requirescount=3
+Revivetip=Revive Pa|cffffcc00l|radin
+ScoreScreenIcon=ReplaceableTextures\CommandButtons\BTNIchigoT.blp
+Specialart=Objects\Spawnmodels\Human\HumanLargeDeathExplode\HumanLargeDeathExplode.mdl
+Tip=Summon Pa|cffffcc00l|radin
+Ubertip="Warrior Hero, exceptional at defense and augmenting nearby friendly troops. Can learn Holy Light, Divine Shield, Devotion Aura and Resurrection. |n|n|cffffcc00Attacks land units.|r"

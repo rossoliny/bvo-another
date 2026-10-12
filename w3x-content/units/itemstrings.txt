@@ -2555,3 +2555,402 @@ Description=|cffffcc00Gives:|r|n+75 movement speed|n+30% attack speed|n+10 all s
 Name=Demonic Boots (recipe)
 Tip=Demonic Boots
 Ubertip=|cffffcc00Gives:|r|n+75 movement speed|n+30% attack speed|n+10 all stats|n|cffffcc00Requires:|r|nShihoin's Boots|n|n|cffff0000Movement Speed does not stack with Boots of Speed or Shihoin's Boots|r
+
+[I050]
+Name=Alleria's Sacred Sight
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Alleria's sacred weapon. Increases base ranged damage by 30%, attack damage by +50, and agility by +30.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I060]
+Name=Shihouin's Claws
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A pair of claws that used by Shihouin Clan. Adds +16 agility, +10% attack speed and +10% movement speed."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I051]
+Name=Shiva's Guard (recipe)
+Hotkey=
+Tip=""
+Ubertip=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Description=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Art=ReplaceableTextures\CommandButtons\BTNSnazzyScrollPurple.blp
+
+[I061]
+Name=Shihouin's Shuriken
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A shuriken often used by Shihouin Clan. Gives +3 to all attributes, and an additional +3 to agility."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I062]
+Name=Silver Helm
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The helm that once protected the legendary Paladin from famous tale. Gives +15 armor, +50 damage, 20% magic resistance, and 28% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I053]
+Name=|cffffcc00Zanbatou|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Zanbatou once wielded by The Master Samurai from the Eastern Country. Grants the power to destroy everything. Gives +18 mana bonus when attacking, 20 hit points regenerated per second, +700 damage, and 50% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I063]
+Name=Sorcerer's Sceptre (Basic)
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="|cffffcc00Gives:|r|n+50 Intelligence|n+500 HP|n+500 Mana|nImproves ultimates of Inoue Orihime, Enel, Nami, Nico Robin and Kuma.|n|cffffcc00Requires:|r|nMystic Staff|nSoul Booster (level 2 shop)"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I064]
+Name=Soukyoku
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A very strong zanpakutou equivalent to one million zanpakutou combined. Gives +100 damage and a 20% Critical Strike for 2.2x damage.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I065]
+Name=Soul Booster
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The crystalized Soul of an ancient dragon. Gives 500 hit points, 500 mana, increases mana bonus by 2 when attacking and 2 hp regeneration.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I066]
+Name=Soul-devourer Stones
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A stones that has been imbued time and time again. Gives +20 Intelligence, +40 damage, and Soul Wrath ability (Bounces up to 11 times, dealing 400 base damage on the primary target. Each jump deals 25% MORE damage).|n|n|cffc3dbffCooldown:|r 60 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I067]
+Name=Spirit Talisman
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A small gemstone that countains minor spiritual power. Gives +3 to all attributes and an additional +3 to intelligence.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I058]
+Name=Darkness Sphere
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Description="This magical sphere used to absorb or negate the magical force. Gives +15 All stats, 6HP/Sec, Increases mana bonus by 9 when attacking.|n|n|cffc3dbffCooldown:|r 20 seconds.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I068]
+Name=Suzumebachi
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A shikai form zanpakutou from one of Shinigami's Captain. Adds 35 damage and has a 10% Critical Strike for 1.75x damage.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I069]
+Name=The Butterfly
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Butterfly is a blade that was magically created for use in the Defense of the Ancients, grants its bearer +30 Agility, 30 damage, +30% increased attack speed, and 30% Evasion."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06A]
+Name=The Red Butterfly
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The Red Butterfly is a blade that once used by the most feared assassin, the blood from his victims makes the weapon stronger and become more stronger than its mate, the green one. It grants its bearer +50 Agility, 100 damage, +85% increased attack speed, and 40% Evasion."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I07A]
+Name=Arrancar's Horn
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Powerful horn of the Arrancar. Gives 33% life steal, +25 Strength, +10 armor, and +75 damage.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06B]
+Name=Totem of Might
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Sven's sacred symbol. Increases base melee damage by 30%, and attack damage by +100.|n|n|cffff0000Damage bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06C]
+Name=Urahara's Offering
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An eerie mask that is haunted with the malice of a fallen Arrancar. Grants a +16% Lifesteal Aura (melee), +4 Armor Aura, and +1.5 Mana Regen Aura."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I07C]
+Name=Gem of True Seeing
+Hotkey=T
+Tip=Purchase Gem of |cffffcc00T|rrue Seeing
+Ubertip="A crystal that grants the hero true sight, which reveals nearby invisible units.|n|n|cffff0000Drops upon death|r"
+Description="A crystal that grants the hero true sight, which reveals nearby invisible units.|n|n|cffff0000Drops upon death|r"
+Art=ReplaceableTextures\CommandButtons\BTNGem.blp
+
+[I06D]
+Name=Windrunner
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A very light material, it holds the power of legendary wind walker. Gives +35 Agility and Wind Walk ability (invisible for lasts 7 seconds).|n|n|cffc3dbffCooldown:|r 20 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I07D]
+Name=Orb of Frost
+Hotkey=R
+Tip=Purchase Orb of F|cffffcc00r|rost
+Ubertip=Adds frost attack to the bearer. Also give 40% chance to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Description=Adds frost attack to the bearer. Also give 40% chance to cast Frost Nova.|n|n|cffff0000Orb effects do not stack|r|n|cffc3dbffBuff placers do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNOrbOfFrost.blp
+
+[I06E]
+Name=|c000042ffFrostmourne|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=The Ice-based Sword.|n|n|cffff0000Orb effects do not stack|r
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05F]
+Name=Diffusal Lance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Lance capable of draining the target's spirit. Gives +20 to agility, +10 to intelligence, and Mana Break ability (burn 35 mana per hit).|nIllusions can't do Mana Break.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05G]
+Name=Drake's Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An axe that used by Drake, Captain of Drake Pirates. Gives +16 to strength, +10 damage, and has a 10% chance on hit to maim the target, reducing speed.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06G]
+Name=|c00ff0303God's Sphere|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Sphere of unknown substance. Grants the power of God. Gives +999 mana bonus when attacking, +250 to All Stats, Permanent Invisibility, and Unlimited Spell Shield."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05H]
+Name=Frozen Hollow Mask
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A frozen mask of Hollow that holds an incredible power. Adds 25 to all stats, 500 life, 500 mana and grants Frost Attack.|n|n|cffff0000Orb effects do not stack (melee)|r|n|cffc3dbffBuff placers do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06H]
+Name=|c00fffc01Ultima Sword|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Considered the most powerful weapon in the world. Gives +350 damage and a 20% Critical Strike for 3x damage, 20% chance to deal 400 bonus damage, 16% Evasion, and a black burning effect that damages nearby units for 250 damage a second."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05I]
+Name=Heart of the Bountou
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Preserved heart of an extinct creature. Bolsters the bearer's fortitude. Adds 35 strength, 300 hit points, and regenerates 20 hit points per second."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05J]
+Name=Helm of the Life Stealer
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The powerful headpiece of a dead lifestealer. Gives +5 armor, +20 damage, and 13% life steal.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I06J]
+Name=|cffffcc00Hell Crusher|r
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="It crushes not only skull, but also Hell! Grants +120 damage, +25 Strength, and a 9% chance on an attack to deal 750 bonus damage and stun an opponent for 2 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05K]
+Name=Hollow Shield
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="The discarded mantlet of one of Pseudo-Arrancar, Hollow Shield defends its wielder from even the most vicious of attacks with ease. Gives +300 hit points, 5 hit points regenerated per second and 65% chance to block 60 damage."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I04L]
+Name=Shiva's Guard
+Tip=Purchase Shiva's Guard
+Ubertip="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Description="Skin of the fallen Goddess of Ice. Gives +60 Intelligence, +12 armor and -20% MS aura. When used, emits a omnidirectional |nice blast, slowing enemies by 40% for 4 seconds and dealing (2500 + (25x INT)) ice damage.|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNAdvancedMoonArmor.blp
+
+[I05L]
+Name=Hood of Kairouseki
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A furred, magic resistant headpiece. Gives +15% magic resistance, +5 armor and +8 hp regeneration."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05M]
+Name=Horn of Mana
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A long forgotten horn. Gives +30 to agility, +20 to intelligence, +600 Mana, Replenish Mana (Fully restore Mana), Mana Break (burn 100 mana per hit), and Mana Void (6% chance on an attack to deal 0.85 pure dmg/target's mana loss).|nIllusions can't do Mana Break.|n|n|cffc3dbffCooldown:|r 45 seconds.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05N]
+Name=Katen Kyoukotsu
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Katen Kyoukotsu, a wind based zanpakutou capable of calling a massive storm. Gives +20 agility, +20 strength, +50 damage, +15% movement speed, +15% attack speed, and a 15% chance to maim the target.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05O]
+Name=Killer Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A powerful axe used by a famous killer. Grants +150 damage, 55% increased attack speed, and a 35% chance to deal 200 bonus damage on every attack stopping channeling or casting spells."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05P]
+Name=Mace of Zeus
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Zeus' sacred weapon. After transformed back to its original state at the Realm of the Ancients, Zeus' sacred mace holds so much power even the original wielder can't bear it anymore. Gives +15 to all stats, +140 damage, and has a 25% chance on hit to release 350 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05Q]
+Name=Mask of Vizard
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="This mask can drives you insane. Grants 20% life steal and allows you to go Berserk. The Berserk state adds 100% attack speed and 15% movement speed, but you take 20% extra damage.|n|n|cffff0000Orb effects do not stack|r|n|n|cffc3dbffCooldown:|r 30 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I04R]
+Name=Shiva's Guard - 15000
+Hotkey=
+Tip=Purchase Shiva's Guard - 15000
+Ubertip=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Description=|cffffcc00Gives:|r|n+60 Intelligence|n+12 Armor|nFreezing Aura (Passive)|nArctic Blast (active)|n|cffffcc00Requires:|r|nMystic Staff|nEro Statue
+Art=ReplaceableTextures\CommandButtons\BTNImprovedMoonArmor.blp
+
+[I05R]
+Name=Maximillian
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A metal heavy armor, named after the one of the greatest champion in famous legend. Gives +50 Strength, +500 hit points, +15 armor, +30 HP regeneration."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05S]
+Name=Orb of Fire
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Orb that holds the power of fire. Gives +20 Intelligence, +15 to all stats, and Chaos Meteor ability (Deals (8 x INT) chaos dmg/sec).|n|n|cffc3dbffCooldown:|r 35 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05T]
+Name=Orb of Lightning
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Orb that holds the power of lightning. Gives +10 to all stats, +40 damage, and has a 20% chance on hit to release 175 damage Chain Lightning.|n|n|cffff0000Orb effects do not stack|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05U]
+Name=Perseverance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A gem that grants heart to the bearer. Increases mana bonus by 6 when attacking, 5 hit point regeneration per second, and +10 damage.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05V]
+Name=Radiance
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A divine weapon that gives +120 damage and a bright burning effect that damages nearby units for 80 damage a second and cause them to miss on 8% of their attacks against Radiance's bearer.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05W]
+Name=Reiatsu Orb
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=A powerful orb that glows with intense magical energy. Gives +5 Armor and +500 Mana. Can cast Replenish (Fully restore Mana).|n|n|cffc3dbffCooldown:|r 45 seconds.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I07W]
+Name=Ancient Staff of Mythology
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Ancient staff found in the ruin of Skypiea (maybe). Gives +20 to all stats, +60 intelligence, +500 hp, +500 mp, and Global HEX ability (turn all enemy heroes into random shit for lasts 4 seconds).|nWew!|n|n|cffc3dbffCooldown:|r 70 seconds."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05X]
+Name=Ring of the Arrancar
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="Ring given to medium level Arrancar. Grants a 0.75 Brilliance Aura, a +3 Devotion Aura, and 10 damage."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I07X]
+Name=Sentoumaru's Axe
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="An axe that used by Sentoumaru from Marine Headquarter. The user becomes a powerful killing machine. Increases mana bonus by 9 when attacking, 6 hit points regenerated per second, +75 damage, and 20% Cleaving Attack.|n|n|cffff0000Mana bonus do not stack with same type of item.|r"
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05Y]
+Name=Bracer
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description="A decorated wrist band. Gives +3 to all attributes, and an additional +3 to strength."
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
+
+[I05Z]
+Name=Shihouin's Boots
+Hotkey=F
+Tip=Purchase Glyph of |cffffcc00F|rortification
+Ubertip="Increases the armor and hit points of your buildings."
+Description=Increases movement and attack rate.
+Art=ReplaceableTextures\CommandButtons\BTNGlyph.blp
