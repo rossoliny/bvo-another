@@ -43,7 +43,8 @@ globals
 
     integer Hex_Mana_Cost = 600
 
-    trigger trig_ShowMyInfo=null
+    trigger developmentInvitationTrigger=null
+    trigger changelogNotificationTrigger=null
     trigger Yo=null
     trigger Zo=null
     unit FG=null
@@ -1078,7 +1079,7 @@ globals
     trigger zs=null
     trigger As=null
     trigger as=null
-    trigger Bs=null
+    trigger matchSetupFinalizationTrigger=null
     trigger bs=null
     trigger Cs=null
     trigger cs=null
@@ -7631,7 +7632,7 @@ function r1 takes nothing returns boolean
     return(G4[16]==false)
 endfunction
 
-function s1 takes nothing returns nothing
+function FinalizeMatchSetup takes nothing returns nothing
     call DisableTrigger(qF)
     call DisableTrigger(sF)
     if(((G4[7])))then
@@ -7715,19 +7716,30 @@ function s1 takes nothing returns nothing
     call DestroyTrigger(GetTriggeringTrigger())
 endfunction
 
-function trig_ShowMyInfo_Action takes nothing returns nothing
-	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Want to help in development? Contact me in Discord: Rossoliny#0686")
-	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Хочешь помочь в разработке? Пиши мне в Discord: Rossoliny#0686")
+function DisplayChangelogNotification takes nothing returns nothing
+    call DisplayTimedTextToForce(GetPlayersAll(),10.,"Read the changelog on GitHub: |cff00ffffgithub.com/rossoliny/bvo-another/releases|r")
+    call DisplayTimedTextToForce(GetPlayersAll(),10.,"Читай ченжлог в Гитхабе: |cff00ffffgithub.com/rossoliny/bvo-another/releases|r")
+    call DestroyTrigger(changelogNotificationTrigger)
+    set changelogNotificationTrigger=null
 endfunction
 
-function t1 takes nothing returns nothing
-    set Bs=CreateTrigger()
-    set trig_ShowMyInfo=CreateTrigger()
-    call TriggerRegisterTimerEventSingle(Bs,60.)
-    call TriggerAddAction(Bs,function s1)
+function DisplayDevelopmentInvitation takes nothing returns nothing
+	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Want to help in development? Contact me in Discord: |cff00ffffRossoliny#0686|r")
+	call DisplayTimedTextToForce(GetPlayersAll(), 10., "Хочешь помочь в разработке? Пиши мне в Discord: |cff00ffffRossoliny#0686|r")
+endfunction
 
-    call TriggerRegisterTimerEventSingle(trig_ShowMyInfo,50.)
-    call TriggerAddAction(trig_ShowMyInfo,function trig_ShowMyInfo_Action)
+function InitializeStartupTimers takes nothing returns nothing
+    set matchSetupFinalizationTrigger=CreateTrigger()
+    set developmentInvitationTrigger=CreateTrigger()
+    set changelogNotificationTrigger=CreateTrigger()
+    call TriggerRegisterTimerEventSingle(matchSetupFinalizationTrigger,60.)
+    call TriggerAddAction(matchSetupFinalizationTrigger,function FinalizeMatchSetup)
+
+    call TriggerRegisterTimerEventSingle(changelogNotificationTrigger,30.)
+    call TriggerAddAction(changelogNotificationTrigger,function DisplayChangelogNotification)
+
+    call TriggerRegisterTimerEventSingle(developmentInvitationTrigger,50.)
+    call TriggerAddAction(developmentInvitationTrigger,function DisplayDevelopmentInvitation)
 endfunction
 
 function u1 takes nothing returns boolean
@@ -8106,7 +8118,7 @@ function O1 takes nothing returns nothing
 endfunction
 
 function MapInfo_CreateQuests takes nothing returns nothing
-    call CreateQuestBJ(0,"Contacts","If you have any suggestions, comments, or bug reports please write to me in Discord:\n|c001ce6b9Rossoliny#0686|r\n\nOr if you want to share ideas, bugs/glitches go and create new issues in my GitHub page:\n|c001ce6b9https://github.com/rossoliny/bvo-another/issues|r\n","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
+    call CreateQuestBJ(0,"Contacts","If you have any suggestions, comments, or bug reports please write to me in Discord:\n|c001ce6b9Rossoliny#0686|r\n\nReport bugs here:\n|c001ce6b9github.com/rossoliny/bvo-another/issues|r\n","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
     call CreateQuestBJ(0,"Modes & Commands","Game Modes:\n-allrandom(-ar), -nopowerups(-np), -halfscore(-hs), -doublescore(-ds), -noduel(-nd), -no3vs3(-n3), -no5vs5(-n5), -noevents(-ne), -noswap(-ns), -norepick(-nr), -fasthunt(-fh), -slowhunt(-sh), -neverhunt(-nh), -supercreep(-sc), -bountyhunter(-bh), -nofountain(-nf), -nowaygates(-nw), -bleachonly(-bo), onepieceonly(-oo) -selectionoff(-so)\n\n\nGame Commands:\n-ms, -ma, -clear, -unstuck, -text on, -text off, -camera high(-ch), -camera low(-cl), -camera autolock(-ca), -camera normal(-cn), -help, -gameinfo\n\nSpecific Commands:\n-repick (if available), -swap (if available), -random (if you have no hero picked yet), -bounty/-b (Bounty Hunter mode), -chance/-c (if you play with Soi Fon)","ReplaceableTextures\\CommandButtons\\BTNManual3.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
@@ -8114,9 +8126,9 @@ function MapInfo_CreateQuests takes nothing returns nothing
     call QuestSetEnabled(bj_lastCreatedQuest,true)
     call CreateQuestBJ(0,"Special Credits","Special thanks to:\nKurogane, Unryze, Outrunner, Nelu_o, Kira_Izuru_3th, Aeris, Aokiji, Abaraizer, Bleacher, bubble, BuRNeD, Casanova, DarkWanderer, DeathGod, Dionysis, Dope, Es&t, Fullmetall, Getsuga, hellgab, Hirako Shinji, ib4ka, kelvinator44, Ken-Chan, Kooh, Miksa, Musashi, Mr. Klauz, Neliel Tu Oderschvank, nud0Ls, Odin, One_Of_A_KinD, Pa[i]n, PirateOf7Sea, RoboKy, Sado_Yasutora, samlebeau, senbonsakura, SHP_Luffy, Somahiro, tayco, Tsukihiko12, Vietnam Boy","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Latest Version","Get the latest version and read the changelog from:\n|c001ce6b9https://github.com/rossoliny/bvo-another/releases|r","ReplaceableTextures\\CommandButtons\\BTNScrollofRegeneration.blp")
+    call CreateQuestBJ(2,"Latest Version","Get the latest version and read the changelog from:\n|c001ce6b9github.com/rossoliny/bvo-another/releases|r\n\nThis Version: Rossoliny 1.4\nDate: 12.10.2026\nChangelog: |c001ce6b9github.com/rossoliny/bvo-another/blob/master/changelog/changelog_en.txt|r\nAll Releases: |c001ce6b9github.com/rossoliny/bvo-another/releases|r\nReport bugs: |c001ce6b9github.com/rossoliny/bvo-another/issues|r","ReplaceableTextures\\CommandButtons\\BTNScrollofRegeneration.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
-    call CreateQuestBJ(2,"Author Comments","Finally, BvO Another v1.1a Rossoliny is done!! Thanks to all people who helped me until this point.\nSome pictures, icons and other texture qualities were reduced due to BvO's texture compression, I recommend you to set the Texture Quality to 'High' on Warcraft III Video Options.\nThis map wasn't edited for AI, so if you found any bugs involving AI, sadly it might not change very fast, but I plan to do so in the future, however AI can never replace human.\nI would appreciate any kind of feedback about the map on my vk group: https://vk.com/acfwc3 as in the future I plan to rebalance the map, so your thoughts will be very useful.\n\n-Unryze\n\nThis version was updated by Rossoliny. Unryze's contacts are deleted due to be invalid.\n\n-Rossoliny\n","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
+    call CreateQuestBJ(2,"Author Comments","Finally, BvO Another v1.1a is done!! Thanks to all people who helped me until this point.\nSome pictures, icons and other texture qualities were reduced due to BvO's texture compression, I recommend you to set the Texture Quality to 'High' on Warcraft III Video Options.\nThis map wasn't edited for AI, so if you found any bugs involving AI, sadly it might not change very fast, but I plan to do so in the future, however AI can never replace human.\nI would appreciate any kind of feedback about the map on my vk group: https://vk.com/acfwc3 as in the future I plan to rebalance the map, so your thoughts will be very useful.\n\n-Unryze\n\nThis version was updated by Rossoliny.\nDiscord: |c001ce6b9Rossoliny#0686|r\nGitHub: |c001ce6b9github.com/rossoliny/bvo-another|r\n\nUnryze's Contacts:\nGarena: |c001ce6b9Unryze|r\nWebsite: |cffBA75FFhttps://vk.com/acfwc3|r\n\n-Rossoliny\n","ReplaceableTextures\\CommandButtons\\BTNShadowMeld.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
     call CreateQuestBJ(2,"Model Credits","Modelers/animators/skinners:\nUnryze, Bandai Namco, Black Stan, Callahan, Conny Bengtsson, Daelin, Falcke, Gothar_Esp, JetFangInferno, kkangtemplar, Lady Kelaodesi, MOD, NarutoJ, Pyritie, RED BARON, Shinigami12, Tranquil, Vestras, WILLTHEALMIGHTY, Rossoliny\n\nIf you use models from this map, please add this names to your credit section!\n","ReplaceableTextures\\CommandButtons\\BTNCloakOfFlames.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
@@ -79489,7 +79501,7 @@ function Q3x takes nothing returns nothing
     call GH()
     call vl()
     call yl()
-    call t1()
+    call InitializeStartupTimers()
     call y1()
     call A1()
     call c1()
