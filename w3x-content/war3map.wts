@@ -4,7 +4,7 @@ BvO Another v1.1a Rossoliny
 }
 STRING 4
 {
-3v3 / 4v4 / 5v5
+1х1 3х3 5х5
 }
 STRING 6
 {
@@ -156,7 +156,7 @@ STRING 3531
 }
 STRING 4654
 {
-Supported Commands in BvO Another v1.1a Rossoliny are:
+Supported Commands in BvO Another v1.1a Rossoliny 1.0 are:
 -ms
 -ma
 -clear

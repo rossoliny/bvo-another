@@ -47,6 +47,6 @@ UNIT_COLUMN1=Creeps Killed
 UNIT_COLUMN2=--
 UNIT_COLUMN3=--
 UNIT_COLUMN4=--
-UPKEEP_NONE=|Cff00ff00BvO Another v1.1a Rossoliny
+UPKEEP_NONE=|Cff00ff00BvO Another v1.1a Rossoliny 1.0
 UPPER_BUTTON_QUEST_TIP=INFO (|Cfffed312F9|R)
 UPPER_BUTTON_QUEST_UBER=Display the map informations.
