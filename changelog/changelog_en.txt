@@ -13,6 +13,7 @@
 
 ## Kurosaki Ichigo
 
+- T — Vastolorde: its logic was ported from 1.1c and improved. Items should no longer be lost when dying in Hollow Form, whether killed by Enel’s R or any other cause.
 - T — Vastolorde: Hollow Form bonuses now scale with ability level; added magic resistance.
 
 Hollow Form bonuses by T level:
@@ -42,7 +43,6 @@ Hollow Form bonuses by T level:
 ## Items and shops
 
 - Added Demonic Boots and Moon Armor to Recipe Shop 3, and Demonic Armor to Recipe Shop 5.
-- Medal Exchange at the base now sells medals.
 - Zaraki no longer loses gold when trying to buy Kuma's Unique Book and cannot receive it through item transfer.
 - Buying medals, gold, attribute, health and level books, and the +100 bonus now works while affected by Hex.
 
@@ -61,4 +61,4 @@ Hollow Form bonuses by T level:
 - Added R/T sounds for Ichigo, Mihawk and Zangetsu, plus Q/W sounds for Ichigo in Hollow Form.
 - Kill streak sounds now play.
 
-Baseline: Unryze 1.1a · Date: 12.10.2026 · Commit: [b357c03](https://github.com/rossoliny/bvo-another/commit/b357c032bfad9133842fda7f7f418c3a5aa9e577)
+Baseline: Unryze 1.1a · Date: 12.10.2026
