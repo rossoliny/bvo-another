@@ -642,10 +642,10 @@ globals
     location array bj
     integer array Cj
     group array cj
-    unit Dj=null
-    unit array Ej
-    integer array Fj
-    real Gj=0
+    unit mamaraganCaster=null
+    unit array mamaraganTargets
+    integer array mamaraganProcChances
+    real mamaraganDamage=0
     unit array Hj
     location array Ij
     integer lj=0
@@ -1949,8 +1949,8 @@ globals
     trigger mE=null
     trigger nE=null
     trigger oE=null
-    trigger pE=null
-    trigger qE=null
+    trigger mamaraganSpellTrigger=null
+    trigger mamaraganAttackTrigger=null
     trigger rE=null
     trigger sE=null
     trigger tE=null
@@ -3670,10 +3670,10 @@ function I6 takes nothing returns nothing
     set i=0
     loop
         exitwhen(i>1)
-        set Fj[i]=0
+        set mamaraganProcChances[i]=0
         set i=i+1
     endloop
-    set Gj=.0
+    set mamaraganDamage=.0
     set lj=0
     set Jj=.0
     set i=0
@@ -65973,8 +65973,8 @@ function Ejx takes nothing returns nothing
         call DestroyTrigger(mE)
         call DestroyTrigger(nE)
         call DestroyTrigger(oE)
-        call DestroyTrigger(pE)
-        call DestroyTrigger(qE)
+        call DestroyTrigger(mamaraganSpellTrigger)
+        call DestroyTrigger(mamaraganAttackTrigger)
         call DestroyTrigger(rE)
         call DestroyTrigger(sE)
         call DestroyTrigger(tE)
@@ -66287,18 +66287,18 @@ function XXx takes nothing returns boolean
 endfunction
 
 function XOx takes nothing returns boolean
-    return(Dj!=null)
+    return(mamaraganCaster!=null)
 endfunction
 
 function XRx takes nothing returns nothing
-    set Dj=GetTriggerUnit()
-    set Fj[1]=(25+(5*GetUnitAbilityLevelSwapped('A02U',Dj)))
-    set Fj[2]=(5+(3*GetUnitAbilityLevelSwapped('A02U',Dj)))
-    set Gj=(2.5*I2R(GetHeroStatBJ(2,Dj,true)))
+    set mamaraganCaster=GetTriggerUnit()
+    set mamaraganProcChances[1]=(25+(5*GetUnitAbilityLevelSwapped('A02U',mamaraganCaster)))
+    set mamaraganProcChances[2]=(5+(3*GetUnitAbilityLevelSwapped('A02U',mamaraganCaster)))
+    set mamaraganDamage=(2.5*I2R(GetHeroStatBJ(2,mamaraganCaster,true)))
     call AddWeatherEffectSaveLast(bj_mapInitialPlayableArea,'RLhr')
     set Q[2]=bj_lastCreatedWeatherEffect
     call EnableWeatherEffect(Q[2],true)
-    call CreateTextTagUnitBJ("Mamaragan",Dj,0,10.,100,100.,100.,0)
+    call CreateTextTagUnitBJ("Mamaragan",mamaraganCaster,0,10.,100,100.,100.,0)
     call SetTextTagPermanentBJ(bj_lastCreatedTextTag,false)
     call SetTextTagLifespanBJ(bj_lastCreatedTextTag,1.5)
     call ShowTextTagForceBJ(false,bj_lastCreatedTextTag,t6(Condition(function XXx)))
@@ -66306,16 +66306,16 @@ function XRx takes nothing returns nothing
     call PlaySoundAtPointBJ(Xr,100,Sg[3],0)
     call RemoveLocation(Sg[3])
     set Sg[3]=null
-    call EnableTrigger(pE)
-    call EnableTrigger(qE)
+    call EnableTrigger(mamaraganSpellTrigger)
+    call EnableTrigger(mamaraganAttackTrigger)
     call TriggerSleepAction(15.)
-    if(((Dj!=null)))then
-        call DisableTrigger(pE)
-        call DisableTrigger(qE)
-        set Dj=null
-        set Fj[1]=0
-        set Fj[2]=0
-        set Gj=.0
+    if(((mamaraganCaster!=null)))then
+        call DisableTrigger(mamaraganSpellTrigger)
+        call DisableTrigger(mamaraganAttackTrigger)
+        set mamaraganCaster=null
+        set mamaraganProcChances[1]=0
+        set mamaraganProcChances[2]=0
+        set mamaraganDamage=.0
         call EnableWeatherEffect(Q[2],false)
         call RemoveWeatherEffect(Q[2])
     endif
@@ -66328,16 +66328,16 @@ function XIx takes nothing returns nothing
 endfunction
 
 function XAx takes nothing returns boolean
-    return(GetDyingUnit()==Dj)
+    return(GetDyingUnit()==mamaraganCaster)
 endfunction
 
 function XNx takes nothing returns nothing
-    call DisableTrigger(pE)
-    call DisableTrigger(qE)
-    set Dj=null
-    set Fj[1]=0
-    set Fj[2]=0
-    set Gj=.0
+    call DisableTrigger(mamaraganSpellTrigger)
+    call DisableTrigger(mamaraganAttackTrigger)
+    set mamaraganCaster=null
+    set mamaraganProcChances[1]=0
+    set mamaraganProcChances[2]=0
+    set mamaraganDamage=.0
     call EnableWeatherEffect(Q[2],false)
     call RemoveWeatherEffect(Q[2])
 endfunction
@@ -66349,30 +66349,30 @@ function Xbx takes nothing returns nothing
 endfunction
 
 function XBx takes nothing returns boolean
-    return(Dj!=x)and(Dj!=y)
+    return(mamaraganCaster!=x)and(mamaraganCaster!=y)
 endfunction
 
 function Xcx takes nothing returns boolean
-    return(Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))
+    return(mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))
 endfunction
 
 function XCx takes nothing returns boolean
-    return(IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(Dj)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))
+    return(IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(mamaraganCaster)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))))
 endfunction
 
 function IsMamaraganSpellEligible takes nothing returns boolean
     if GetSpellAbilityId() == 'ANss' or GetSpellAbilityId() == 'A07Z' then
         return false
     endif
-    return(((IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(Dj)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))))
+    return(((IsUnitEnemy(GetSpellAbilityUnit(),GetOwningPlayer(mamaraganCaster)))and(MG(GetSpellAbilityUnit(),UNIT_TYPE_HERO))and(((mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))))))
 endfunction
 
 function XDx takes nothing returns boolean
-    return(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[1])<=Gj)
+    return(GetUnitStateSwap(UNIT_STATE_LIFE,mamaraganTargets[1])<=mamaraganDamage)
 endfunction
 
 function Xfx takes nothing returns boolean
-    return(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[1])>Gj)
+    return(GetUnitStateSwap(UNIT_STATE_LIFE,mamaraganTargets[1])>mamaraganDamage)
 endfunction
 
 function XFx takes nothing returns nothing
@@ -66380,71 +66380,73 @@ function XFx takes nothing returns nothing
 endfunction
 
 function Xgx takes nothing returns boolean
-    return(GetRandomInt(1,100)<=Fj[1])
+    return(GetRandomInt(1,100)<=mamaraganProcChances[1])
 endfunction
 
-function XGx takes nothing returns nothing
-    if(((GetRandomInt(1,100)<=Fj[1])))then
-        set Ej[1]=GetSpellAbilityUnit()
-        set dg[37]=GetUnitLoc(Ej[1])
-        if(((GetUnitStateSwap(UNIT_STATE_LIFE,Ej[1])>Gj)))then
-            call SetWidgetLife(Ej[1],(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[1])-Gj))
-        else
-            if(((GetUnitStateSwap(UNIT_STATE_LIFE,Ej[1])<=Gj)))then
-                call UnitDamageTargetBJ(Dj,Ej[1],99999.,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-            endif
-        endif
-        call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(Dj),dg[37],bj_UNIT_FACING)
+function HandleMamaraganSpellCast takes nothing returns nothing
+    local unit lightningCaster=mamaraganCaster
+    local player lightningOwner=GetOwningPlayer(lightningCaster)
+    local unit lightningTarget=null
+    local location lightningLocation=null
+    if(((GetRandomInt(1,100)<=mamaraganProcChances[1])))then
+        set lightningTarget=GetSpellAbilityUnit()
+        set mamaraganTargets[1]=lightningTarget
+        set lightningLocation=GetUnitLoc(lightningTarget)
+        call UnitDamageTarget(lightningCaster,lightningTarget,mamaraganDamage,false,false,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_UNIVERSAL,WEAPON_TYPE_WHOKNOWS)
+        call CreateNUnitsAtLoc(1,'u003',lightningOwner,lightningLocation,bj_UNIT_FACING)
         call SetUnitFlyHeight(bj_lastCreatedUnit,1000.,.0)
         call UnitAddAbility(bj_lastCreatedUnit,'A07H')
-        call IssueTargetOrderById(bj_lastCreatedUnit,852119,Ej[1])
+        call IssueTargetOrderById(bj_lastCreatedUnit,852119,lightningTarget)
         call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
-        call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(Dj),dg[37],bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'u003',lightningOwner,lightningLocation,bj_UNIT_FACING)
         call SetUnitFlyHeight(bj_lastCreatedUnit,1000.,.0)
         call UnitAddAbility(bj_lastCreatedUnit,'A02V')
-        call IssueTargetOrderById(bj_lastCreatedUnit,852119,Ej[1])
+        call IssueTargetOrderById(bj_lastCreatedUnit,852119,lightningTarget)
         call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
-        call AddSpecialEffectLocBJ(dg[37],"war3mapImported\\LightningWrath.mdx")
+        call AddSpecialEffectLocBJ(lightningLocation,"war3mapImported\\LightningWrath.mdx")
         call DestroyEffect(bj_lastCreatedEffect)
-        call AddSpecialEffectLocBJ(dg[37],"Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
+        call AddSpecialEffectLocBJ(lightningLocation,"Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-        call UG(250.,dg[37],function XFx)
-        call RemoveLocation(dg[37])
-        set dg[37]=null
-        set Ej[1]=null
+        call UG(250.,lightningLocation,function XFx)
+        call RemoveLocation(lightningLocation)
+        set mamaraganTargets[1]=null
     endif
+    set lightningLocation=null
+    set lightningTarget=null
+    set lightningOwner=null
+    set lightningCaster=null
 endfunction
 
 function Xhx takes nothing returns nothing
-    set pE=CreateTrigger()
-    call DisableTrigger(pE)
-    call TriggerRegisterAnyUnitEventBJ(pE,EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    call TriggerAddCondition(pE,Condition(function IsMamaraganSpellEligible))
-    call TriggerAddAction(pE,function XGx)
+    set mamaraganSpellTrigger=CreateTrigger()
+    call DisableTrigger(mamaraganSpellTrigger)
+    call TriggerRegisterAnyUnitEventBJ(mamaraganSpellTrigger,EVENT_PLAYER_UNIT_SPELL_EFFECT)
+    call TriggerAddCondition(mamaraganSpellTrigger,Condition(function IsMamaraganSpellEligible))
+    call TriggerAddAction(mamaraganSpellTrigger,function HandleMamaraganSpellCast)
 endfunction
 
 function XHx takes nothing returns boolean
-    return(Dj!=x)and(Dj!=y)
+    return(mamaraganCaster!=x)and(mamaraganCaster!=y)
 endfunction
 
 function Xjx takes nothing returns boolean
-    return(Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))
+    return(mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))
 endfunction
 
 function XJx takes nothing returns boolean
-    return(IsUnitEnemy(GetAttacker(),GetOwningPlayer(Dj)))and(MG(GetAttacker(),UNIT_TYPE_HERO))and(IsUnitAlly(GetTriggerUnit(),GetOwningPlayer(Dj)))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))
+    return(IsUnitEnemy(GetAttacker(),GetOwningPlayer(mamaraganCaster)))and(MG(GetAttacker(),UNIT_TYPE_HERO))and(IsUnitAlly(GetTriggerUnit(),GetOwningPlayer(mamaraganCaster)))and(((mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))))
 endfunction
 
 function Xkx takes nothing returns boolean
-    return(((IsUnitEnemy(GetAttacker(),GetOwningPlayer(Dj)))and(MG(GetAttacker(),UNIT_TYPE_HERO))and(IsUnitAlly(GetTriggerUnit(),GetOwningPlayer(Dj)))and(((Dj==x)or(Dj==y)or(((Dj!=x)and(Dj!=y)))))))
+    return(((IsUnitEnemy(GetAttacker(),GetOwningPlayer(mamaraganCaster)))and(MG(GetAttacker(),UNIT_TYPE_HERO))and(IsUnitAlly(GetTriggerUnit(),GetOwningPlayer(mamaraganCaster)))and(((mamaraganCaster==x)or(mamaraganCaster==y)or(((mamaraganCaster!=x)and(mamaraganCaster!=y)))))))
 endfunction
 
 function XKx takes nothing returns boolean
-    return(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[2])<=Gj)
+    return(GetUnitStateSwap(UNIT_STATE_LIFE,mamaraganTargets[2])<=mamaraganDamage)
 endfunction
 
 function Xlx takes nothing returns boolean
-    return(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[2])>Gj)
+    return(GetUnitStateSwap(UNIT_STATE_LIFE,mamaraganTargets[2])>mamaraganDamage)
 endfunction
 
 function XLx takes nothing returns nothing
@@ -66452,47 +66454,49 @@ function XLx takes nothing returns nothing
 endfunction
 
 function Xmx takes nothing returns boolean
-    return(GetRandomInt(1,100)<=Fj[2])
+    return(GetRandomInt(1,100)<=mamaraganProcChances[2])
 endfunction
 
-function XMx takes nothing returns nothing
-    if(((GetRandomInt(1,100)<=Fj[2])))then
-        set Ej[2]=GetAttacker()
-        set dg[7193]=GetUnitLoc(Ej[2])
-        if(((GetUnitStateSwap(UNIT_STATE_LIFE,Ej[2])>Gj)))then
-            call SetWidgetLife(Ej[2],(GetUnitStateSwap(UNIT_STATE_LIFE,Ej[2])-Gj))
-        else
-            if(((GetUnitStateSwap(UNIT_STATE_LIFE,Ej[2])<=Gj)))then
-                call UnitDamageTargetBJ(Dj,Ej[2],99999.,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-            endif
-        endif
-        call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(Dj),dg[7193],bj_UNIT_FACING)
+function HandleMamaraganAttack takes nothing returns nothing
+    local unit lightningCaster=mamaraganCaster
+    local player lightningOwner=GetOwningPlayer(lightningCaster)
+    local unit lightningTarget=null
+    local location lightningLocation=null
+    if(((GetRandomInt(1,100)<=mamaraganProcChances[2])))then
+        set lightningTarget=GetAttacker()
+        set mamaraganTargets[2]=lightningTarget
+        set lightningLocation=GetUnitLoc(lightningTarget)
+        call UnitDamageTarget(lightningCaster,lightningTarget,mamaraganDamage,false,false,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_UNIVERSAL,WEAPON_TYPE_WHOKNOWS)
+        call CreateNUnitsAtLoc(1,'u003',lightningOwner,lightningLocation,bj_UNIT_FACING)
         call SetUnitFlyHeight(bj_lastCreatedUnit,1000.,.0)
         call UnitAddAbility(bj_lastCreatedUnit,'A07H')
-        call IssueTargetOrderById(bj_lastCreatedUnit,852119,Ej[2])
+        call IssueTargetOrderById(bj_lastCreatedUnit,852119,lightningTarget)
         call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
-        call CreateNUnitsAtLoc(1,'u003',GetOwningPlayer(Dj),dg[7193],bj_UNIT_FACING)
+        call CreateNUnitsAtLoc(1,'u003',lightningOwner,lightningLocation,bj_UNIT_FACING)
         call SetUnitFlyHeight(bj_lastCreatedUnit,1000.,.0)
         call UnitAddAbility(bj_lastCreatedUnit,'A02V')
-        call IssueTargetOrderById(bj_lastCreatedUnit,852119,Ej[2])
+        call IssueTargetOrderById(bj_lastCreatedUnit,852119,lightningTarget)
         call UnitApplyTimedLifeBJ(1.,'BTLF',bj_lastCreatedUnit)
-        call AddSpecialEffectLocBJ(dg[7193],"war3mapImported\\LightningWrath.mdx")
+        call AddSpecialEffectLocBJ(lightningLocation,"war3mapImported\\LightningWrath.mdx")
         call DestroyEffect(bj_lastCreatedEffect)
-        call AddSpecialEffectLocBJ(dg[7193],"Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
+        call AddSpecialEffectLocBJ(lightningLocation,"Abilities\\Spells\\Human\\ThunderClap\\ThunderClapCaster.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-        call UG(250.,dg[7193],function XLx)
-        call RemoveLocation(dg[7193])
-        set dg[7193]=null
-        set Ej[2]=null
+        call UG(250.,lightningLocation,function XLx)
+        call RemoveLocation(lightningLocation)
+        set mamaraganTargets[2]=null
     endif
+    set lightningLocation=null
+    set lightningTarget=null
+    set lightningOwner=null
+    set lightningCaster=null
 endfunction
 
 function Xpx takes nothing returns nothing
-    set qE=CreateTrigger()
-    call DisableTrigger(qE)
-    call TriggerRegisterAnyUnitEventBJ(qE,EVENT_PLAYER_UNIT_ATTACKED)
-    call TriggerAddCondition(qE,Condition(function Xkx))
-    call TriggerAddAction(qE,function XMx)
+    set mamaraganAttackTrigger=CreateTrigger()
+    call DisableTrigger(mamaraganAttackTrigger)
+    call TriggerRegisterAnyUnitEventBJ(mamaraganAttackTrigger,EVENT_PLAYER_UNIT_ATTACKED)
+    call TriggerAddCondition(mamaraganAttackTrigger,Condition(function Xkx))
+    call TriggerAddAction(mamaraganAttackTrigger,function HandleMamaraganAttack)
 endfunction
 
 function XPx takes nothing returns boolean

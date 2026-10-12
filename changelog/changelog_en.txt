@@ -1,3 +1,9 @@
+UNRELEASED CHANGES
+------------------
+
+Enel:
+- R (Mamaragan): deals 2.5 × INT pure damage through the engine instead of direct HP removal; lethal hits use the same damage instead of a 99,999-damage hit. Shields, blocks and damage reflection react to lightning.
+
 REBUILD #1.4 — 12.10.2026
 -----------------------
 Changes compared with the #1.4 maps published on 11.10.2026:
