@@ -2447,13 +2447,13 @@ function Scoreboard_Create takes nothing returns nothing
         set column = 1
         loop
             exitwhen column > 5
-            set columnWidth = .018
+            set columnWidth = .022
             if column == 1 then
-                set columnWidth = .09
+                set columnWidth = .112
             elseif column == 4 then
-                set columnWidth = .013
+                set columnWidth = .016
             elseif column == 5 then
-                set columnWidth = .026
+                set columnWidth = .031
             endif
             set cell = MultiboardGetItem(Scoreboard,row-1,column-1)
             call MultiboardSetItemWidth(cell,columnWidth)
