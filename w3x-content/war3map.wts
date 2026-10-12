@@ -1,6 +1,6 @@
 STRING 3
 {
-BvO Another v1.1a Rossoliny
+|cff00ff00BvO Another v1.1a Rossoliny 1.0|r
 }
 STRING 4
 {
@@ -173,6 +173,8 @@ STRING 5692
 Choose from 30 different heroes from anime Bleach or One Piece to join the battle arena!
 
 Modes: |c0020c000-ar, -np, -hs, -ds, -nd, -n3, -n5, -ne, -ns, -nr, -fh, -sh, -nh, -sc, -bh, -nf, -nw, -bo, -oo, -so|r
+
+Release: 1.0 - Date: 12.10.2026
 }
 STRING 5693
 {
@@ -190,11 +192,14 @@ If you have any suggestions, comments, or bug reports please write to me in Disc
 Or if you want to share ideas, bugs/glitches go and create new issues in my GitHub page:
 |c001ce6b9https://github.com/rossoliny/bvo-another/issues|r
 
+Release: 1.0 - Date: 12.10.2026
 }
 STRING 6747
 {
 Get the latest version and read the changelog from:
 |c001ce6b9https://github.com/rossoliny/bvo-another/releases|r
+
+Release: 1.0 - Date: 12.10.2026
 }
 STRING 6891
 {

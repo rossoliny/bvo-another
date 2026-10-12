@@ -8118,7 +8118,7 @@ function O1 takes nothing returns nothing
 endfunction
 
 function MapInfo_CreateQuests takes nothing returns nothing
-    call CreateQuestBJ(0,"Contacts","If you have any suggestions, comments, or bug reports please write to me in Discord:\n|c001ce6b9Rossoliny#0686|r\n\nReport bugs here:\n|c001ce6b9github.com/rossoliny/bvo-another/issues|r\n","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
+    call CreateQuestBJ(0,"Contacts","If you have any suggestions, comments, or bug reports please write to me in Discord:\n|c001ce6b9Rossoliny#0686|r\n\nReport bugs here:\n|c001ce6b9github.com/rossoliny/bvo-another/issues|r\n\nRelease: 1.0 - Date: 12.10.2026","ReplaceableTextures\\CommandButtons\\BTNSpy.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
     call CreateQuestBJ(0,"Modes & Commands","Game Modes:\n-allrandom(-ar), -nopowerups(-np), -halfscore(-hs), -doublescore(-ds), -noduel(-nd), -no3vs3(-n3), -no5vs5(-n5), -noevents(-ne), -noswap(-ns), -norepick(-nr), -fasthunt(-fh), -slowhunt(-sh), -neverhunt(-nh), -supercreep(-sc), -bountyhunter(-bh), -nofountain(-nf), -nowaygates(-nw), -bleachonly(-bo), onepieceonly(-oo) -selectionoff(-so)\n\n\nGame Commands:\n-ms, -ma, -clear, -unstuck, -text on, -text off, -camera high(-ch), -camera low(-cl), -camera autolock(-ca), -camera normal(-cn), -help, -gameinfo\n\nSpecific Commands:\n-repick (if available), -swap (if available), -random (if you have no hero picked yet), -bounty/-b (Bounty Hunter mode), -chance/-c (if you play with Soi Fon)","ReplaceableTextures\\CommandButtons\\BTNManual3.blp")
     call QuestSetEnabled(bj_lastCreatedQuest,true)
@@ -81232,8 +81232,8 @@ function main takes nothing returns nothing
 endfunction
 
 function config takes nothing returns nothing
-    call SetMapName(MapDisplayName)
-    call SetMapDescription("Choose from 30 different heroes from anime Bleach or One Piece to join the battle arena!\n\nModes: |c0020c000-ar, -np, -hs, -ds, -nd, -n3, -n5, -ne, -ns, -nr, -fh, -sh, -nh, -sc, -bh, -nf, -nw, -bo, -oo, -so|r")
+    call SetMapName("|cff00ff00BvO Another v1.1a Rossoliny 1.0|r")
+    call SetMapDescription("Choose from 30 different heroes from anime Bleach or One Piece to join the battle arena!\n\nModes: |c0020c000-ar, -np, -hs, -ds, -nd, -n3, -n5, -ne, -ns, -nr, -fh, -sh, -nh, -sc, -bh, -nf, -nw, -bo, -oo, -so|r\n\nRelease: 1.0 - Date: 12.10.2026")
     call SetPlayers(12)
     call SetTeams(12)
     call SetGamePlacement(MAP_PLACEMENT_TEAMS_TOGETHER)
