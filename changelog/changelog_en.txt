@@ -61,4 +61,4 @@ Hollow Form bonuses by T level:
 - Added R/T sounds for Ichigo, Mihawk and Zangetsu, plus Q/W sounds for Ichigo in Hollow Form.
 - Kill streak sounds now play.
 
-Baseline: Unryze 1.1a · Date: 12.10.2026
+Baseline: Unryze 1.1a · Date: 12.10.2026 · Commit: [0272755](https://github.com/rossoliny/bvo-another/commit/02727556a696a78548a66f077c6ebd5771fadbc6)
