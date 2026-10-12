@@ -63,7 +63,22 @@ fi
 
 read_map_script() {
     if [[ $build_mode == dev ]]; then
-        cat -- "$map_script"
+        awk '
+            FNR == NR {
+                if (/^[[:space:]]*globals[[:space:]]*$/) { in_probe_globals = 1; next }
+                if (/^[[:space:]]*endglobals[[:space:]]*$/) { in_probe_globals = 0; next }
+                if (in_probe_globals) probe_globals = probe_globals $0 ORS
+                else probe_functions = probe_functions $0 ORS
+                next
+            }
+            /^[[:space:]]*endglobals/ {
+                printf "%s", probe_globals
+                print
+                printf "%s", probe_functions
+                next
+            }
+            { print }
+        ' "$repository_root/tests/kill-ichigo-on-t.j" "$map_script"
         return
     fi
     awk '

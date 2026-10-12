@@ -23,20 +23,6 @@ globals
     trigger TestCommands_OneShotDamageTrigger = null
     group TestCommands_OneShotRegisteredUnits = null
     region TestCommands_OneShotWorldRegion = null
-    boolean TestCommands_IchigoInitialized = false
-    boolean TestCommands_IchigoRunning = false
-    boolean TestCommands_IchigoHollowDied = false
-    boolean TestCommands_IchigoKilledByEnel = false
-    boolean TestCommands_IchigoMamaraganStarted = false
-    boolean TestCommands_IchigoEventTimerPaused = false
-    boolean TestCommands_IchigoEnelWasPaused = false
-    integer TestCommands_IchigoSuccessfulCasts = 0
-    player TestCommands_IchigoPlayer = null
-    unit TestCommands_IchigoOriginal = null
-    unit TestCommands_IchigoEnel = null
-    unit TestCommands_IchigoHollow = null
-    item array TestCommands_IchigoItems
-    string array TestCommands_IchigoItemNames
     integer array Scoreboard_Deaths
     unit array Mihawk_T_Copies
     sound Sound_Effect_Ichigo_R_1 = null
@@ -521,12 +507,11 @@ globals
     boolean Ug=false
     unit Vg=null
     effect Wg=null
-    unit Xg=null
+    unit IchigoOriginalUnit=null
     effect array Yg
     unit Zg=null
-    unit dh=null
-    boolean eh=false
-    real fh=0
+    unit IchigoHollowAbilityOwner=null
+    boolean IchigoHollowCycleRunning=false
     group gh=null
     group hh=null
     unit array ih
@@ -706,12 +691,25 @@ globals
     group RenjiRHitUnits=null
     boolean RenjiTActive=false
     group RenjiTBlastHitUnits=null
-    unit Ck=null
-    boolean ck=false
-    integer array Dk
-    integer array Ek
+    unit IchigoHollowUnit=null
+    timer IchigoHollowTimer = null
+    player IchigoHollowPlayer = null
+    unit IchigoHollowKiller = null
+    boolean IchigoHollowEntryPending = false
+    boolean IchigoHollowEntryFailed = false
+    boolean IchigoHollowDeathPending = false
+    boolean IchigoHollowOriginalWasInvulnerable = false
+    integer IchigoHollowAbilityLevel = 0
+    integer IchigoHollowElapsedTicks = 0
+    integer IchigoHollowDurationTicks = 0
+    string IchigoHollowLastTransferError = ""
+    item IchigoHollowPendingItem = null
+    boolean IchigoHollowPendingItemWasVisible = true
+    boolean IchigoHollowPendingItemWasInvulnerable = false
+    boolean IchigoHollowTransferStarted = false
+    boolean IchigoHollowActive=false
+    integer array IchigoHollowSpellState
     group Fk=null
-    unit Gk=null
     unit array Hk
     real array Ik
     group array lk
@@ -841,7 +839,7 @@ globals
     rect fo=null
     rect go=null
     rect ho=null
-    rect io=null
+    rect HiddenHeroStorageRect=null
     rect jo=null
     rect ko=null
     rect mo=null
@@ -1531,10 +1529,10 @@ globals
     trigger qa=null
     trigger ra=null
     trigger sa=null
-    trigger ta=null
-    trigger ua=null
-    trigger va=null
-    trigger wa=null
+    trigger IchigoHollowLearnTrigger=null
+    trigger IchigoHollowAvailabilityTrigger=null
+    trigger IchigoHollowSpellTrigger=null
+    trigger IchigoFormDeathTrigger=null
     trigger xa=null
     trigger ya=null
     trigger za=null
@@ -3508,8 +3506,7 @@ function I6 takes nothing returns nothing
     set Rg=CreateGroup()
     set Tg=0
     set Ug=false
-    set eh=false
-    set fh=.0
+    set IchigoHollowCycleRunning=false
     set gh=CreateGroup()
     set hh=CreateGroup()
     set jh=CreateGroup()
@@ -3723,17 +3720,11 @@ function I6 takes nothing returns nothing
     set RenjiRHitUnits=CreateGroup()
     set RenjiTActive=false
     set RenjiTBlastHitUnits=CreateGroup()
-    set ck=false
+    set IchigoHollowActive=false
     set i=0
     loop
         exitwhen(i>1)
-        set Dk[i]='moon'
-        set i=i+1
-    endloop
-    set i=0
-    loop
-        exitwhen(i>1)
-        set Ek[i]=0
+        set IchigoHollowSpellState[i]=0
         set i=i+1
     endloop
     set Fk=CreateGroup()
@@ -5957,7 +5948,7 @@ function fH takes nothing returns nothing
     set fo=Rect(5120.,-704.,5248.,-576.)
     set go=Rect(7072.,-8192.,8192.,-7008.)
     set ho=Rect(7328.,-1376.,7392.,-1312.)
-    set io=Rect(3104.,-4576.,3168.,-4544.)
+    set HiddenHeroStorageRect=Rect(3104.,-4576.,3168.,-4544.)
     set jo=Rect(-5760.,288.,-4448.,896.)
     set ko=Rect(2976.,128.,4576.,896.)
     set mo=Rect(6144.,5792.,7168.,7040.)
@@ -17131,11 +17122,11 @@ function rUv takes nothing returns boolean
     return(IsPlayerInForce(GetEnumPlayer(),e))
 endfunction
 
-// Count the registered main hero only. Hollow death is credited when Xg dies.
+// Count the registered main hero only. Hollow death is credited when IchigoOriginalUnit dies.
 function Scoreboard_Death takes nothing returns nothing
     local unit dyingHero = GetTriggerUnit()
     local integer playerIndex = GetPlayerId(GetOwningPlayer(dyingHero)) + 1
-    if not N4 and playerIndex >= 1 and playerIndex <= 12 and dyingHero == m[playerIndex] and dyingHero != Ck and IsUnitType(dyingHero,UNIT_TYPE_HERO) and not IsUnitIllusion(dyingHero) then
+    if not N4 and playerIndex >= 1 and playerIndex <= 12 and dyingHero == m[playerIndex] and dyingHero != IchigoHollowUnit and IsUnitType(dyingHero,UNIT_TYPE_HERO) and not IsUnitIllusion(dyingHero) then
         if Scoreboard_PlayerRows[playerIndex] != 0 then
             set Scoreboard_Deaths[playerIndex] = Scoreboard_Deaths[playerIndex] + 1
             call Scoreboard_UpdatePlayer(GetOwningPlayer(dyingHero))
@@ -21427,11 +21418,11 @@ function Afv takes nothing returns nothing
 endfunction
 
 function AFv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function Agv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function AGv takes nothing returns boolean
@@ -21760,11 +21751,11 @@ function NOv takes nothing returns nothing
 endfunction
 
 function NRv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function NIv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e)==false)and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function NAv takes nothing returns boolean
@@ -22093,11 +22084,11 @@ function bvv takes nothing returns nothing
 endfunction
 
 function bev takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(0))and(m[1]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(0))and(m[1]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function bxv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(0))and(m[1]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(0))and(m[1]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function bov takes nothing returns boolean
@@ -22507,11 +22498,11 @@ function Bev takes nothing returns nothing
 endfunction
 
 function Bxv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(1))and(m[2]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(1))and(m[2]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function Bov takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(1))and(m[2]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(1))and(m[2]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function Brv takes nothing returns boolean
@@ -22921,11 +22912,11 @@ function cxv takes nothing returns nothing
 endfunction
 
 function cov takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(2))and(m[3]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(2))and(m[3]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function crv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(2))and(m[3]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(2))and(m[3]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function civ takes nothing returns boolean
@@ -23335,11 +23326,11 @@ function Cov takes nothing returns nothing
 endfunction
 
 function Crv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(3))and(m[4]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(3))and(m[4]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function Civ takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(3))and(m[4]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(3))and(m[4]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function Cav takes nothing returns boolean
@@ -23749,11 +23740,11 @@ function drv takes nothing returns nothing
 endfunction
 
 function div takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(4))and(m[5]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(4))and(m[5]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function dav takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(4))and(m[5]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(4))and(m[5]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function dnv takes nothing returns boolean
@@ -24163,11 +24154,11 @@ function Div takes nothing returns nothing
 endfunction
 
 function Dav takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(5))and(m[6]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(5))and(m[6]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function Dnv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(5))and(m[6]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),e))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),f))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(5))and(m[6]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function DVv takes nothing returns boolean
@@ -24577,11 +24568,11 @@ function fav takes nothing returns nothing
 endfunction
 
 function fnv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(6))and(m[7]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(6))and(m[7]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function fVv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(6))and(m[7]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(6))and(m[7]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function fEv takes nothing returns boolean
@@ -24991,11 +24982,11 @@ function Fnv takes nothing returns nothing
 endfunction
 
 function FVv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(7))and(m[8]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(7))and(m[8]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function FEv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(7))and(m[8]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(7))and(m[8]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function FXv takes nothing returns boolean
@@ -25405,11 +25396,11 @@ function gVv takes nothing returns nothing
 endfunction
 
 function gEv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(8))and(m[9]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(8))and(m[9]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function gXv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(8))and(m[9]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(8))and(m[9]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function gOv takes nothing returns boolean
@@ -25819,11 +25810,11 @@ function GEv takes nothing returns nothing
 endfunction
 
 function GXv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(9))and(m[10]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(9))and(m[10]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function GOv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(9))and(m[10]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(9))and(m[10]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function GRv takes nothing returns boolean
@@ -26233,11 +26224,11 @@ function hXv takes nothing returns nothing
 endfunction
 
 function hOv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(10))and(m[11]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(10))and(m[11]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function hRv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(10))and(m[11]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(10))and(m[11]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function hIv takes nothing returns boolean
@@ -26647,11 +26638,11 @@ function HOv takes nothing returns nothing
 endfunction
 
 function HRv takes nothing returns boolean
-    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(11))and(m[12]!=null)and(GetDyingUnit()!=Ck)
+    return(MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(11))and(m[12]!=null)and(GetDyingUnit()!=IchigoHollowUnit)
 endfunction
 
 function HIv takes nothing returns boolean
-    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(11))and(m[12]!=null)and(GetDyingUnit()!=Ck)))
+    return(((MG(GetDyingUnit(),UNIT_TYPE_HERO))and(IsPlayerInForce(GetOwningPlayer(GetKillingUnit()),f))and(IsPlayerInForce(GetOwningPlayer(GetDyingUnit()),e))and(GetOwningPlayer(GetKillingUnit())!=Player(12))and(GetOwningPlayer(GetKillingUnit())==Player(11))and(m[12]!=null)and(GetDyingUnit()!=IchigoHollowUnit)))
 endfunction
 
 function HAv takes nothing returns boolean
@@ -38644,10 +38635,10 @@ function rRe takes nothing returns nothing
         call DestroyTrigger(qa)
         call DestroyTrigger(ra)
         call DestroyTrigger(sa)
-        call DestroyTrigger(ta)
-        call DestroyTrigger(ua)
-        call DestroyTrigger(wa)
-        call DestroyTrigger(va)
+        call DestroyTrigger(IchigoHollowLearnTrigger)
+        call DestroyTrigger(IchigoHollowAvailabilityTrigger)
+        call DestroyTrigger(IchigoFormDeathTrigger)
+        call DestroyTrigger(IchigoHollowSpellTrigger)
         call DestroyTrigger(xa)
         call DestroyTrigger(ya)
         call DestroyTrigger(za)
@@ -38657,9 +38648,9 @@ function rRe takes nothing returns nothing
         call TriggerRegisterUnitEvent(pa,hj,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(qa,hj,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(sa,hj,EVENT_UNIT_SPELL_EFFECT)
-        call TriggerRegisterUnitEvent(va,hj,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(IchigoHollowSpellTrigger,hj,EVENT_UNIT_SPELL_EFFECT)
         call TriggerRegisterUnitEvent(oa,hj,EVENT_UNIT_DEATH)
-        call TriggerRegisterUnitEvent(ta,hj,EVENT_UNIT_HERO_SKILL)
+        call TriggerRegisterUnitEvent(IchigoHollowLearnTrigger,hj,EVENT_UNIT_HERO_SKILL)
     endif
 endfunction
 
@@ -38792,7 +38783,7 @@ function rHe takes nothing returns boolean
 endfunction
 
 function rje takes nothing returns boolean
-    return(UnitHasBuffBJ(Xg,'B016'))
+    return(UnitHasBuffBJ(IchigoOriginalUnit,'B016'))
 endfunction
 
 function rJe takes nothing returns boolean
@@ -38809,13 +38800,13 @@ endfunction
 
 function rle takes nothing returns nothing
     set Zg=GetDyingUnit()
-    if(((UnitHasBuffBJ(Xg,'B016'))))then
-        call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
+    if(((UnitHasBuffBJ(IchigoOriginalUnit,'B016'))))then
+        call AddSpecialEffectTargetUnitBJ("origin",IchigoOriginalUnit,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
         call DestroyEffect(bj_lastCreatedEffect)
-        call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
+        call SetUnitMoveSpeed(IchigoOriginalUnit,GetUnitDefaultMoveSpeed(IchigoOriginalUnit))
         // probably hollow bug
-        call ModifyHeroStat(0,Xg,1,50)
-        call ModifyHeroStat(1,Xg,1,50)
+        call ModifyHeroStat(0,IchigoOriginalUnit,1,50)
+        call ModifyHeroStat(1,IchigoOriginalUnit,1,50)
     endif
     if(((((Ug)and(Zg==Vg)))))then
         call SetUnitAbilityLevelSwapped('A0AI',Vg,1)
@@ -38919,7 +38910,7 @@ endfunction
 
 
 function rUe takes nothing returns boolean
-    return(UnitHasBuffBJ(Xg,'B016'))
+    return(UnitHasBuffBJ(IchigoOriginalUnit,'B016'))
 endfunction
 
 function rwe takes nothing returns boolean
@@ -39100,13 +39091,13 @@ function Ichigo_Bankai_Action takes nothing returns nothing
         if(GetUnitAbilityLevelSwapped('A03J',s9[1])>=3)then
             call DestroyEffect(Yg[1])
         endif
-        if(((UnitHasBuffBJ(Xg,'B016'))))then
-            call UnitRemoveAbility(Xg,'B016')
-            call AddSpecialEffectTargetUnitBJ("origin",Xg,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
+        if(((UnitHasBuffBJ(IchigoOriginalUnit,'B016'))))then
+            call UnitRemoveAbility(IchigoOriginalUnit,'B016')
+            call AddSpecialEffectTargetUnitBJ("origin",IchigoOriginalUnit,"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
             call DestroyEffect(bj_lastCreatedEffect)
-            call SetUnitMoveSpeed(Xg,GetUnitDefaultMoveSpeed(Xg))
-            call ModifyHeroStat(0,Xg,1,50)
-            call ModifyHeroStat(1,Xg,1,50)
+            call SetUnitMoveSpeed(IchigoOriginalUnit,GetUnitDefaultMoveSpeed(IchigoOriginalUnit))
+            call ModifyHeroStat(0,IchigoOriginalUnit,1,50)
+            call ModifyHeroStat(1,IchigoOriginalUnit,1,50)
         endif
     endif
     if(((((Ug)and(Vg!=null)))))then
@@ -39453,138 +39444,6 @@ function iYe takes nothing returns nothing
     call TriggerAddAction(sa,function iye)
 endfunction
 
-function Ichigo_Hollow_Learned_Condition takes nothing returns boolean
-    return(GetLearnedSkill()=='A04A')
-endfunction
-
-function Ichigo_Hollow_Learned_Action takes nothing returns nothing
-    local integer unitID 
-    local integer abilityLevel
-    set dh=GetLearningUnit()
-    set Sd=GetRectCenter(io)
-    set abilityLevel = GetUnitAbilityLevel(dh, 'A04A')
-
-    if(GetUnitAbilityLevel(dh, 'A04A') != 1) then
-        call RemoveUnit(Ck)
-        set Ck = null
-    endif
-
-    // TODO: check if these units can buy blink 
-
-    if(abilityLevel == 1) then
-        set unitID = 'H01F'
-    elseif(abilityLevel == 2) then
-        set unitID = 'H02A'
-    elseif(abilityLevel == 3) then
-        set unitID = 'H02B'
-    elseif(abilityLevel == 4) then
-        set unitID = 'H02C'
-    elseif(abilityLevel == 5) then
-        set unitID = 'H02D'
-    endif
-
-    call CreateNUnitsAtLoc(1,unitID,Player(15),Sd,bj_UNIT_FACING)
-    set Ck=bj_lastCreatedUnit
-    call UnitAddAbility(Ck, 'Agho')
-
-    // magic resistance 0/5/10/15/20%
-    if(abilityLevel > 1) then
-        call UnitAddAbility(Ck, 'A101')
-        call SetUnitAbilityLevel(Ck, 'A101', abilityLevel - 1)
-    endif
-
-    call PauseUnit(Ck,true)
-    call SetUnitInvulnerable(Ck,true)
-    call RemoveLocation(Sd)
-    set Sd=null
-    call EnableTrigger(ua)
-    call TriggerRegisterUnitEvent(wa,Ck,EVENT_UNIT_DEATH)
-    call TriggerRegisterUnitEvent(xa,Ck,EVENT_UNIT_SPELL_EFFECT)
-    call TriggerRegisterUnitEvent(za,Ck,EVENT_UNIT_SPELL_EFFECT)
-    if(GetUnitAbilityLevel(dh, 'A04A') == 5) then 
-        call DisableTrigger(GetTriggeringTrigger())
-    endif
-endfunction
-
-function Ichigo_Hollow_Learned_Trig takes nothing returns nothing
-    set ta=CreateTrigger()
-    call TriggerAddCondition(ta,Condition(function Ichigo_Hollow_Learned_Condition))
-    call TriggerAddAction(ta,function Ichigo_Hollow_Learned_Action)
-endfunction
-
-
-function Ichigo_Trig_0_Condition takes nothing returns boolean
-    return((eh==false)and(IsUnitAliveBJ(dh)))
-endfunction
-
-
-function Remove_orai takes nothing returns nothing
-    call RemoveUnit(GetEnumUnit())
-endfunction
-
-
-function Ichigo_Trig_0_Action takes nothing returns nothing
-    set G[0]=k6(GetOwningPlayer(dh),'orai')
-    if(GetUnitStateSwap(UNIT_STATE_LIFE,dh)<=(.4*GetUnitStateSwap(UNIT_STATE_MAX_LIFE,dh)))then
-        if(IsUnitGroupEmptyBJ(G[0]))and(RectContainsUnit(zn,dh)==false)then
-            set r9[1876]=GetRectCenter(to)
-            call CreateNUnitsAtLoc(1,'orai',GetOwningPlayer(dh),r9[1876],bj_UNIT_FACING)
-            call RemoveLocation(r9[1876])
-            set r9[3]=null
-        endif
-    else
-        if(CountUnitsInGroup(G[0])>0)then
-            call ForGroupBJ(G[0],function Remove_orai)
-        endif
-    endif
-    call DestroyGroup(G[0])
-    set G[0]=null
-endfunction
-
-
-function Init_Ichigo_Trig_0 takes nothing returns nothing
-    set ua=CreateTrigger()
-    call DisableTrigger(ua)
-    call TriggerRegisterTimerEventPeriodic(ua,.5)
-    call TriggerAddCondition(ua,Condition(function Ichigo_Trig_0_Condition))
-    call TriggerAddAction(ua,function Ichigo_Trig_0_Action)
-endfunction
-
-
-function Ichigo_HollowForm_Condition takes nothing returns boolean
-    return(GetSpellAbilityId()=='A04A')
-endfunction
-
-
-function axe takes nothing returns boolean
-    return(Xg==Y[Cj[70]])
-endfunction
-
-function aoe takes nothing returns boolean
-    return(Xg==Z[Cj[70]])
-endfunction
-
-function are takes nothing returns boolean
-    return(r4[(1+GetPlayerId(GetOwningPlayer(Ck)))])
-endfunction
-
-
-function ane takes nothing returns boolean
-    return(Xg==x)
-endfunction
-
-function aVe takes nothing returns boolean
-    return(Xg==y)
-endfunction
-
-function aEe takes nothing returns boolean
-    return(Xg==a[401])
-endfunction
-
-function aXe takes nothing returns boolean
-    return(Xg==a[16])
-endfunction
-
 function RenjiERetargetFlights takes unit previousTarget, unit replacementTarget returns nothing
     local integer flightIndex=1
     local integer flightKey
@@ -39598,1142 +39457,617 @@ function RenjiERetargetFlights takes unit previousTarget, unit replacementTarget
     endloop
 endfunction
 
-
-function aRe takes nothing returns boolean
-    return(Xg==RenjiTTarget)
-endfunction
-
-function aIe takes nothing returns boolean
-    return(Xg==rh)
-endfunction
-
-function aAe takes nothing returns boolean
-    return(Xg==xe)
-endfunction
-
-function aNe takes nothing returns boolean
-    return(Xg==be)
-endfunction
-
-function abe takes nothing returns boolean
-    return(Xg==a[8])
-endfunction
-
-function aBe takes nothing returns boolean
-    return(Xg==a[801])
-endfunction
-
-function ace takes nothing returns boolean
-    return(Xg==a[800])
-endfunction
-
-function aCe takes nothing returns boolean
-    return(Xg==Ok[5])
-endfunction
-
-function ade takes nothing returns boolean
-    return(Xg==a[870])
-endfunction
-
-function aDe takes nothing returns boolean
-    return(Xg==a[880])
-endfunction
-
-function afe takes nothing returns boolean
-    return(Xg==ej)
-endfunction
-
-function aFe takes nothing returns boolean
-    return(Xg==Hm[2])
-endfunction
-
-function age takes nothing returns boolean
-    return(Xg==hk[36])
-endfunction
-
-function aGe takes nothing returns boolean
-    return(Xg==a[3])
-endfunction
-
-function ahe takes nothing returns boolean
-    return(Xg==a[9])
-endfunction
-
-function aHe takes nothing returns boolean
-    return(Xg==a[10])
-endfunction
-
-function aje takes nothing returns boolean
-    return(Xg==h8)
-endfunction
-
-function aJe takes nothing returns boolean
-    return(Xg==a[1006])
-endfunction
-
-function ake takes nothing returns boolean
-    return(Xg==a[1008])
-endfunction
-
-function aKe takes nothing returns boolean
-    return(Xg==a[404])
-endfunction
-
-function ale takes nothing returns boolean
-    return(Xg==a[406])
-endfunction
-
-function aLe takes nothing returns boolean
-    return(Xg==jm[4])
-endfunction
-
-function ame takes nothing returns boolean
-    return(Xg==jm[10])
-endfunction
-
-function aMe takes nothing returns boolean
-    return(Xg==a[66])
-endfunction
-
-function ape takes nothing returns boolean
-    return(Xg==a[67])
-endfunction
-
-function aPe takes nothing returns boolean
-    return(Xg==jf[15])
-endfunction
-
-function aqe takes nothing returns boolean
-    return(Xg==Y[nn])
-endfunction
-
-function aQe takes nothing returns boolean
-    return(Xg==Z[nn])
-endfunction
-
-function ase takes nothing returns boolean
-    return(Xg==O7[nn])
-endfunction
-
-function aSe takes nothing returns boolean
-    return(Xg==P7[nn])
-endfunction
-
-function ate takes nothing returns boolean
-    return(Xg==a4)
-endfunction
-
-function aTe takes nothing returns boolean
-    return(n4[(1+GetPlayerId(GetOwningPlayer(Ck)))])
-endfunction
-
-function aue takes nothing returns nothing
-    call RemoveUnit(GetEnumUnit())
-endfunction
-
-function aUe takes nothing returns boolean
-    return(UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)
-endfunction
-
-function awe takes nothing returns boolean
-    return(((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))
-endfunction
-
-function aWe takes nothing returns boolean
-    return(Ck==Y[Cj[70]])
-endfunction
-
-function aye takes nothing returns boolean
-    return(Ck==Z[Cj[70]])
-endfunction
-
-function aYe takes nothing returns boolean
-    return(r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])
-endfunction
-
-function aze takes nothing returns boolean
-    return(o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)
-endfunction
-
-function aZe takes nothing returns boolean
-    return(((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))
-endfunction
-
-function a_e takes nothing returns boolean
-    return(Ck==x)
-endfunction
-
-function a0e takes nothing returns boolean
-    return(Ck==y)
-endfunction
-
-function a1e takes nothing returns boolean
-    return(Ck==a[401])
-endfunction
-
-function a2e takes nothing returns boolean
-    return(Ck==a[16])
-endfunction
-
-
-function a4e takes nothing returns boolean
-    return(Ck==RenjiTTarget)
-endfunction
-
-function a5e takes nothing returns boolean
-    return(Ck==rh)
-endfunction
-
-function a6e takes nothing returns boolean
-    return(Ck==xe)
-endfunction
-
-function a7e takes nothing returns boolean
-    return(Ck==be)
-endfunction
-
-function a8e takes nothing returns boolean
-    return(Ck==a[8])
-endfunction
-
-function a9e takes nothing returns boolean
-    return(Ck==a[801])
-endfunction
-
-function nve takes nothing returns boolean
-    return(Ck==a[800])
-endfunction
-
-function nee takes nothing returns boolean
-    return(Ck==Ok[5])
-endfunction
-
-function nxe takes nothing returns boolean
-    return(Ck==a[870])
-endfunction
-
-function noe takes nothing returns boolean
-    return(Ck==a[880])
-endfunction
-
-function nre takes nothing returns boolean
-    return(Ck==ej)
-endfunction
-
-function nie takes nothing returns boolean
-    return(Ck==Hm[2])
-endfunction
-
-function nae takes nothing returns boolean
-    return(Ck==hk[36])
-endfunction
-
-function nne takes nothing returns boolean
-    return(Ck==a[3])
-endfunction
-
-function nVe takes nothing returns boolean
-    return(Ck==a[9])
-endfunction
-
-function nEe takes nothing returns boolean
-    return(Ck==a[10])
-endfunction
-
-function nXe takes nothing returns boolean
-    return(Ck==h8)
-endfunction
-
-function nOe takes nothing returns boolean
-    return(Ck==a[1006])
-endfunction
-
-function nRe takes nothing returns boolean
-    return(Ck==a[1008])
-endfunction
-
-function nIe takes nothing returns boolean
-    return(Ck==a[404])
-endfunction
-
-function nAe takes nothing returns boolean
-    return(Ck==a[406])
-endfunction
-
-function nNe takes nothing returns boolean
-    return(Ck==jm[4])
-endfunction
-
-function nbe takes nothing returns boolean
-    return(Ck==jm[10])
-endfunction
-
-function nBe takes nothing returns boolean
-    return(Ck==a[66])
-endfunction
-
-function nce takes nothing returns boolean
-    return(Ck==a[67])
-endfunction
-
-function nCe takes nothing returns boolean
-    return(Ck==jf[15])
-endfunction
-
-function nde takes nothing returns boolean
-    return(Ck==Y[nn])
-endfunction
-
-function nDe takes nothing returns boolean
-    return(Ck==Z[nn])
-endfunction
-
-function nfe takes nothing returns boolean
-    return(Ck==O7[nn])
-endfunction
-
-function nFe takes nothing returns boolean
-    return(Ck==P7[nn])
-endfunction
-
-function nge takes nothing returns boolean
-    return(Ck==a4)
-endfunction
-
-function nGe takes nothing returns boolean
-    return(n4[(1+GetPlayerId(GetOwningPlayer(Xg)))])
-endfunction
-
-function nhe takes nothing returns boolean
-    return(ck)
-endfunction
-
 function Get_HollowForm_Stat_Bonus takes integer abilityLevel returns integer
     return (10 * (abilityLevel - 1))
 endfunction
 
 function Get_Random_Sound_Ichigo_T takes nothing returns sound
-    local integer which_sound = GetRandomInt(1, 3)
-    local sound to_play
-    if(which_sound == 1) then
-        set to_play = Sound_Effect_Ichigo_T_1
-    elseif(which_sound == 2) then
-        set to_play = Sound_Effect_Ichigo_T_2
+    local integer soundIndex = GetRandomInt(1, 3)
+    local sound selectedSound
+    if(soundIndex == 1) then
+        set selectedSound = Sound_Effect_Ichigo_T_1
+    elseif(soundIndex == 2) then
+        set selectedSound = Sound_Effect_Ichigo_T_2
     else
-        set to_play = Sound_Effect_Ichigo_T_3
+        set selectedSound = Sound_Effect_Ichigo_T_3
     endif
-    return to_play
+    return selectedSound
 endfunction
 
-function Ichigo_HollowForm_Action takes nothing returns nothing
-    local integer abilityLevel
-    local real hollowDuration
-    local item currItem = null
-    local boolean wasHollowPaused = false
-    set Xg=GetTriggerUnit()
-    set abilityLevel = GetUnitAbilityLevelSwapped('A04A',Xg)
-    set hollowDuration = (15.+(1.*I2R(abilityLevel)))
-    set fh=(160.-(10.*I2R(abilityLevel)))
-    set r9[1000]=GetUnitLoc(Xg)
-    set r9[1001]=GetRectCenter(io)
-    set Cj[70]=1
+function IchigoHollow_RetargetReferences takes unit previousUnit, unit replacementUnit returns nothing
+    local integer referenceIndex
+    set referenceIndex=1
     loop
-        exitwhen Cj[70]>6
-        if((UnitItemInSlotBJ(Xg,Cj[70])==oG)and(Xg==T))then
-            call UnitRemoveItemFromSlotSwapped(Cj[70],Xg)
-        else
-            set currItem = UnitItemInSlotBJ(Xg,Cj[70])
-            call UnitRemoveItem(Xg, currItem)
-            call UnitAddItem(Ck, currItem)
+        exitwhen referenceIndex>6
+        if previousUnit==Y[referenceIndex] then
+            set Y[referenceIndex]=replacementUnit
         endif
-        set Cj[70]=Cj[70]+1
+        if previousUnit==Z[referenceIndex] then
+            set Z[referenceIndex]=replacementUnit
+        endif
+        set referenceIndex=referenceIndex+1
     endloop
-    set currItem = null
-    set Ek[0]=R2I(GetUnitFacing(Xg))
-    set Ek[1]=GetHeroStatBJ(0,Xg,false)
-    set Ek[2]=GetHeroStatBJ(1,Xg,false)
-    set Ek[3]=GetHeroStatBJ(2,Xg,false)
-    set Ek[4]=GetHeroXP(Xg)
-    set Ek[5]=GetHeroLevel(Xg)
-    set Ek[6]=R2I(GetUnitStateSwap(UNIT_STATE_LIFE,Xg))
-    set m[(1+GetPlayerId(GetOwningPlayer(Xg)))]=null
-    set Km[2]=GetUnitLoc(Xg)
-    call PlaySoundAtPointBJ(fs,100,Km[2],0)
-    call RemoveLocation(Km[2])
-    set Km[2]=null
-    call UnitRemoveBuffsBJ(1,Xg)
-    call SetUnitInvulnerable(Xg,true)
-    call SetUnitOwner(Ck,GetOwningPlayer(Xg),true)
-    call SetUnitOwner(Xg,Player(15),true)
-    call UnitAddAbility(Xg,'Agho')
-    call SetUnitPositionLocFacingBJ(Xg,r9[1001],bj_UNIT_FACING)
-    call SetUnitLifePercentBJ(Xg,100)
-    call PauseUnit(Xg,true)
-    call SelectUnitRemove(Xg)
-    call AddSpecialEffectLocBJ(r9[1000],"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
-    call DestroyEffect(bj_lastCreatedEffect)
-    set m[(1+GetPlayerId(GetOwningPlayer(Ck)))]=Ck
-    call SetUnitPositionLocFacingBJ(Ck,r9[1000],I2R(Ek[0]))
-    call Play_Spell_Sound_Effect( Get_Random_Sound_Ichigo_T(), Ck)
-    call SetHeroXP(Ck,Ek[4],false)
-    call SetHeroLevelBJ(Ck,Ek[5],false)
-    call ModifyHeroStat(0,Ck,2,(Ek[1] +  (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give str bonus
-    call ModifyHeroStat(1,Ck,2,(Ek[2] +  (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) )) // give agi bonus
-    call ModifyHeroStat(2,Ck,2,Ek[3])     // copy INT
-    call PauseUnit(Ck,false)
-    call SetUnitInvulnerable(Ck,false)
-    call UnitRemoveBuffsBJ(1,Ck)
-    call SetWidgetLife(Ck,I2R(Ek[6]))
-    call SetUnitManaBJ(Ck,0)
-    call UnitRemoveAbility(Ck,'Agho')
-    set Cj[70]=1
+    if(((previousUnit==x)))then
+        set x=replacementUnit
+    endif
+    if(((previousUnit==y)))then
+        set y=replacementUnit
+    endif
+    if(((previousUnit==a[401])))then
+        set a[401]=replacementUnit
+    endif
+    if(((previousUnit==a[16])))then
+        set a[16]=replacementUnit
+    endif
+    call RenjiERetargetFlights(previousUnit,replacementUnit)
+    if(((previousUnit==RenjiTTarget)))then
+        set RenjiTTarget=replacementUnit
+    endif
+    if(((previousUnit==rh)))then
+        set rh=replacementUnit
+    endif
+    if(((previousUnit==xe)))then
+        set xe=replacementUnit
+    endif
+    if(((previousUnit==be)))then
+        set be=replacementUnit
+    endif
+    if(((previousUnit==a[8])))then
+        set a[8]=replacementUnit
+    endif
+    if(((previousUnit==a[801])))then
+        set a[801]=replacementUnit
+    endif
+    if(((previousUnit==a[800])))then
+        set a[800]=replacementUnit
+    endif
+    if(((previousUnit==Ok[5])))then
+        set Ok[5]=replacementUnit
+    endif
+    if(((previousUnit==a[870])))then
+        set a[870]=replacementUnit
+    endif
+    if(((previousUnit==a[880])))then
+        set a[880]=replacementUnit
+    endif
+    if(((previousUnit==ej)))then
+        set ej=replacementUnit
+    endif
+    if(((previousUnit==Hm[2])))then
+        set Hm[2]=replacementUnit
+    endif
+    if(((previousUnit==hk[36])))then
+        set hk[36]=replacementUnit
+    endif
+    if(((previousUnit==a[3])))then
+        set a[3]=replacementUnit
+    endif
+    if(((previousUnit==a[9])))then
+        set a[9]=replacementUnit
+    endif
+    if(((previousUnit==a[10])))then
+        set a[10]=replacementUnit
+    endif
+    if(((previousUnit==h8)))then
+        set h8=replacementUnit
+    endif
+    if(((previousUnit==a[1006])))then
+        set a[1006]=replacementUnit
+    endif
+    if(((previousUnit==a[1008])))then
+        set a[1008]=replacementUnit
+    endif
+    if(((previousUnit==a[404])))then
+        set a[404]=replacementUnit
+    endif
+    if(((previousUnit==a[406])))then
+        set a[406]=replacementUnit
+    endif
+    if(((previousUnit==jm[4])))then
+        set jm[4]=replacementUnit
+    endif
+    if(((previousUnit==jm[10])))then
+        set jm[10]=replacementUnit
+    endif
+    if(((previousUnit==a[66])))then
+        set a[66]=replacementUnit
+    endif
+    if(((previousUnit==a[67])))then
+        set a[67]=replacementUnit
+    endif
+    if(((previousUnit==jf[15])))then
+        set jf[15]=replacementUnit
+    endif
+    set referenceIndex=1
     loop
-        exitwhen Cj[70]>6
-        //call UnitAddItemByIdSwapped(Dk[i],Ck)
-        set Dk[Cj[70]]='moon'
-        set Ek[Cj[70]]=0
-        if(((Xg==Y[Cj[70]])))then
-            set Y[Cj[70]]=Ck
+        exitwhen referenceIndex>5
+        if(((previousUnit==Y[referenceIndex])))then
+            set Y[referenceIndex]=replacementUnit
         endif
-        if(((Xg==Z[Cj[70]])))then
-            set Z[Cj[70]]=Ck
+        if(((previousUnit==Z[referenceIndex])))then
+            set Z[referenceIndex]=replacementUnit
         endif
-        set Cj[70]=Cj[70]+1
+        if(((previousUnit==O7[referenceIndex])))then
+            set O7[referenceIndex]=replacementUnit
+        endif
+        if(((previousUnit==P7[referenceIndex])))then
+            set P7[referenceIndex]=replacementUnit
+        endif
+        set referenceIndex=referenceIndex+1
     endloop
-
-    if((o4[(1+GetPlayerId(GetOwningPlayer(Ck)))])and(GetUnitAbilityLevelSwapped('A028',Ck)==0))then
-        if(((r4[(1+GetPlayerId(GetOwningPlayer(Ck)))])))then
-            call UnitAddAbility(Ck,'A028')
-        endif
-    endif
-    call SelectUnitForPlayerSingle(Ck,GetOwningPlayer(Ck))
-    if(((Xg==x)))then
-        set x=Ck
-    endif
-    if(((Xg==y)))then
-        set y=Ck
-    endif
-    if(((Xg==a[401])))then
-        set a[401]=Ck
-    endif
-    if(((Xg==a[16])))then
-        set a[16]=Ck
-    endif
-    call RenjiERetargetFlights(Xg,Ck)
-    if(((Xg==RenjiTTarget)))then
-        set RenjiTTarget=Ck
-    endif
-    if(((Xg==rh)))then
-        set rh=Ck
-    endif
-    if(((Xg==xe)))then
-        set xe=Ck
-    endif
-    if(((Xg==be)))then
-        set be=Ck
-    endif
-    if(((Xg==a[8])))then
-        set a[8]=Ck
-    endif
-    if(((Xg==a[801])))then
-        set a[801]=Ck
-    endif
-    if(((Xg==a[800])))then
-        set a[800]=Ck
-    endif
-    if(((Xg==Ok[5])))then
-        set Ok[5]=Ck
-    endif
-    if(((Xg==a[870])))then
-        set a[870]=Ck
-    endif
-    if(((Xg==a[880])))then
-        set a[880]=Ck
-    endif
-    if(((Xg==ej)))then
-        set ej=Ck
-    endif
-    if(((Xg==Hm[2])))then
-        set Hm[2]=Ck
-    endif
-    if(((Xg==hk[36])))then
-        set hk[36]=Ck
-    endif
-    if(((Xg==a[3])))then
-        set a[3]=Ck
-    endif
-    if(((Xg==a[9])))then
-        set a[9]=Ck
-    endif
-    if(((Xg==a[10])))then
-        set a[10]=Ck
-    endif
-    if(((Xg==h8)))then
-        set h8=Ck
-    endif
-    if(((Xg==a[1006])))then
-        set a[1006]=Ck
-    endif
-    if(((Xg==a[1008])))then
-        set a[1008]=Ck
-    endif
-    if(((Xg==a[404])))then
-        set a[404]=Ck
-    endif
-    if(((Xg==a[406])))then
-        set a[406]=Ck
-    endif
-    if(((Xg==jm[4])))then
-        set jm[4]=Ck
-    endif
-    if(((Xg==jm[10])))then
-        set jm[10]=Ck
-    endif
-    if(((Xg==a[66])))then
-        set a[66]=Ck
-    endif
-    if(((Xg==a[67])))then
-        set a[67]=Ck
-    endif
-    if(((Xg==jf[15])))then
-        set jf[15]=Ck
-    endif
-    set nn=1
-    loop
-        exitwhen nn>5
-        if(((Xg==Y[nn])))then
-            set Y[nn]=Ck
-        endif
-        if(((Xg==Z[nn])))then
-            set Z[nn]=Ck
-        endif
-        if(((Xg==O7[nn])))then
-            set O7[nn]=Ck
-        endif
-        if(((Xg==P7[nn])))then
-            set P7[nn]=Ck
-        endif
-        set nn=nn+1
-    endloop
-    if(((Xg==a4)))then
+    if(((previousUnit==a4)))then
         call DestroyEffect(B4)
-        set a4=Ck
+        set a4=replacementUnit
         call AddSpecialEffectTargetUnitBJ("overhead",a4,"Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdl")
         set B4=bj_lastCreatedEffect
     endif
-    if(((n4[(1+GetPlayerId(GetOwningPlayer(Ck)))])))then
-        call SetCameraTargetControllerNoZForPlayer(GetOwningPlayer(Ck),Ck,0,0,false)
+endfunction
+
+function IchigoHollow_IsAlive takes unit targetUnit returns boolean
+    return targetUnit != null and GetUnitTypeId(targetUnit) != 0 and not IsUnitType(targetUnit,UNIT_TYPE_DEAD) and GetWidgetLife(targetUnit) > 0.
+endfunction
+
+function IchigoHollow_RoundHealthUp takes real currentHealth returns real
+    local integer roundedHealth = R2I(currentHealth)
+    if I2R(roundedHealth) < currentHealth then
+        set roundedHealth = roundedHealth + 1
     endif
-    call SetPlayerHandicapXPBJ(GetOwningPlayer(Ck),.0)
-    call RemoveLocation(r9[1000])
-    set r9[1000]=null
-    call RemoveLocation(r9[1001])
-    set r9[1001]=null
-    set eh=true
-    set ck=true
-    call DisableTrigger(ua)
-    set G[0]=k6(GetOwningPlayer(Ck),'orai')
-    call ForGroupBJ(G[0],function aue)
-    call DestroyGroup(G[0])
-    set G[0]=null
-    call TriggerSleepAction((15.+(1.*I2R(GetUnitAbilityLevelSwapped('A04A',Xg)))))
-    if(((ck)))then
-        set wasHollowPaused=IsUnitPaused(Ck)
-        set ck=false
-        set r9[1000]=GetUnitLoc(Ck)
-        set r9[1001]=GetRectCenter(io)
-        set Cj[70]=1
-        loop
-            exitwhen Cj[70]>6
-            if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
-                call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
+    return I2R(IMaxBJ(1,roundedHealth))
+endfunction
+
+function IchigoHollow_ReportTransferFailure takes string failureReason returns nothing
+    local player receivingPlayer = IchigoHollowPlayer
+    if receivingPlayer == null then
+        set receivingPlayer = GetOwningPlayer(IchigoHollowAbilityOwner)
+    endif
+    if failureReason != IchigoHollowLastTransferError then
+        call DisplayTimedTextToPlayer(receivingPlayer,0,0,12,"|cffff2020T Ичиго: "+failureReason+"|r")
+        set IchigoHollowLastTransferError = failureReason
+    endif
+    set receivingPlayer = null
+endfunction
+
+function IchigoHollow_CountItems takes unit inventoryUnit returns integer
+    local integer inventorySlot = 0
+    local integer itemCount = 0
+    loop
+        exitwhen inventorySlot >= UnitInventorySize(inventoryUnit)
+        if UnitItemInSlot(inventoryUnit,inventorySlot) != null then
+            set itemCount = itemCount + 1
+        endif
+        set inventorySlot = inventorySlot + 1
+    endloop
+    return itemCount
+endfunction
+
+function IchigoHollow_TransferInventory takes unit donorUnit, unit recipientUnit returns boolean
+    local integer inventorySlot = 0
+    local item inventoryItem = null
+    local string itemName
+    local string failureReason
+    local boolean itemWasAdded
+    set IchigoHollowTransferStarted = false
+    if donorUnit == null or recipientUnit == null or GetUnitTypeId(donorUnit) == 0 or GetUnitTypeId(recipientUnit) == 0 then
+        call IchigoHollow_ReportTransferFailure("перенос вещей отменён: одна из форм не существует.")
+        return false
+    endif
+    if IchigoHollow_CountItems(donorUnit) == 0 then
+        return true
+    endif
+    if not IchigoHollow_IsAlive(recipientUnit) then
+        call IchigoHollow_ReportTransferFailure("перенос вещей отменён: получатель мёртв.")
+        return false
+    endif
+    if UnitInventorySize(recipientUnit) == 0 then
+        call IchigoHollow_ReportTransferFailure("перенос вещей отменён: у получателя нет инвентаря.")
+        return false
+    endif
+    if IchigoHollow_CountItems(donorUnit) + IchigoHollow_CountItems(recipientUnit) > UnitInventorySize(recipientUnit) then
+        call IchigoHollow_ReportTransferFailure("перенос вещей отменён: у получателя недостаточно свободных слотов.")
+        return false
+    endif
+    loop
+        exitwhen inventorySlot >= UnitInventorySize(donorUnit)
+        set inventoryItem = UnitItemInSlot(donorUnit,inventorySlot)
+        if inventoryItem != null then
+            set itemName = GetItemName(inventoryItem)
+            set IchigoHollowTransferStarted = true
+            // Preserve the existing special handling of the arena's unique item.
+            if inventoryItem == oG and donorUnit == T then
+                call UnitRemoveItem(donorUnit,inventoryItem)
             else
-                set currItem = UnitItemInSlotBJ(Ck,Cj[70])
-                call UnitRemoveItem(Ck, currItem)
-                call UnitAddItem(Xg, currItem)
-            endif
-            set Cj[70]=Cj[70]+1
-        endloop
-        set currItem = null
-        set Ek[0]=R2I(GetUnitFacing(Ck))
-        set Ek[1]=GetHeroStatBJ(0,Ck,false)
-        set Ek[2]=GetHeroStatBJ(1,Ck,false)
-        set Ek[3]=GetHeroStatBJ(2,Ck,false)
-        set Ek[4]=GetHeroXP(Ck)
-        set Ek[5]=GetHeroLevel(Ck)
-        set Ek[6]=R2I(GetUnitStateSwap(UNIT_STATE_LIFE,Ck))
-        set m[(1+GetPlayerId(GetOwningPlayer(Ck)))]=null
-        call UnitRemoveBuffsBJ(1,Ck)
-        call SetUnitOwner(Xg,GetOwningPlayer(Ck),true)
-        call SetUnitOwner(Ck,Player(15),true)
-        call UnitAddAbility(Ck,'Agho')
-        call SetUnitPositionLocFacingBJ(Ck,r9[1001],bj_UNIT_FACING)
-        call SetUnitLifePercentBJ(Ck,100)
-        call PauseUnit(Ck,true)
-        call SetUnitInvulnerable(Ck,true)
-        call SelectUnitRemove(Ck)
-        call AddSpecialEffectLocBJ(r9[1000],"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
-        call DestroyEffect(bj_lastCreatedEffect)
-        set m[(1+GetPlayerId(GetOwningPlayer(Xg)))]=Xg
-        call SetUnitPositionLocFacingBJ(Xg,r9[1000],I2R(Ek[0]))
-        call SetHeroXP(Xg,Ek[4],false)
-        call SetHeroLevelBJ(Xg,Ek[5],false)
-        // take stat bonus back
-        call ModifyHeroStat(0,Xg,2,(Ek[1]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-        call ModifyHeroStat(1,Xg,2,(Ek[2]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-        call ModifyHeroStat(2,Xg,2,Ek[3])
-        call PauseUnit(Xg,wasHollowPaused)
-        call SetUnitInvulnerable(Xg,false)
-        call UnitRemoveBuffsBJ(1,Xg)
-        //call SetWidgetLife(Xg,I2R(Ek[6]))
-        call SetUnitLifePercentBJ(Xg, 40)
-        call SetUnitManaBJ(Xg,0)
-        call UnitRemoveAbility(Xg,'Agho')
-        set Cj[70]=1
-        loop
-            exitwhen Cj[70]>6
-            //call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
-            set Dk[Cj[70]]='moon'
-            set Ek[Cj[70]]=0
-            if(((Ck==Y[Cj[70]])))then
-                set Y[Cj[70]]=Xg
-            endif
-            if(((Ck==Z[Cj[70]])))then
-                set Z[Cj[70]]=Xg
-            endif
-            set Cj[70]=Cj[70]+1
-        endloop
-        if(((((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))))then
-            if(((r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
-                call UnitAddAbility(Xg,'A028')
+                call UnitRemoveItem(donorUnit,inventoryItem)
+                set itemWasAdded = UnitAddItem(recipientUnit,inventoryItem)
+                if not itemWasAdded or not UnitHasItem(recipientUnit,inventoryItem) then
+                    if GetItemTypeId(inventoryItem) == 0 then
+                        set failureReason = "предмет удалён обработчиком подбора."
+                    elseif not IchigoHollow_IsAlive(recipientUnit) then
+                        set failureReason = "получатель погиб во время передачи."
+                    elseif IchigoHollow_CountItems(recipientUnit) >= UnitInventorySize(recipientUnit) then
+                        set failureReason = "инвентарь получателя заполнен."
+                    else
+                        set failureReason = "движок отклонил передачу; UnitAddItem не сообщает точную причину."
+                    endif
+                    if GetItemTypeId(inventoryItem) != 0 and not UnitHasItem(donorUnit,inventoryItem) then
+                        set itemWasAdded = UnitAddItem(donorUnit,inventoryItem)
+                        if not itemWasAdded or not UnitHasItem(donorUnit,inventoryItem) then
+                            // Keep this exact item for a later recovery attempt, without recreating it.
+                            set IchigoHollowPendingItem = inventoryItem
+                            set IchigoHollowPendingItemWasVisible = IsItemVisible(inventoryItem)
+                            set IchigoHollowPendingItemWasInvulnerable = IsItemInvulnerable(inventoryItem)
+                            call SetItemInvulnerable(inventoryItem,true)
+                            call SetItemVisible(inventoryItem,false)
+                            set failureReason = failureReason + " Возврат донору также не удался; предмет сохранён для повторной передачи."
+                        endif
+                    endif
+                    call IchigoHollow_ReportTransferFailure("не удалось передать «"+itemName+"»: "+failureReason)
+                    set inventoryItem = null
+                    return false
+                endif
             endif
         endif
-        call SelectUnitForPlayerSingle(Xg,GetOwningPlayer(Xg))
-        if(((Ck==x)))then
-            set x=Xg
-        endif
-        if(((Ck==y)))then
-            set y=Xg
-        endif
-        if(((Ck==a[401])))then
-            set a[401]=Xg
-        endif
-        if(((Ck==a[16])))then
-            set a[16]=Xg
-        endif
-        call RenjiERetargetFlights(Ck,Xg)
-        if(((Ck==RenjiTTarget)))then
-            set RenjiTTarget=Xg
-        endif
-        if(((Ck==rh)))then
-            set rh=Xg
-        endif
-        if(((Ck==xe)))then
-            set xe=Xg
-        endif
-        if(((Ck==be)))then
-            set be=Xg
-        endif
-        if(((Ck==a[8])))then
-            set a[8]=Xg
-        endif
-        if(((Ck==a[801])))then
-            set a[801]=Xg
-        endif
-        if(((Ck==a[800])))then
-            set a[800]=Xg
-        endif
-        if(((Ck==Ok[5])))then
-            set Ok[5]=Xg
-        endif
-        if(((Ck==a[870])))then
-            set a[870]=Xg
-        endif
-        if(((Ck==a[880])))then
-            set a[880]=Xg
-        endif
-        if(((Ck==ej)))then
-            set ej=Xg
-        endif
-        if(((Ck==Hm[2])))then
-            set Hm[2]=Xg
-        endif
-        if(((Ck==hk[36])))then
-            set hk[36]=Xg
-        endif
-        if(((Ck==a[3])))then
-            set a[3]=Xg
-        endif
-        if(((Ck==a[9])))then
-            set a[9]=Xg
-        endif
-        if(((Ck==a[10])))then
-            set a[10]=Xg
-        endif
-        if(((Ck==h8)))then
-            set h8=Xg
-        endif
-        if(((Ck==a[1006])))then
-            set a[1006]=Xg
-        endif
-        if(((Ck==a[1008])))then
-            set a[1008]=Xg
-        endif
-        if(((Ck==a[404])))then
-            set a[404]=Xg
-        endif
-        if(((Ck==a[406])))then
-            set a[406]=Xg
-        endif
-        if(((Ck==jm[4])))then
-            set jm[4]=Xg
-        endif
-        if(((Ck==jm[10])))then
-            set jm[10]=Xg
-        endif
-        if(((Ck==a[66])))then
-            set a[66]=Xg
-        endif
-        if(((Ck==a[67])))then
-            set a[67]=Xg
-        endif
-        if(((Ck==jf[15])))then
-            set jf[15]=Xg
-        endif
-        set nn=1
-        loop
-            exitwhen nn>5
-            if(((Ck==Y[nn])))then
-                set Y[nn]=Xg
-            endif
-            if(((Ck==Z[nn])))then
-                set Z[nn]=Xg
-            endif
-            if(((Ck==O7[nn])))then
-                set O7[nn]=Xg
-            endif
-            if(((Ck==P7[nn])))then
-                set P7[nn]=Xg
-            endif
-            set nn=nn+1
-        endloop
-        if(((Ck==a4)))then
-            call DestroyEffect(B4)
-            set a4=Xg
-            call AddSpecialEffectTargetUnitBJ("overhead",a4,"Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdl")
-            set B4=bj_lastCreatedEffect
-        endif
-        if(((n4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
-            call SetCameraTargetControllerNoZForPlayer(GetOwningPlayer(Xg),Xg,0,0,false)
-        endif
-        call SetPlayerHandicapXPBJ(GetOwningPlayer(Xg),100.)
-        call RemoveLocation(r9[1000])
-        set r9[1000]=null
-        call RemoveLocation(r9[1001])
-        set r9[1001]=null
+        set inventorySlot = inventorySlot + 1
+    endloop
+    set inventoryItem = null
+    return true
+endfunction
+
+function IchigoHollow_RecoverPendingItem takes unit recipientUnit returns boolean
+    local boolean itemWasAdded
+    if IchigoHollowPendingItem == null then
+        return true
     endif
-    set Xg=null
-    //call TriggerSleepAction( (fh-(15.+(1.*I2R(GetUnitAbilityLevelSwapped('A04A',Xg))))) )
-    call EnableTrigger(ua)
-    set eh=false
-    set fh=.0
+    if GetItemTypeId(IchigoHollowPendingItem) == 0 then
+        call IchigoHollow_ReportTransferFailure("восстановление невозможно: предмет был удалён другим обработчиком.")
+        set IchigoHollowPendingItem = null
+        return true
+    endif
+    if UnitHasItem(IchigoOriginalUnit,IchigoHollowPendingItem) or UnitHasItem(IchigoHollowUnit,IchigoHollowPendingItem) then
+        call SetItemInvulnerable(IchigoHollowPendingItem,IchigoHollowPendingItemWasInvulnerable)
+        call SetItemVisible(IchigoHollowPendingItem,IchigoHollowPendingItemWasVisible)
+        set IchigoHollowPendingItem = null
+        return true
+    endif
+    if not IchigoHollow_IsAlive(recipientUnit) then
+        return false
+    endif
+    set itemWasAdded = UnitAddItem(recipientUnit,IchigoHollowPendingItem)
+    if itemWasAdded and UnitHasItem(recipientUnit,IchigoHollowPendingItem) then
+        call SetItemInvulnerable(IchigoHollowPendingItem,IchigoHollowPendingItemWasInvulnerable)
+        call SetItemVisible(IchigoHollowPendingItem,IchigoHollowPendingItemWasVisible)
+        set IchigoHollowPendingItem = null
+        return true
+    endif
+    return false
 endfunction
 
-
-function Init_Ichigo_HollowForm_Trig takes nothing returns nothing
-    set va=CreateTrigger()
-    call TriggerAddCondition(va,Condition(function Ichigo_HollowForm_Condition))
-    call TriggerAddAction(va,function Ichigo_HollowForm_Action)
+function IchigoHollow_RemoveAvailabilityUnit takes nothing returns nothing
+    call RemoveUnit(GetEnumUnit())
 endfunction
 
-
-function Ichigo_Die_Condition takes nothing returns boolean
-    return(ck)
+function IchigoHollow_ClearAvailability takes player heroPlayer returns nothing
+    local group availabilityUnits = GetUnitsOfPlayerAndTypeId(heroPlayer,'orai')
+    call ForGroup(availabilityUnits,function IchigoHollow_RemoveAvailabilityUnit)
+    call DestroyGroup(availabilityUnits)
+    set availabilityUnits = null
 endfunction
 
-
-function nke takes nothing returns boolean
-    return(UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)
+function IchigoHollow_PrepareUnit takes integer abilityLevel returns boolean
+    local integer hollowTypeId = 'H01F'
+    local unit previousHollow = IchigoHollowUnit
+    if abilityLevel == 2 then
+        set hollowTypeId = 'H02A'
+    elseif abilityLevel == 3 then
+        set hollowTypeId = 'H02B'
+    elseif abilityLevel == 4 then
+        set hollowTypeId = 'H02C'
+    elseif abilityLevel >= 5 then
+        set hollowTypeId = 'H02D'
+    endif
+    if previousHollow != null and GetUnitTypeId(previousHollow) != hollowTypeId then
+        if IchigoHollow_CountItems(previousHollow) != 0 or IchigoHollowPendingItem != null then
+            call IchigoHollow_ReportTransferFailure("замена формы отменена: на старом Пустом остались предметы.")
+            set previousHollow = null
+            return false
+        endif
+        call RemoveUnit(previousHollow)
+        set IchigoHollowUnit = null
+    endif
+    if IchigoHollowUnit == null then
+        set IchigoHollowUnit = CreateUnit(Player(15),hollowTypeId,GetRectCenterX(HiddenHeroStorageRect),GetRectCenterY(HiddenHeroStorageRect),270.)
+        if IchigoHollowUnit == null then
+            call IchigoHollow_ReportTransferFailure("не удалось создать форму Пустого.")
+            set previousHollow = null
+            return false
+        endif
+        call SetUnitInvulnerable(IchigoHollowUnit,true)
+        call UnitAddAbility(IchigoHollowUnit,'Agho')
+        call PauseUnit(IchigoHollowUnit,true)
+        call TriggerRegisterUnitEvent(IchigoFormDeathTrigger,IchigoHollowUnit,EVENT_UNIT_DEATH)
+        call TriggerRegisterUnitEvent(xa,IchigoHollowUnit,EVENT_UNIT_SPELL_EFFECT)
+        call TriggerRegisterUnitEvent(za,IchigoHollowUnit,EVENT_UNIT_SPELL_EFFECT)
+    elseif not IchigoHollow_IsAlive(IchigoHollowUnit) then
+        call ReviveHero(IchigoHollowUnit,GetRectCenterX(HiddenHeroStorageRect),GetRectCenterY(HiddenHeroStorageRect),false)
+        call SetUnitInvulnerable(IchigoHollowUnit,true)
+        call PauseUnit(IchigoHollowUnit,true)
+    endif
+    if abilityLevel > 1 then
+        call UnitAddAbility(IchigoHollowUnit,'A101')
+        call SetUnitAbilityLevel(IchigoHollowUnit,'A101',abilityLevel-1)
+    endif
+    set previousHollow = null
+    if not IchigoHollow_IsAlive(IchigoHollowUnit) then
+        call IchigoHollow_ReportTransferFailure("не удалось подготовить живую форму Пустого.")
+        return false
+    endif
+    return true
 endfunction
 
-function nKe takes nothing returns boolean
-    return(((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))
+// Shared transition, based on 1.1c SwapUnits; it moves the existing item handles.
+function IchigoHollow_SwapUnits takes unit donorUnit, unit recipientUnit, integer statAdjustment, boolean donorWasPaused, boolean donorWasInvulnerable returns boolean
+    local real donorX = GetUnitX(donorUnit)
+    local real donorY = GetUnitY(donorUnit)
+    local real donorFacing = GetUnitFacing(donorUnit)
+    local integer donorStrength = GetHeroStr(donorUnit,false)
+    local integer donorAgility = GetHeroAgi(donorUnit,false)
+    local integer donorIntelligence = GetHeroInt(donorUnit,false)
+    local integer donorExperience = GetHeroXP(donorUnit)
+    local integer donorLevel = GetHeroLevel(donorUnit)
+    local real transferredHealth
+    local boolean inventoryTransferred
+    call SetUnitInvulnerable(donorUnit,true)
+    call SetUnitInvulnerable(recipientUnit,true)
+    set inventoryTransferred = IchigoHollow_TransferInventory(donorUnit,recipientUnit)
+    if not inventoryTransferred then
+        if donorUnit == IchigoHollowUnit and not IchigoHollowDeathPending then
+            call SetUnitInvulnerable(donorUnit,donorWasInvulnerable)
+        endif
+        return false
+    endif
+    if donorUnit == IchigoOriginalUnit then
+        call TestCommands_KillOnTProbe(donorUnit,1)
+    else
+        call TestCommands_KillOnTProbe(donorUnit,2)
+    endif
+    if not IchigoHollow_IsAlive(donorUnit) then
+        if donorUnit == IchigoOriginalUnit then
+            return false
+        endif
+        set IchigoHollowDeathPending = true
+        call ReviveHero(donorUnit,donorX,donorY,false)
+        call SetUnitInvulnerable(donorUnit,true)
+        if not IchigoHollow_IsAlive(donorUnit) then
+            call IchigoHollow_ReportTransferFailure("возврат отменён: не удалось воскресить служебную форму Пустого.")
+            return false
+        endif
+    endif
+    set transferredHealth = IchigoHollow_RoundHealthUp(GetWidgetLife(donorUnit))
+    call SetUnitOwner(recipientUnit,IchigoHollowPlayer,true)
+    call SetUnitOwner(donorUnit,Player(15),true)
+    call PauseUnit(donorUnit,true)
+    call UnitAddAbility(donorUnit,'Agho')
+    call UnitRemoveAbility(recipientUnit,'Agho')
+    call UnitRemoveBuffs(donorUnit,false,true)
+    call UnitRemoveBuffs(recipientUnit,false,true)
+    call SetHeroXP(recipientUnit,donorExperience,false)
+    call SetHeroLevel(recipientUnit,donorLevel,false)
+    call SetHeroStr(recipientUnit,donorStrength+statAdjustment,true)
+    call SetHeroAgi(recipientUnit,donorAgility+statAdjustment,true)
+    call SetHeroInt(recipientUnit,donorIntelligence,true)
+    call SetWidgetLife(recipientUnit,transferredHealth)
+    call DestroyEffect(AddSpecialEffect("Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl",donorX,donorY))
+    call SetUnitPosition(recipientUnit,donorX,donorY)
+    call SetUnitFacing(recipientUnit,donorFacing)
+    call SetUnitPosition(donorUnit,GetRectCenterX(HiddenHeroStorageRect),GetRectCenterY(HiddenHeroStorageRect))
+    call SetUnitLifePercentBJ(donorUnit,100.)
+    set m[GetPlayerId(IchigoHollowPlayer)+1] = recipientUnit
+    call IchigoHollow_RetargetReferences(donorUnit,recipientUnit)
+    if o4[GetPlayerId(IchigoHollowPlayer)+1] and r4[GetPlayerId(IchigoHollowPlayer)+1] and GetUnitAbilityLevel(recipientUnit,'A028') == 0 then
+        call UnitAddAbility(recipientUnit,'A028')
+    endif
+    call SelectUnitForPlayerSingle(recipientUnit,IchigoHollowPlayer)
+    if n4[GetPlayerId(IchigoHollowPlayer)+1] then
+        call SetCameraTargetControllerNoZForPlayer(IchigoHollowPlayer,recipientUnit,0,0,false)
+    endif
+    // Apply the donor's actual pause state, including event and ability pauses.
+    call PauseUnit(recipientUnit,donorWasPaused)
+    call SetUnitInvulnerable(recipientUnit,donorWasInvulnerable)
+    return true
 endfunction
 
-function nle takes nothing returns boolean
-    return(Ck==Y[Cj[70]])
+function IchigoHollow_FinishCycle takes nothing returns nothing
+    call PauseTimer(IchigoHollowTimer)
+    call UnitRemoveAbility(IchigoOriginalUnit,'B016')
+    call SetPlayerHandicapXPBJ(IchigoHollowPlayer,100.)
+    set IchigoHollowActive = false
+    set IchigoHollowCycleRunning = false
+    set IchigoHollowEntryPending = false
+    set IchigoHollowEntryFailed = false
+    set IchigoHollowDeathPending = false
+    set IchigoHollowKiller = null
+    set IchigoOriginalUnit = null
+    set IchigoHollowPlayer = null
+    call EnableTrigger(IchigoHollowAvailabilityTrigger)
 endfunction
 
-function nLe takes nothing returns boolean
-    return(Ck==Z[Cj[70]])
-endfunction
-
-function nme takes nothing returns boolean
-    return(r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])
-endfunction
-
-function nMe takes nothing returns boolean
-    return(o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)
-endfunction
-
-function npe takes nothing returns boolean
-    return(((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))
-endfunction
-
-function nPe takes nothing returns boolean
-    return(Ck==x)
-endfunction
-
-function nqe takes nothing returns boolean
-    return(Ck==y)
-endfunction
-
-function nQe takes nothing returns boolean
-    return(Ck==a[401])
-endfunction
-
-function nse takes nothing returns boolean
-    return(Ck==a[16])
-endfunction
-
-
-function nte takes nothing returns boolean
-    return(Ck==RenjiTTarget)
-endfunction
-
-function nTe takes nothing returns boolean
-    return(Ck==rh)
-endfunction
-
-function nue takes nothing returns boolean
-    return(Ck==xe)
-endfunction
-
-function nUe takes nothing returns boolean
-    return(Ck==be)
-endfunction
-
-function nwe takes nothing returns boolean
-    return(Ck==a[8])
-endfunction
-
-function nWe takes nothing returns boolean
-    return(Ck==a[801])
-endfunction
-
-function nye takes nothing returns boolean
-    return(Ck==a[800])
-endfunction
-
-function nYe takes nothing returns boolean
-    return(Ck==Ok[5])
-endfunction
-
-function nze takes nothing returns boolean
-    return(Ck==a[870])
-endfunction
-
-function nZe takes nothing returns boolean
-    return(Ck==a[880])
-endfunction
-
-function n_e takes nothing returns boolean
-    return(Ck==ej)
-endfunction
-
-function n0e takes nothing returns boolean
-    return(Ck==Hm[2])
-endfunction
-
-function n1e takes nothing returns boolean
-    return(Ck==hk[36])
-endfunction
-
-function n2e takes nothing returns boolean
-    return(Ck==a[3])
-endfunction
-
-function n3e takes nothing returns boolean
-    return(Ck==a[9])
-endfunction
-
-function n4e takes nothing returns boolean
-    return(Ck==a[10])
-endfunction
-
-function n5e takes nothing returns boolean
-    return(Ck==h8)
-endfunction
-
-function n6e takes nothing returns boolean
-    return(Ck==a[1006])
-endfunction
-
-function n7e takes nothing returns boolean
-    return(Ck==a[1008])
-endfunction
-
-function n8e takes nothing returns boolean
-    return(Ck==a[404])
-endfunction
-
-function n9e takes nothing returns boolean
-    return(Ck==a[406])
-endfunction
-
-function Vve takes nothing returns boolean
-    return(Ck==jm[4])
-endfunction
-
-function Vee takes nothing returns boolean
-    return(Ck==jm[10])
-endfunction
-
-function Vxe takes nothing returns boolean
-    return(Ck==a[66])
-endfunction
-
-function Voe takes nothing returns boolean
-    return(Ck==a[67])
-endfunction
-
-function Vre takes nothing returns boolean
-    return(Ck==jf[15])
-endfunction
-
-function Vie takes nothing returns boolean
-    return(Ck==Y[nn])
-endfunction
-
-function Vae takes nothing returns boolean
-    return(Ck==Z[nn])
-endfunction
-
-function Vne takes nothing returns boolean
-    return(Ck==O7[nn])
-endfunction
-
-function VVe takes nothing returns boolean
-    return(Ck==P7[nn])
-endfunction
-
-function VEe takes nothing returns boolean
-    return(Ck==a4)
-endfunction
-
-function VXe takes nothing returns boolean
-    return(n4[(1+GetPlayerId(GetOwningPlayer(Xg)))])
-endfunction
-
-
-function Ichigo_Die_Action takes nothing returns nothing
-    local integer abilityLevel = GetUnitAbilityLevel(Xg, 'A04A')
-    local item currItem = null
-    set ck=false
-    set Gk=GetKillingUnit()
-    set r9[1000]=GetUnitLoc(Ck)
-    set r9[1001]=GetRectCenter(io)
-    set Cj[70]=1
-    loop
-        exitwhen Cj[70]>6
-        if(((((UnitItemInSlotBJ(Ck,Cj[70])==oG)and(Ck==T)))))then
-            call UnitRemoveItemFromSlotSwapped(Cj[70],Ck)
+function IchigoHollow_TimerTick takes nothing returns nothing
+    local boolean donorWasPaused
+    local boolean donorWasInvulnerable
+    local integer statBonus = 50 + Get_HollowForm_Stat_Bonus(IchigoHollowAbilityLevel)
+    local real hollowX
+    local real hollowY
+    if IchigoHollowEntryFailed then
+        if not IchigoHollow_IsAlive(IchigoOriginalUnit) then
+            return
+        endif
+        if IchigoHollow_RecoverPendingItem(IchigoOriginalUnit) and IchigoHollow_TransferInventory(IchigoHollowUnit,IchigoOriginalUnit) then
+            call SetUnitInvulnerable(IchigoOriginalUnit,IchigoHollowOriginalWasInvulnerable)
+            call IchigoHollow_FinishCycle()
+        endif
+        return
+    endif
+    if IchigoHollowEntryPending then
+        set IchigoHollowEntryPending = false
+        if not IchigoHollow_IsAlive(IchigoOriginalUnit) then
+            set IchigoHollowEntryFailed = true
+            return
+        endif
+        set donorWasPaused = IsUnitPaused(IchigoOriginalUnit)
+        if IchigoHollow_SwapUnits(IchigoOriginalUnit,IchigoHollowUnit,statBonus,donorWasPaused,IchigoHollowOriginalWasInvulnerable) then
+            set IchigoHollowActive = true
+            call SetUnitManaBJ(IchigoHollowUnit,0.)
+            call SetPlayerHandicapXPBJ(IchigoHollowPlayer,0.)
+            call Play_Spell_Sound_Effect(Get_Random_Sound_Ichigo_T(),IchigoHollowUnit)
         else
-            set currItem = UnitItemInSlotBJ(Ck,Cj[70])
-            call UnitRemoveItem(Ck, currItem)
-            call UnitAddItem(Xg, currItem)
-        endif
-        set Cj[70]=Cj[70]+1
-    endloop
-    set currItem = null
-    set Ek[0]=R2I(GetUnitFacing(Ck))
-    set Ek[1]=GetHeroStatBJ(0,Ck,false)
-    set Ek[2]=GetHeroStatBJ(1,Ck,false)
-    set Ek[3]=GetHeroStatBJ(2,Ck,false)
-    set Ek[4]=GetHeroXP(Ck)
-    set Ek[5]=GetHeroLevel(Ck)
-    set Ek[6]=R2I(GetUnitStateSwap(UNIT_STATE_LIFE,Ck))
-    set m[(1+GetPlayerId(GetOwningPlayer(Ck)))]=null
-    call SetUnitOwner(Xg,GetOwningPlayer(Ck),true)
-    call SetUnitOwner(Ck,Player(15),true)
-    call SetUnitPositionLocFacingBJ(Ck,r9[1001],bj_UNIT_FACING)
-    call SelectUnitRemove(Ck)
-    call AddSpecialEffectLocBJ(r9[1000],"Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl")
-    call DestroyEffect(bj_lastCreatedEffect)
-    set m[(1+GetPlayerId(GetOwningPlayer(Xg)))]=Xg
-    call SetUnitPositionLocFacingBJ(Xg,r9[1000],I2R(Ek[0]))
-    call SetHeroXP(Xg,Ek[4],false)
-    call SetHeroLevelBJ(Xg,Ek[5],false)
-    // reset stat if Hollow killed
-    call ModifyHeroStat(0,Xg,2,(Ek[1]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-    call ModifyHeroStat(1,Xg,2,(Ek[2]- (50 + Get_HollowForm_Stat_Bonus(abilityLevel)) ))
-    call ModifyHeroStat(2,Xg,2,Ek[3])
-    call SetUnitLifePercentBJ(Xg, 40)
-    call PauseUnit(Xg,false)
-    call SetUnitInvulnerable(Xg,false)
-    call UnitRemoveBuffsBJ(1,Xg)
-    call UnitRemoveAbility(Xg,'Agho')
-    set Cj[70]=1
-    loop
-        exitwhen Cj[70]>6
-        //call UnitAddItemByIdSwapped(Dk[Cj[70]],Xg)
-        set Dk[Cj[70]]='moon'
-        set Ek[Cj[70]]=0
-        if(((Ck==Y[Cj[70]])))then
-            set Y[Cj[70]]=Xg
-        endif
-        if(((Ck==Z[Cj[70]])))then
-            set Z[Cj[70]]=Xg
-        endif
-        set Cj[70]=Cj[70]+1
-    endloop
-    if(((((o4[(1+GetPlayerId(GetOwningPlayer(Xg)))])and(GetUnitAbilityLevelSwapped('A028',Xg)==0)))))then
-        if(((r4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
-            call UnitAddAbility(Xg,'A028')
+            if not IchigoHollowTransferStarted and IchigoHollow_IsAlive(IchigoOriginalUnit) then
+                call SetUnitInvulnerable(IchigoOriginalUnit,IchigoHollowOriginalWasInvulnerable)
+                call IchigoHollow_FinishCycle()
+                return
+            endif
+            set IchigoHollowEntryFailed = true
         endif
     endif
-    // after timed life is expired must auto select ichigo
-    call SelectUnitForPlayerSingle(Xg,GetOwningPlayer(Xg))
-    if(((Ck==x)))then
-        set x=Xg
-    endif
-    if(((Ck==y)))then
-        set y=Xg
-    endif
-    if(((Ck==a[401])))then
-        set a[401]=Xg
-    endif
-    if(((Ck==a[16])))then
-        set a[16]=Xg
-    endif
-    call RenjiERetargetFlights(Ck,Xg)
-    if(((Ck==RenjiTTarget)))then
-        set RenjiTTarget=Xg
-    endif
-    if(((Ck==rh)))then
-        set rh=Xg
-    endif
-    if(((Ck==xe)))then
-        set xe=Xg
-    endif
-    if(((Ck==be)))then
-        set be=Xg
-    endif
-    if(((Ck==a[8])))then
-        set a[8]=Xg
-    endif
-    if(((Ck==a[801])))then
-        set a[801]=Xg
-    endif
-    if(((Ck==a[800])))then
-        set a[800]=Xg
-    endif
-    if(((Ck==Ok[5])))then
-        set Ok[5]=Xg
-    endif
-    if(((Ck==a[870])))then
-        set a[870]=Xg
-    endif
-    if(((Ck==a[880])))then
-        set a[880]=Xg
-    endif
-    if(((Ck==ej)))then
-        set ej=Xg
-    endif
-    if(((Ck==Hm[2])))then
-        set Hm[2]=Xg
-    endif
-    if(((Ck==hk[36])))then
-        set hk[36]=Xg
-    endif
-    if(((Ck==a[3])))then
-        set a[3]=Xg
-    endif
-    if(((Ck==a[9])))then
-        set a[9]=Xg
-    endif
-    if(((Ck==a[10])))then
-        set a[10]=Xg
-    endif
-    if(((Ck==h8)))then
-        set h8=Xg
-    endif
-    if(((Ck==a[1006])))then
-        set a[1006]=Xg
-    endif
-    if(((Ck==a[1008])))then
-        set a[1008]=Xg
-    endif
-    if(((Ck==a[404])))then
-        set a[404]=Xg
-    endif
-    if(((Ck==a[406])))then
-        set a[406]=Xg
-    endif
-    if(((Ck==jm[4])))then
-        set jm[4]=Xg
-    endif
-    if(((Ck==jm[10])))then
-        set jm[10]=Xg
-    endif
-    if(((Ck==a[66])))then
-        set a[66]=Xg
-    endif
-    if(((Ck==a[67])))then
-        set a[67]=Xg
-    endif
-    if(((Ck==jf[15])))then
-        set jf[15]=Xg
-    endif
-    set nn=1
-    loop
-        exitwhen nn>5
-        if(((Ck==Y[nn])))then
-            set Y[nn]=Xg
+    set IchigoHollowElapsedTicks = IchigoHollowElapsedTicks + 1
+    if IchigoHollowActive and (IchigoHollowElapsedTicks >= IchigoHollowDurationTicks or IchigoHollowDeathPending or not IchigoHollow_IsAlive(IchigoHollowUnit)) then
+        set donorWasPaused = IsUnitPaused(IchigoHollowUnit)
+        set donorWasInvulnerable = GetUnitAbilityLevel(IchigoHollowUnit,'Avul') > 0
+        call SetUnitInvulnerable(IchigoHollowUnit,true)
+        call SetUnitInvulnerable(IchigoOriginalUnit,true)
+        if not IchigoHollow_IsAlive(IchigoHollowUnit) then
+            set IchigoHollowDeathPending = true
+            set hollowX = GetUnitX(IchigoHollowUnit)
+            set hollowY = GetUnitY(IchigoHollowUnit)
+            call ReviveHero(IchigoHollowUnit,hollowX,hollowY,false)
+            call SetUnitInvulnerable(IchigoHollowUnit,true)
         endif
-        if(((Ck==Z[nn])))then
-            set Z[nn]=Xg
+        if not IchigoHollow_IsAlive(IchigoOriginalUnit) then
+            set IchigoHollowDeathPending = true
+            call ReviveHero(IchigoOriginalUnit,GetRectCenterX(HiddenHeroStorageRect),GetRectCenterY(HiddenHeroStorageRect),false)
+            call SetUnitInvulnerable(IchigoOriginalUnit,true)
         endif
-        if(((Ck==O7[nn])))then
-            set O7[nn]=Xg
+        if not IchigoHollow_RecoverPendingItem(IchigoOriginalUnit) then
+            if not IchigoHollowDeathPending then
+                call SetUnitInvulnerable(IchigoHollowUnit,donorWasInvulnerable)
+            endif
+            return
         endif
-        if(((Ck==P7[nn])))then
-            set P7[nn]=Xg
+        if IchigoHollow_SwapUnits(IchigoHollowUnit,IchigoOriginalUnit,-statBonus,donorWasPaused,donorWasInvulnerable) then
+            set IchigoHollowActive = false
+            if IchigoHollowDeathPending then
+                call SetUnitInvulnerable(IchigoOriginalUnit,false)
+                if IchigoHollowKiller != null and GetUnitTypeId(IchigoHollowKiller) != 0 then
+                    call UnitDamageTargetBJ(IchigoHollowKiller,IchigoOriginalUnit,9999999.,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
+                else
+                    call KillUnit(IchigoOriginalUnit)
+                endif
+            endif
+            call IchigoHollow_FinishCycle()
         endif
-        set nn=nn+1
-    endloop
-    if(((Ck==a4)))then
-        call DestroyEffect(B4)
-        set a4=Xg
-        call AddSpecialEffectTargetUnitBJ("overhead",a4,"Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdl")
-        set B4=bj_lastCreatedEffect
     endif
-    if(((n4[(1+GetPlayerId(GetOwningPlayer(Xg)))])))then
-        call SetCameraTargetControllerNoZForPlayer(GetOwningPlayer(Xg),Xg,0,0,false)
-    endif
-    call SetPlayerHandicapXPBJ(GetOwningPlayer(Xg),100.)
-    call UnitDamageTargetBJ(Gk,Xg,9999999.,ATTACK_TYPE_CHAOS,DAMAGE_TYPE_NORMAL)
-    call TriggerSleepAction(2)
-    call ReviveHeroLoc(Ck,r9[1001],false)
-    call TriggerSleepAction(.01)
-    call UnitAddAbility(Ck,'Agho')
-    call SetUnitLifePercentBJ(Ck,100)
-    call PauseUnit(Ck,true)
-    call SetUnitInvulnerable(Ck,true)
-    set Gk=null
-    call RemoveLocation(r9[1000])
-    set r9[1000]=null
-    call RemoveLocation(r9[1001])
-    set r9[1001]=null
 endfunction
 
-
-function Init_Ichigo_Die_Trig takes nothing returns nothing
-    set wa=CreateTrigger()
-    call TriggerAddCondition(wa,Condition(function Ichigo_Die_Condition))
-    call TriggerAddAction(wa,function Ichigo_Die_Action)
+function IchigoHollow_AvailabilityCondition takes nothing returns boolean
+    return not IchigoHollowCycleRunning and IchigoHollow_IsAlive(IchigoHollowAbilityOwner)
 endfunction
 
+function IchigoHollow_AvailabilityAction takes nothing returns nothing
+    local player heroPlayer = GetOwningPlayer(IchigoHollowAbilityOwner)
+    local group availabilityUnits = GetUnitsOfPlayerAndTypeId(heroPlayer,'orai')
+    if GetWidgetLife(IchigoHollowAbilityOwner) <= 0.4*GetUnitState(IchigoHollowAbilityOwner,UNIT_STATE_MAX_LIFE) and not RectContainsUnit(zn,IchigoHollowAbilityOwner) then
+        if FirstOfGroup(availabilityUnits) == null then
+            call CreateUnit(heroPlayer,'orai',GetRectCenterX(to),GetRectCenterY(to),270.)
+        endif
+    else
+        call ForGroup(availabilityUnits,function IchigoHollow_RemoveAvailabilityUnit)
+    endif
+    call DestroyGroup(availabilityUnits)
+    set availabilityUnits = null
+    set heroPlayer = null
+endfunction
+
+function IchigoHollow_LearnedCondition takes nothing returns boolean
+    return GetLearnedSkill() == 'A04A'
+endfunction
+
+function IchigoHollow_LearnedAction takes nothing returns nothing
+    set IchigoHollowAbilityOwner = GetLearningUnit()
+    if GetUnitAbilityLevel(IchigoHollowAbilityOwner,'A04A') == 1 then
+        call TriggerRegisterUnitEvent(IchigoFormDeathTrigger,IchigoHollowAbilityOwner,EVENT_UNIT_DEATH)
+    endif
+    if not IchigoHollowCycleRunning then
+        call IchigoHollow_PrepareUnit(GetUnitAbilityLevel(IchigoHollowAbilityOwner,'A04A'))
+        call EnableTrigger(IchigoHollowAvailabilityTrigger)
+    endif
+endfunction
+
+function IchigoHollow_SpellCondition takes nothing returns boolean
+    return GetSpellAbilityId() == 'A04A' and not IchigoHollowCycleRunning and IchigoHollow_IsAlive(GetTriggerUnit())
+endfunction
+
+function IchigoHollow_SpellAction takes nothing returns nothing
+    set IchigoOriginalUnit = GetTriggerUnit()
+    set IchigoHollowPlayer = GetOwningPlayer(IchigoOriginalUnit)
+    set IchigoHollowOriginalWasInvulnerable = GetUnitAbilityLevel(IchigoOriginalUnit,'Avul') > 0
+    call SetUnitInvulnerable(IchigoOriginalUnit,true)
+    call SetUnitInvulnerable(IchigoHollowUnit,true)
+    set IchigoHollowLastTransferError = ""
+    set IchigoHollowAbilityLevel = GetUnitAbilityLevel(IchigoOriginalUnit,'A04A')
+    if not IchigoHollow_PrepareUnit(IchigoHollowAbilityLevel) then
+        call SetUnitInvulnerable(IchigoOriginalUnit,IchigoHollowOriginalWasInvulnerable)
+        set IchigoOriginalUnit = null
+        set IchigoHollowPlayer = null
+        return
+    endif
+    set IchigoHollowCycleRunning = true
+    set IchigoHollowActive = false
+    set IchigoHollowEntryPending = true
+    set IchigoHollowEntryFailed = false
+    set IchigoHollowDeathPending = false
+    set IchigoHollowKiller = null
+    set IchigoHollowElapsedTicks = 0
+    set IchigoHollowDurationTicks = (15 + IchigoHollowAbilityLevel)*100
+    call DisableTrigger(IchigoHollowAvailabilityTrigger)
+    call IchigoHollow_ClearAvailability(IchigoHollowPlayer)
+    call TimerStart(IchigoHollowTimer,0.01,true,function IchigoHollow_TimerTick)
+endfunction
+
+function IchigoHollow_DeathCondition takes nothing returns boolean
+    return IchigoHollowCycleRunning and (GetDyingUnit() == IchigoHollowUnit or GetDyingUnit() == IchigoOriginalUnit)
+endfunction
+
+function IchigoHollow_DeathAction takes nothing returns nothing
+    set IchigoHollowKiller = GetKillingUnit()
+    if GetDyingUnit() == IchigoHollowUnit or IchigoHollowActive then
+        set IchigoHollowDeathPending = true
+    endif
+endfunction
+
+function IchigoHollow_InitLearnedTrigger takes nothing returns nothing
+    set IchigoHollowLearnTrigger = CreateTrigger()
+    call TriggerAddCondition(IchigoHollowLearnTrigger,Condition(function IchigoHollow_LearnedCondition))
+    call TriggerAddAction(IchigoHollowLearnTrigger,function IchigoHollow_LearnedAction)
+endfunction
+
+function IchigoHollow_InitAvailabilityTrigger takes nothing returns nothing
+    set IchigoHollowAvailabilityTrigger = CreateTrigger()
+    call DisableTrigger(IchigoHollowAvailabilityTrigger)
+    call TriggerRegisterTimerEventPeriodic(IchigoHollowAvailabilityTrigger,0.5)
+    call TriggerAddCondition(IchigoHollowAvailabilityTrigger,Condition(function IchigoHollow_AvailabilityCondition))
+    call TriggerAddAction(IchigoHollowAvailabilityTrigger,function IchigoHollow_AvailabilityAction)
+endfunction
+
+function IchigoHollow_InitSpellTrigger takes nothing returns nothing
+    set IchigoHollowTimer = CreateTimer()
+    set IchigoHollowSpellTrigger = CreateTrigger()
+    call TriggerAddCondition(IchigoHollowSpellTrigger,Condition(function IchigoHollow_SpellCondition))
+    call TriggerAddAction(IchigoHollowSpellTrigger,function IchigoHollow_SpellAction)
+endfunction
+
+function IchigoHollow_InitDeathTrigger takes nothing returns nothing
+    set IchigoFormDeathTrigger = CreateTrigger()
+    call TriggerAddCondition(IchigoFormDeathTrigger,Condition(function IchigoHollow_DeathCondition))
+    call TriggerAddAction(IchigoFormDeathTrigger,function IchigoHollow_DeathAction)
+endfunction
 
 function Ichigo_HollowForm_Cero_Condition takes nothing returns boolean
     return(GetSpellAbilityId()=='A0BS')
@@ -40759,8 +40093,8 @@ function Ichigo_HollowForm_Cero_Action takes nothing returns nothing
     call Play_Spell_Sound_Effect( Get_Random_Sound_Vastolorde_Q(), t9[100] )
     set r9[100]=GetUnitLoc(t9[100])
     set r9[101]=GetSpellTargetLoc()
-    set Ek[10]=R2I(AngleBetweenPoints(r9[100],r9[101]))
-    set Ek[11]=0
+    set IchigoHollowSpellState[10]=R2I(AngleBetweenPoints(r9[100],r9[101]))
+    set IchigoHollowSpellState[11]=0
     call RemoveLocation(r9[101])
     set r9[101]=null
     call EnableTrigger(ya)
@@ -40773,8 +40107,8 @@ function Ichigo_HollowForm_Cero_Action takes nothing returns nothing
         call TriggerSleepAction(RMaxBJ(bj_WAIT_FOR_COND_MIN_INTERVAL,.1))
     endloop
     set t9[100]=null
-    set Ek[10]=0
-    set Ek[11]=0
+    set IchigoHollowSpellState[10]=0
+    set IchigoHollowSpellState[11]=0
     call RemoveLocation(r9[100])
     set r9[100]=null
     set bj_wantDestroyGroup=true
@@ -40833,12 +40167,12 @@ function VHe takes nothing returns nothing
 endfunction
 
 function Vje takes nothing returns boolean
-    return(Ek[11]>=1600)
+    return(IchigoHollowSpellState[11]>=1600)
 endfunction
 
 function VJe takes nothing returns nothing
-    set Ek[11]=(Ek[11]+45)
-    set r9[101]=PG(r9[100],I2R(Ek[11]),I2R(Ek[10]))
+    set IchigoHollowSpellState[11]=(IchigoHollowSpellState[11]+45)
+    set r9[101]=PG(r9[100],I2R(IchigoHollowSpellState[11]),I2R(IchigoHollowSpellState[10]))
     call AddSpecialEffectLocBJ(r9[101],"Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdl")
     call DestroyEffect(bj_lastCreatedEffect)
     set yk[101]=e6(300.,r9[101],Condition(function VGe))
@@ -40850,7 +40184,7 @@ function VJe takes nothing returns nothing
     call UG(300.,r9[101],function VHe)
     call RemoveLocation(r9[101])
     set r9[101]=null
-    if(((Ek[11]>=1600)))then
+    if(((IchigoHollowSpellState[11]>=1600)))then
         call DisableTrigger(GetTriggeringTrigger())
     endif
 endfunction
@@ -40924,13 +40258,13 @@ endfunction
 function Ichigo_HollowForm_Getsuga_Action takes nothing returns nothing
     set t9[102]=GetTriggerUnit()
     call Play_Spell_Sound_Effect( Get_Random_Sound_Vastolorde_W(), t9[102])
-    set Ek[12]=0
+    set IchigoHollowSpellState[12]=0
     set r9[102]=GetUnitLoc(t9[102])
     set Cj[71]=1
     loop
         exitwhen Cj[71]>30
-        set Ek[12]=(Ek[12]+12)
-        set r9[103]=PG(r9[102],300.,I2R(Ek[12]))
+        set IchigoHollowSpellState[12]=(IchigoHollowSpellState[12]+12)
+        set r9[103]=PG(r9[102],300.,I2R(IchigoHollowSpellState[12]))
         call CreateNUnitsAtLocFacingLocBJ(1,'u002',GetOwningPlayer(t9[102]),r9[102],r9[103])
         call PlaySoundAtPointBJ(hq,100,r9[103],0)
         set t9[103]=bj_lastCreatedUnit
@@ -40950,7 +40284,7 @@ function Ichigo_HollowForm_Getsuga_Action takes nothing returns nothing
     call DestroyEffect(bj_lastCreatedEffect)
     call UG(700.,uk[102],function Vte)
     set t9[102]=null
-    set Ek[12]=0
+    set IchigoHollowSpellState[12]=0
     set Km[4]=GetUnitLoc(t9[102])
     call PlaySoundAtPointBJ(hq,100,Km[4],0)
     call RemoveLocation(Km[4])
@@ -80610,10 +79944,10 @@ function Q3x takes nothing returns nothing
     call Init_Ichigo_Bankai_Trigger()
     call iBe()
     call iYe()
-    call Ichigo_Hollow_Learned_Trig()
-    call Init_Ichigo_Trig_0()
-    call Init_Ichigo_HollowForm_Trig()
-    call Init_Ichigo_Die_Trig()
+    call IchigoHollow_InitLearnedTrigger()
+    call IchigoHollow_InitAvailabilityTrigger()
+    call IchigoHollow_InitSpellTrigger()
+    call IchigoHollow_InitDeathTrigger()
     call Vbe()
     call Vke()
     call Vue()
@@ -81835,395 +81169,6 @@ function TestCommands_OzInit takes nothing returns nothing
     set ozChatTrigger = null
 endfunction
 
-// This scenario uses the normal hero registration, learning and spell orders.
-// Every helper/global has the TestCommands_ prefix so release builds strip it.
-function TestCommands_IchigoLearn takes unit testHero, integer abilityId, integer maximumRank returns nothing
-    local integer learnedRank = GetUnitAbilityLevel(testHero,abilityId)
-    local integer previousRank = -1
-    if learnedRank > maximumRank then
-        call SetUnitAbilityLevel(testHero,abilityId,maximumRank)
-        set learnedRank = maximumRank
-    endif
-    loop
-        exitwhen learnedRank >= maximumRank or learnedRank == previousRank
-        set previousRank = learnedRank
-        call SelectHeroSkill(testHero,abilityId)
-        set learnedRank = GetUnitAbilityLevel(testHero,abilityId)
-    endloop
-endfunction
-
-function TestCommands_IchigoParkHero takes unit previousHero returns nothing
-    if previousHero != null and GetUnitTypeId(previousHero) != 0 then
-        call PauseUnit(previousHero,true)
-        call SetUnitInvulnerable(previousHero,true)
-        call SetUnitOwner(previousHero,Player(15),false)
-        call SetUnitPosition(previousHero,GetRectCenterX(io),GetRectCenterY(io))
-    endif
-endfunction
-
-function TestCommands_IchigoReserveHero takes integer heroTypeId, unit selectionUnit returns nothing
-    local integer playerIndex = 0
-    call RemoveUnitFromAllStock(heroTypeId)
-    call GroupRemoveUnit(i4,selectionUnit)
-    loop
-        exitwhen playerIndex >= 12
-        call SetPlayerUnitAvailableBJ(heroTypeId,false,Player(playerIndex))
-        set playerIndex = playerIndex+1
-    endloop
-endfunction
-
-function TestCommands_IchigoPrepare takes player commandPlayer returns boolean
-    local integer playerIndex = 0
-    local player enemyPlayer = null
-    local unit originalHero = hj
-    local unit enelHero = ym
-    local integer inventorySlot = 0
-    local integer freeSlots = 0
-    local integer itemIndex = 0
-    local integer itemTypeId = 0
-    if originalHero != null and GetOwningPlayer(originalHero) != commandPlayer then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: Ичиго уже выбран другим игроком; команду должен вводить его владелец")
-        return false
-    endif
-    if originalHero != null and GetUnitAbilityLevel(originalHero,'A04A') > 1 then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: для этого сценария нужен Ичиго с T не выше первого ранга")
-        return false
-    endif
-    if enelHero != null then
-        if not IsUnitEnemy(enelHero,commandPlayer) then
-            call TestCommands_Message(commandPlayer,"-testichigo","Отказ: уже выбранный Энель должен быть во вражеской команде")
-            return false
-        endif
-        set enemyPlayer = GetOwningPlayer(enelHero)
-    else
-        loop
-            exitwhen playerIndex >= 12 or enemyPlayer != null
-            if GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING and ((IsPlayerInForce(commandPlayer,e) and IsPlayerInForce(Player(playerIndex),f)) or (IsPlayerInForce(commandPlayer,f) and IsPlayerInForce(Player(playerIndex),e))) then
-                set enemyPlayer = Player(playerIndex)
-            endif
-            set playerIndex = playerIndex+1
-        endloop
-    endif
-    if enemyPlayer == null then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: нужен хотя бы один игрок или бот во вражеской команде")
-        return false
-    endif
-    if originalHero != null then
-        loop
-            exitwhen inventorySlot >= UnitInventorySize(originalHero)
-            if UnitItemInSlot(originalHero,inventorySlot) == null then
-                set freeSlots = freeSlots+1
-            endif
-            set inventorySlot = inventorySlot+1
-        endloop
-        if freeSlots < 3 then
-            call TestCommands_Message(commandPlayer,"-testichigo","Отказ: освободи три слота инвентаря Ичиго для контрольных предметов")
-            return false
-        endif
-    endif
-    if originalHero == null then
-        call TestCommands_IchigoParkHero(m[GetPlayerId(commandPlayer)+1])
-        set originalHero = CreateUnit(commandPlayer,'H003',-1024.,-6208.,0.)
-        set hj = originalHero
-        // The same registration used by Hero_HandleSelectionEntry.
-        call TriggerExecute(ka)
-        call TestCommands_IchigoReserveHero('H003',wj[5])
-    endif
-    if enelHero == null then
-        call TestCommands_IchigoParkHero(m[GetPlayerId(enemyPlayer)+1])
-        set enelHero = CreateUnit(enemyPlayer,'E002',2048.,-6208.,180.)
-        set ym = enelHero
-        call TriggerExecute(gE)
-        call TestCommands_IchigoReserveHero('E002',xj[12])
-    endif
-    set m[GetPlayerId(commandPlayer)+1] = originalHero
-    set m[GetPlayerId(enemyPlayer)+1] = enelHero
-    set TestCommands_IchigoPlayer = commandPlayer
-    set TestCommands_IchigoOriginal = originalHero
-    set TestCommands_IchigoEnel = enelHero
-    if not IsUnitAliveBJ(originalHero) then
-        call ReviveHero(originalHero,-1024.,-6208.,false)
-    endif
-    if not IsUnitAliveBJ(enelHero) then
-        call ReviveHero(enelHero,2048.,-6208.,false)
-    endif
-    if GetHeroLevel(originalHero) > 20 then
-        call UnitStripHeroLevel(originalHero,GetHeroLevel(originalHero)-20)
-    else
-        call SetHeroLevel(originalHero,20,false)
-    endif
-    if GetHeroLevel(enelHero) > 20 then
-        call UnitStripHeroLevel(enelHero,GetHeroLevel(enelHero)-20)
-    else
-        call SetHeroLevel(enelHero,20,false)
-    endif
-    // Maximum ranks permitted by the current ability data at hero level 20.
-    call TestCommands_IchigoLearn(originalHero,'A008',6)
-    call TestCommands_IchigoLearn(originalHero,'A0AQ',5)
-    call TestCommands_IchigoLearn(originalHero,'A03J',3)
-    call TestCommands_IchigoLearn(originalHero,'A00C',2)
-    call TestCommands_IchigoLearn(originalHero,'A04A',1)
-    call TestCommands_IchigoLearn(enelHero,'A0BI',6)
-    call TestCommands_IchigoLearn(enelHero,'A02X',5)
-    call TestCommands_IchigoLearn(enelHero,'A02Y',3)
-    call TestCommands_IchigoLearn(enelHero,'A02U',2)
-    call TestCommands_IchigoLearn(enelHero,'A07G',1)
-    if Ck == null or GetUnitTypeId(Ck) == 0 or GetUnitAbilityLevel(originalHero,'A04A') != 1 or GetUnitAbilityLevel(enelHero,'A02U') == 0 then
-        call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: штатное обучение не подготовило пустого или Mamaragan")
-        return false
-    endif
-    set TestCommands_Access[GetPlayerId(commandPlayer)] = true
-    set TestCommands_InfiniteMana[GetPlayerId(commandPlayer)] = true
-    set TestCommands_NoCooldown[GetPlayerId(commandPlayer)] = true
-    set inventorySlot = 0
-    loop
-        exitwhen itemIndex >= 3
-        loop
-            exitwhen inventorySlot >= UnitInventorySize(originalHero) or UnitItemInSlot(originalHero,inventorySlot) == null
-            set inventorySlot = inventorySlot+1
-        endloop
-        if itemIndex == 0 then
-            set itemTypeId = 'bspd'
-        elseif itemIndex == 1 then
-            set itemTypeId = 'ratf'
-        else
-            set itemTypeId = 'rde1'
-        endif
-        if not UnitAddItemToSlotById(originalHero,itemTypeId,inventorySlot) then
-            call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: не удалось выдать контрольный предмет")
-            return false
-        endif
-        set TestCommands_IchigoItems[itemIndex] = UnitItemInSlot(originalHero,inventorySlot)
-        set TestCommands_IchigoItemNames[itemIndex] = GetItemName(TestCommands_IchigoItems[itemIndex])
-        set itemIndex = itemIndex+1
-        set inventorySlot = inventorySlot+1
-    endloop
-    set TestCommands_IchigoInitialized = true
-    call TriggerExecute(Scoreboard_RefreshTrigger)
-    call TestCommands_Message(commandPlayer,"-testichigo","Подготовлены Ичиго и Энель, уровень 20, доступные навыки, бесконечная мана, nocd и три контрольных предмета")
-    set originalHero = null
-    set enelHero = null
-    set enemyPlayer = null
-    return true
-endfunction
-
-function TestCommands_IchigoItemLocation takes item trackedItem returns string
-    local group worldUnits = null
-    local unit itemCarrier = null
-    local string resultText = ""
-    if trackedItem == null or GetItemTypeId(trackedItem) == 0 then
-        return "удалён или не существует"
-    elseif UnitHasItem(TestCommands_IchigoOriginal,trackedItem) then
-        return "у обычного Ичиго"
-    elseif UnitHasItem(TestCommands_IchigoHollow,trackedItem) then
-        return "у пустого"
-    elseif not IsItemOwned(trackedItem) then
-        return "на земле: X="+R2S(GetItemX(trackedItem))+", Y="+R2S(GetItemY(trackedItem))
-    endif
-    set worldUnits = CreateGroup()
-    call GroupEnumUnitsInRect(worldUnits,bj_mapInitialPlayableArea,null)
-    loop
-        set itemCarrier = FirstOfGroup(worldUnits)
-        exitwhen itemCarrier == null
-        if UnitHasItem(itemCarrier,trackedItem) then
-            set resultText = "у "+GetUnitName(itemCarrier)+" ("+GetPlayerName(GetOwningPlayer(itemCarrier))+")"
-            exitwhen true
-        endif
-        call GroupRemoveUnit(worldUnits,itemCarrier)
-    endloop
-    call DestroyGroup(worldUnits)
-    set worldUnits = null
-    set itemCarrier = null
-    if resultText == "" then
-        set resultText = "в чужом инвентаре; владелец не найден в игровой области"
-    endif
-    return resultText
-endfunction
-
-function TestCommands_IchigoReportItems takes nothing returns nothing
-    local integer itemIndex = 0
-    loop
-        exitwhen itemIndex >= 3
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo",TestCommands_IchigoItemNames[itemIndex]+": "+TestCommands_IchigoItemLocation(TestCommands_IchigoItems[itemIndex]))
-        set itemIndex = itemIndex+1
-    endloop
-endfunction
-
-function TestCommands_IchigoSpell takes nothing returns nothing
-    if TestCommands_IchigoRunning then
-        if GetTriggerUnit() == TestCommands_IchigoEnel and GetSpellAbilityId() == 'A02U' then
-            set TestCommands_IchigoMamaraganStarted = true
-            // Prevent a bot from walking away or casting other damaging spells.
-            call PauseUnit(TestCommands_IchigoEnel,true)
-        elseif GetTriggerUnit() == TestCommands_IchigoHollow and (GetSpellAbilityId() == 'A0BS' or GetSpellAbilityId() == 'A0BT') then
-            set TestCommands_IchigoSuccessfulCasts = TestCommands_IchigoSuccessfulCasts+1
-        endif
-    endif
-endfunction
-
-function TestCommands_IchigoDeath takes nothing returns nothing
-    if TestCommands_IchigoRunning and GetTriggerUnit() == TestCommands_IchigoHollow then
-        set TestCommands_IchigoHollowDied = true
-        set TestCommands_IchigoKilledByEnel = GetKillingUnit() == TestCommands_IchigoEnel
-    endif
-endfunction
-
-function TestCommands_IchigoFinish takes nothing returns nothing
-    // Death does not cancel the normal sleeping T/R handlers. Do not overlap runs.
-    loop
-        exitwhen not eh and Dj != TestCommands_IchigoEnel
-        call TriggerSleepAction(1.)
-    endloop
-    call PauseUnit(TestCommands_IchigoEnel,TestCommands_IchigoEnelWasPaused)
-    if TestCommands_IchigoEventTimerPaused then
-        call ResumeTimer(q)
-        set TestCommands_IchigoEventTimerPaused = false
-    endif
-    set TestCommands_IchigoRunning = false
-    call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Цепочка завершена; можно повторить -testichigo без повторного обучения и выдачи предметов")
-endfunction
-
-function TestCommands_IchigoRun takes nothing returns nothing
-    local integer castIndex = 0
-    local integer enelIntelligence = 0
-    set TestCommands_IchigoHollowDied = false
-    set TestCommands_IchigoKilledByEnel = false
-    set TestCommands_IchigoMamaraganStarted = false
-    set TestCommands_IchigoSuccessfulCasts = 0
-    set TestCommands_IchigoHollow = Ck
-    set TestCommands_IchigoEnelWasPaused = IsUnitPaused(TestCommands_IchigoEnel)
-    if q != null and TimerGetRemaining(q) > 0. then
-        call PauseTimer(q)
-        set TestCommands_IchigoEventTimerPaused = true
-    endif
-    if not IsUnitAliveBJ(TestCommands_IchigoOriginal) then
-        call ReviveHero(TestCommands_IchigoOriginal,-1024.,-6208.,false)
-    endif
-    if not IsUnitAliveBJ(TestCommands_IchigoEnel) then
-        call ReviveHero(TestCommands_IchigoEnel,2048.,-6208.,false)
-    endif
-    call PauseUnit(TestCommands_IchigoOriginal,false)
-    call PauseUnit(TestCommands_IchigoEnel,true)
-    call SetUnitInvulnerable(TestCommands_IchigoOriginal,false)
-    call SetUnitInvulnerable(TestCommands_IchigoEnel,false)
-    call SetUnitPosition(TestCommands_IchigoOriginal,-1024.,-6208.)
-    call SetUnitPosition(TestCommands_IchigoEnel,2048.,-6208.)
-    call IssueImmediateOrder(TestCommands_IchigoOriginal,"holdposition")
-    call UnitResetCooldown(TestCommands_IchigoOriginal)
-    call UnitResetCooldown(TestCommands_IchigoEnel)
-    call SetUnitState(TestCommands_IchigoOriginal,UNIT_STATE_MANA,GetUnitState(TestCommands_IchigoOriginal,UNIT_STATE_MAX_MANA))
-    if GetUnitTypeId(TestCommands_IchigoOriginal) == 'H003' then
-        call IssueImmediateOrder(TestCommands_IchigoOriginal,"chemicalrage")
-        call TriggerSleepAction(.5)
-    endif
-    call SetUnitLifePercentBJ(TestCommands_IchigoOriginal,30.)
-    call TestCommands_IchigoReportItems()
-    call PanCameraToTimedForPlayer(TestCommands_IchigoPlayer,GetUnitX(TestCommands_IchigoOriginal),GetUnitY(TestCommands_IchigoOriginal),0.)
-    // Fixed delay requested by the scenario; no T-availability polling.
-    call TriggerSleepAction(1.)
-    call IssueImmediateOrder(TestCommands_IchigoOriginal,"battleroar")
-    call TriggerSleepAction(.25)
-    if not ck or Ck == null or GetUnitTypeId(Ck) == 0 or not IsUnitAliveBJ(Ck) then
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Ошибка: T не превратила Ичиго в живого пустого")
-        call TestCommands_IchigoReportItems()
-        call TestCommands_IchigoFinish()
-        return
-    endif
-    set TestCommands_IchigoHollow = Ck
-    call SelectUnitForPlayerSingle(TestCommands_IchigoHollow,TestCommands_IchigoPlayer)
-    call UnitResetCooldown(TestCommands_IchigoHollow)
-    call TestCommands_IchigoReportItems()
-    // Keep Mamaragan's chance and damage handler unchanged. One proc is lethal.
-    set enelIntelligence = R2I(GetUnitState(TestCommands_IchigoHollow,UNIT_STATE_MAX_LIFE)/2.5)+1
-    call SetHeroInt(TestCommands_IchigoEnel,enelIntelligence,true)
-    call SetUnitState(TestCommands_IchigoEnel,UNIT_STATE_MANA,GetUnitState(TestCommands_IchigoEnel,UNIT_STATE_MAX_MANA))
-    call PauseUnit(TestCommands_IchigoEnel,false)
-    call IssueImmediateOrder(TestCommands_IchigoEnel,"fanofknives")
-    call TriggerSleepAction(.25)
-    if not TestCommands_IchigoMamaraganStarted or Dj != TestCommands_IchigoEnel or not IsTriggerEnabled(pE) then
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Ошибка: R Энеля не запустила Mamaragan")
-        call TestCommands_IchigoFinish()
-        return
-    endif
-    call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Mamaragan активен: урон молнии "+R2S(Gj)+", максимум HP пустого "+R2S(GetUnitState(TestCommands_IchigoHollow,UNIT_STATE_MAX_LIFE)))
-    loop
-        exitwhen castIndex >= 15 or TestCommands_IchigoHollowDied or not ck or Dj != TestCommands_IchigoEnel or not IsUnitAliveBJ(TestCommands_IchigoHollow)
-        call UnitResetCooldown(TestCommands_IchigoHollow)
-        if ModuloInteger(castIndex,2) == 0 then
-            call IssuePointOrder(TestCommands_IchigoHollow,"carrionswarm",GetUnitX(TestCommands_IchigoHollow)-500.,GetUnitY(TestCommands_IchigoHollow))
-        else
-            call IssueImmediateOrder(TestCommands_IchigoHollow,"fanofknives")
-        endif
-        call TriggerSleepAction(1.)
-        set castIndex = castIndex+1
-    endloop
-    if TestCommands_IchigoHollowDied and TestCommands_IchigoKilledByEnel then
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Пустой убит Энелем при Mamaragan; успешных применений Q/W: "+I2S(TestCommands_IchigoSuccessfulCasts))
-    elseif TestCommands_IchigoHollowDied then
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Пустой погиб от другого источника; это не подтверждает убийство Mamaragan")
-    else
-        call TestCommands_Message(TestCommands_IchigoPlayer,"-testichigo","Убийство не произошло; успешных применений Q/W: "+I2S(TestCommands_IchigoSuccessfulCasts)+". Можно повторить после завершения цепочки")
-    endif
-    // Let the normal death handler revive and park Hollow before the final report.
-    call TriggerSleepAction(2.5)
-    call TestCommands_IchigoReportItems()
-    call TestCommands_IchigoFinish()
-endfunction
-
-function TestCommands_IchigoChat takes nothing returns nothing
-    local player commandPlayer = GetTriggerPlayer()
-    if not TestCommands_Access[GetPlayerId(commandPlayer)] then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: сначала введи -cheats bvo-rossoliny")
-    elseif GetEventPlayerChatString() != "-testichigo" then
-        call TestCommands_Message(commandPlayer,"-testichigo","Ошибка: используй -testichigo без параметров")
-    elseif TestCommands_IchigoRunning then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: предыдущая цепочка ещё выполняется")
-    elseif not IsPlayerInForce(commandPlayer,e) and not IsPlayerInForce(commandPlayer,f) then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: команда доступна игрокам двух основных команд")
-    elseif N4 or s == null then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: дождись начала игры; завершённый матч не подходит")
-    elseif w or IsTriggerEnabled(nt) or eh or Dj != null then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: дождись окончания события, текущей формы пустого и Mamaragan")
-    elseif TestCommands_IchigoInitialized and commandPlayer != TestCommands_IchigoPlayer then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: повторный запуск доступен игроку, подготовившему сценарий")
-    elseif TestCommands_IchigoInitialized and (GetUnitTypeId(TestCommands_IchigoOriginal) == 0 or GetUnitTypeId(TestCommands_IchigoEnel) == 0 or m[GetPlayerId(commandPlayer)+1] != TestCommands_IchigoOriginal or m[GetPlayerId(GetOwningPlayer(TestCommands_IchigoEnel))+1] != TestCommands_IchigoEnel or GetOwningPlayer(TestCommands_IchigoOriginal) != commandPlayer or not IsUnitEnemy(TestCommands_IchigoEnel,commandPlayer)) then
-        call TestCommands_Message(commandPlayer,"-testichigo","Отказ: подготовленные герои удалены, заменены или больше не являются противниками")
-    else
-        set TestCommands_IchigoRunning = true
-        if not TestCommands_IchigoInitialized then
-            if not TestCommands_IchigoPrepare(commandPlayer) then
-                set TestCommands_IchigoRunning = false
-                set commandPlayer = null
-                return
-            endif
-        endif
-        call TestCommands_IchigoRun()
-    endif
-    set commandPlayer = null
-endfunction
-
-function TestCommands_IchigoInit takes nothing returns nothing
-    local trigger chatTrigger = CreateTrigger()
-    local trigger spellTrigger = CreateTrigger()
-    local trigger deathTrigger = CreateTrigger()
-    local integer playerIndex = 0
-    loop
-        exitwhen playerIndex >= 12
-        if GetPlayerController(Player(playerIndex)) == MAP_CONTROL_USER and GetPlayerSlotState(Player(playerIndex)) == PLAYER_SLOT_STATE_PLAYING then
-            call TriggerRegisterPlayerChatEvent(chatTrigger,Player(playerIndex),"-testichigo",false)
-        endif
-        set playerIndex = playerIndex+1
-    endloop
-    call TriggerRegisterAnyUnitEventBJ(spellTrigger,EVENT_PLAYER_UNIT_SPELL_EFFECT)
-    call TriggerRegisterAnyUnitEventBJ(deathTrigger,EVENT_PLAYER_UNIT_DEATH)
-    call TriggerAddAction(chatTrigger,function TestCommands_IchigoChat)
-    call TriggerAddAction(spellTrigger,function TestCommands_IchigoSpell)
-    call TriggerAddAction(deathTrigger,function TestCommands_IchigoDeath)
-    set chatTrigger = null
-    set spellTrigger = null
-    set deathTrigger = null
-endfunction
-
 function TestCommands_Init takes nothing returns nothing
     local integer testPlayerIndex = 0
     local trigger testChat = CreateTrigger()
@@ -82251,7 +81196,7 @@ function TestCommands_Init takes nothing returns nothing
     call TestCommands_EventInit()
     call TestCommands_RefreshInit()
     call TestCommands_OzInit()
-    call TestCommands_IchigoInit()
+    call TestCommands_KillOnTInit()
 endfunction
 
 function main takes nothing returns nothing
