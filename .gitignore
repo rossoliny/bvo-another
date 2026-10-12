@@ -8,3 +8,4 @@ toolkit/W3x2Lni v2.7.2/log/*
 *.log
 /build/
 /.serena/
+/toolkit/prep-release-info/__pycache__/
