@@ -1,3 +1,13 @@
+REBUILD #1.4 — 12.10.2026
+-----------------------
+Changes compared with the #1.4 maps published on 11.10.2026:
+
+- Restored missing hero/form, ability, buff and item definitions, including Ichigo's Hollow forms for T levels 2–5 and their descriptions.
+- Restored the missing texture and references to three unnamed resources from original Unryze 1.1a.
+- Corrected the scoreboard icon mapping for Ichigo's Hollow forms.
+- Rebuilt cheat-free EN/RU maps from commit 78c5f28, excluding uncommitted changes. RU still uses the original text.
+- Embedded the updated build date 12.10.2026. The release number and URL remain #1.4; the published tag was not moved.
+
 UPDATE #1.4 — 11.10.2026, COMPARED WITH RELEASE #1.3
 ----------------------------------------------------
 
