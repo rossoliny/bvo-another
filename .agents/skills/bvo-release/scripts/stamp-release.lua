@@ -31,51 +31,74 @@ local function resolve_string(text, string_table)
     error('Missing map string: ' .. text)
 end
 
-function metadata.map_info(content, string_table, identity)
-    assert(string.unpack('<I4', content) == 25, 'Unsupported W3I version; expected this map\'s format 25')
-    local map_name, map_author, map_description, recommended_players, fields_end_position = string.unpack('zzzz', content, 13)
-    map_name = resolve_string(map_name, string_table)
-    map_description = resolve_string(map_description, string_table)
-    local plain_map_name = map_name:gsub('|[cC]%x%x%x%x%x%x%x%x', ''):gsub('|[rR]', '')
-    assert(plain_map_name:match('^BvO Another'), 'Unexpected map identity')
-    local display_name = map_name
-    if not plain_map_name:match('Rossoliny ' .. identity.tag:sub(2):gsub('%.', '%%.') .. '$') then
-        display_name = map_name:gsub(' #%d+[%d%.]*$', '') .. ' ' .. identity.tag
+local function update_release_values(field_text, release_identity, needs_date)
+    local release_version = release_identity.tag:sub(2)
+    local function replace_version(version_prefix)
+        return version_prefix .. release_version
     end
-    assert(not map_description:find('Release #%d'), 'Use a fresh bvo-build output, not an already stamped map')
-    map_description = map_description .. '\r\n\r\nRelease ' .. identity.tag .. ' — ' .. identity.date .. '\r\n' .. identity.url
-    return content:sub(1, 12) .. string.pack('zzzz', display_name, map_author, map_description, recommended_players)
-        .. content:sub(fields_end_position), display_name
+    local updated_text, rossoliny_version_count = field_text:gsub(
+        '(Rossoliny[ \t]+)%d[%w%.%-]*', replace_version)
+    local release_version_count
+    updated_text, release_version_count = updated_text:gsub(
+        '(Release:[ \t]+)%d[%w%.%-]*', replace_version)
+    assert(rossoliny_version_count + release_version_count > 0,
+        'Missing existing release version after Rossoliny or Release:')
+    if needs_date then
+        local release_date_count
+        updated_text, release_date_count = updated_text:gsub(
+            '(Date:[ \t]+)%d%d%.%d%d%.%d%d%d%d',
+            function(date_prefix) return date_prefix .. release_identity.date end)
+        assert(release_date_count > 0, 'Missing existing release date after Date:')
+    end
+    return updated_text
 end
 
-function metadata.script(content, display_name, identity)
-    assert(not content:find('TestCommands_', 1, true), 'Cheat code remains in the map; run bvo-build --release')
-    assert(not content:find('"-oneshot"', 1, true), 'A cheat command remains in the map')
-    local description_prefix = 'call%s+CreateQuestBJ%(%s*2%s*,%s*"Latest Version"%s*,%s*"'
-    local call_start, quote_position = content:find(description_prefix)
-    assert(call_start, 'INFO / Latest Version entry not found')
-    assert(not content:find(description_prefix, quote_position + 1), 'Multiple Latest Version entries')
-    local closing_quote = quote_position + 1
-    while closing_quote <= #content do
-        local character = content:sub(closing_quote, closing_quote)
-        if character == '\\' then
-            closing_quote = closing_quote + 2
-        elseif character == '"' then
+function metadata.map_info(map_info_content, map_string_table, release_identity)
+    assert(string.unpack('<I4', map_info_content) == 25, 'Unsupported W3I version; expected this map\'s format 25')
+    local map_name, map_author, map_description, recommended_players, fields_end_position = string.unpack('zzzz', map_info_content, 13)
+    map_name = resolve_string(map_name, map_string_table)
+    map_description = resolve_string(map_description, map_string_table)
+    local plain_map_name = map_name:gsub('|[cC]%x%x%x%x%x%x%x%x', ''):gsub('|[rR]', '')
+    assert(plain_map_name:match('^BvO Another'), 'Unexpected map identity')
+    local release_map_name = update_release_values(map_name, release_identity, false)
+    map_description = update_release_values(map_description, release_identity, true)
+    return map_info_content:sub(1, 12) .. string.pack('zzzz', release_map_name, map_author, map_description, recommended_players)
+        .. map_info_content:sub(fields_end_position), release_map_name
+end
+
+function metadata.script(map_script_content, expected_map_name, release_identity)
+    assert(not map_script_content:find('TestCommands_', 1, true), 'Cheat code remains in the map; run bvo-build --release')
+    assert(not map_script_content:find('"-oneshot"', 1, true), 'A cheat command remains in the map')
+    local description_pattern = 'call%s+CreateQuestBJ%(%s*2%s*,%s*"Latest Version"%s*,%s*"'
+    local quest_call_start, description_quote_position = map_script_content:find(description_pattern)
+    assert(quest_call_start, 'INFO / Latest Version entry not found')
+    assert(not map_script_content:find(description_pattern, description_quote_position + 1), 'Multiple Latest Version entries')
+    local description_end_quote = description_quote_position + 1
+    while description_end_quote <= #map_script_content do
+        local jass_character = map_script_content:sub(description_end_quote, description_end_quote)
+        if jass_character == '\\' then
+            description_end_quote = description_end_quote + 2
+        elseif jass_character == '"' then
             break
         else
-            closing_quote = closing_quote + 1
+            description_end_quote = description_end_quote + 1
         end
     end
-    assert(closing_quote <= #content, 'Unterminated INFO description')
-    local release_description = display_name .. '\nRelease ' .. identity.tag .. ' — ' .. identity.date
-        .. '\n|c001ce6b9' .. identity.url .. '|r'
-    content = content:sub(1, quote_position) .. escape_jass(release_description) .. content:sub(closing_quote)
-    local replacements
-    content, replacements = content:gsub('(call%s+SetMapName%()([^\r\n]-)(%))', function(prefix, argument, suffix)
-        return prefix .. '"' .. escape_jass(display_name) .. '"' .. suffix
+    assert(description_end_quote <= #map_script_content, 'Unterminated INFO description')
+    local original_description = map_script_content:sub(description_quote_position + 1, description_end_quote - 1)
+    local release_description = update_release_values(original_description, release_identity, true)
+    map_script_content = map_script_content:sub(1, description_quote_position) .. release_description .. map_script_content:sub(description_end_quote)
+    local map_name_call_count
+    map_script_content, map_name_call_count = map_script_content:gsub('(call%s+SetMapName%()([^\r\n]-)(%))', function(call_prefix, map_name_argument, call_suffix)
+        local map_name_literal = map_name_argument:match('^%s*"(.-)"%s*$')
+        assert(map_name_literal, 'Expected an existing literal release name in SetMapName')
+        local updated_name_argument = update_release_values(map_name_argument, release_identity, false)
+        assert(updated_name_argument:match('^%s*"(.-)"%s*$') == escape_jass(expected_map_name),
+            'Lobby name and map metadata differ')
+        return call_prefix .. updated_name_argument .. call_suffix
     end)
-    assert(replacements == 1, 'Expected one lobby SetMapName call')
-    return content
+    assert(map_name_call_count == 1, 'Expected one lobby SetMapName call')
+    return map_script_content
 end
 
 function metadata.header(content, display_name)
